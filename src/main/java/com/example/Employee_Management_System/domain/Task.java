@@ -1,13 +1,13 @@
 package com.example.Employee_Management_System.domain;
 
-import jakarta.annotation.Priority;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.annotation.processing.Completion;
-import java.util.Date;
+import java.sql.Date;
+
 
 @Data
 @Builder
@@ -19,9 +19,10 @@ public class Task {
     private String description;
     private Date startDate;
     private Date endDate;
-    private String status;
+    private Status status;
     private Priority priority;
-    private Completion completion;
+    private int completion;
     private double estimateHours;
     private Long employeeId;
+    private Long parentTask;
 }
