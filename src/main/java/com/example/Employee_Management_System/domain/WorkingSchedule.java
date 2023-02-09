@@ -13,6 +13,6 @@ public class WorkingSchedule {
     private Long id;
     private Long employeeId;
     private String date;
-    private boolean morning;
-    private boolean afternoon;
+    private boolean atMorning;
+    private boolean atAfternoon;
 }

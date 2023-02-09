@@ -1,5 +1,7 @@
-package com.example.Employee_Management_System.controller;
-
+package com.example.Employee_Management_System.cont
+import com.example.Employee_Management_System.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.Response;
@@ -12,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/auth")
-@RequiredArgsConstructor
+@RestController("/api/auth")
 public class AuthController {
+   
     private final UserService userService;
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -27,4 +28,5 @@ public class AuthController {
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
     }
+
 }
