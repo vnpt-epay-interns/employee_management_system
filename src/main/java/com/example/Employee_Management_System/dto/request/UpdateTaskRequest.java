@@ -4,10 +4,7 @@ import lombok.Data;
 
 @Data
 public class UpdateTaskRequest {
-
     private long taskId;
     private String status;
     private Integer completion;
-
-
 }
