@@ -3,6 +3,7 @@ package com.example.Employee_Management_System.service.impl;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
+import com.example.Employee_Management_System.dto.response.JwtToken;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.AuthService;
@@ -42,12 +43,17 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         String jwtToken = jwtService.generateToken(user);
+        JwtToken token = JwtToken
+                .builder()
+                .token(jwtToken)
+                .build();
+
         return ResponseEntity.ok(
                 Response
                         .builder()
                         .status(200)
                         .message("Register successfully!")
-                        .data(jwtToken)
+                        .data(token)
                         .build()
         );
     }
@@ -63,12 +69,16 @@ public class AuthServiceImpl implements AuthService {
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         String jwtToken = jwtService.generateToken(user);
+        JwtToken token = JwtToken
+                .builder()
+                .token(jwtToken)
+                .build();
         return ResponseEntity.ok(
                 Response
                         .builder()
                         .status(200)
                         .message("Login successfully!")
-                        .data(jwtToken)
+                        .data(token)
                         .build()
         );
     }
