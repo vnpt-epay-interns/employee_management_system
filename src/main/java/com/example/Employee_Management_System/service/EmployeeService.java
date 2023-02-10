@@ -19,4 +19,5 @@ public interface EmployeeService {
     ResponseEntity<Response> scheduleWorkingDay(Employee employee, ScheduleWorkingDayRequest request);
 
 
+    void save(Employee employee);
 }
