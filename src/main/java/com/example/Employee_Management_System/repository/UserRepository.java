@@ -19,6 +19,7 @@ public class UserRepository {
     }
 
     public boolean existsByUsername(String email) {
+        return false;
     }
 
     public Optional<User> findByUsername(String username) {

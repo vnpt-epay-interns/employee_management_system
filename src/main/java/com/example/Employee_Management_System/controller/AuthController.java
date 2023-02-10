@@ -39,7 +39,7 @@ public class AuthController {
     // save the code to the manager table
     @PostMapping("/register-account/manager")
     public ResponseEntity<Response> registerManager() {
-        return authService.registerManager();
+        return authService.registerManager(getCurrentUser());
     }
 
     @PostMapping("/register-account/employee/{referenceCode}")
