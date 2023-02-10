@@ -1,8 +1,15 @@
 package com.example.Employee_Management_System.mapper;
 
+import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
+import com.example.Employee_Management_System.domain.WorkingSchedule;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.Collection;
+import java.util.List;
 
 @Mapper
 public interface ManagerMapper {
@@ -12,4 +19,8 @@ public interface ManagerMapper {
 
 
     Manager findByReferenceCode(String referenceCode);
+
+    Collection<Employee> getAllEmployees();
+
+    List<WorkingScheduleResponse> getWorkingSchedules(long monthNumber);
 }

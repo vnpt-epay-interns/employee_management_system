@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class WorkingSchedule {
     private Long id;
     private Long employeeId;
-    private String date;
+    private Date date;
     private boolean atMorning;
     private boolean atAfternoon;
 }

@@ -24,7 +24,7 @@ public class ManagerController {
     }
 
     @PostMapping("/reports/{reportId}")
-    public ResponseEntity<Response> viewReports(@PathVariable long reportId) {
+    public ResponseEntity<Response> viewReportById(@PathVariable long reportId) {
         return managerService.getReportById(reportId);
     }
 
@@ -36,6 +36,13 @@ public class ManagerController {
 
     @PostMapping("/working-schedule/{monthNumber}")
     public ResponseEntity<Response> viewWorkingSchedule(@PathVariable long monthNumber) {
-        return managerService.getWorkingSchedule(monthNumber);
+        return managerService.getWorkingSchedules(monthNumber);
     }
+
+    @GetMapping("/allEmployees")
+    public ResponseEntity<Response> getAllEmployees() {
+        return managerService.getAllEmployees();
+    }
+
+
 }

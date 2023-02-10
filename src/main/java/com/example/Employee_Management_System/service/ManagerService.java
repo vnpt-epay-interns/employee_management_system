@@ -14,7 +14,9 @@ public interface ManagerService {
     ResponseEntity<Response> getReportById(long employeeId);
 
     ResponseEntity<Response> getReportEmployeeId(long employeeId);
-    ResponseEntity<Response> getWorkingSchedule(long monthNumber);
+    ResponseEntity<Response> getWorkingSchedules(long monthNumber);
 
     void save(Manager manager);
+
+    ResponseEntity<Response> getAllEmployees();
 }
