@@ -1,7 +1,9 @@
 package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Manager;
+import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
+import com.example.Employee_Management_System.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
