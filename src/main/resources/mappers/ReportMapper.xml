@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Employee_Management_System.mapper.ReportMapper">
+
+    <resultMap id="reportBasic" type="com.example.Employee_Management_System.model.ReportBasicInfo">
+        <result property="reportId" column="report_id"/>
+        <result property="reportTitle" column="report_title"/>
+        <result property="employeeName" column="employee_name"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <resultMap id="report" type="com.example.Employee_Management_System.domain.Report">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="isRead" column="is_read" javaType="boolean"/>
+    </resultMap>
+
+
+    <select id="getAllUnreadReports" resultMap="reportBasic">
+        SELECT
+            r.id AS report_id,
+            r.title AS report_title,
+            CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+            r.created_at AS created_at
+        FROM reports r
+        JOIN users e ON r.id = e.id
+        WHERE r.is_read = 0
+    </select>
+
+    <select id="findById" resultMap="report">
+            SELECT * FROM reports WHERE id = #{id}
+    </select>
+
+    <select id="findUnreadReportsByEmployeeId" resultMap="reportBasic">
+        SELECT r.id AS report_id,
+            r.title AS report_title,
+            CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+            r.created_at AS created_at
+        FROM reports r
+        JOIN users e ON r.employee_id = e.id
+        WHERE r.is_read = 0 AND r.employee_id = #{employeeId}
+    </select>
+
+    <select id="findAllReportsByTaskId" resultMap="reportBasic">
+        SELECT r.id AS report_id,
+               r.title AS report_title,
+               CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+               r.created_at AS created_at
+        FROM reports r
+        JOIN users e ON r.employee_id = e.id
+        WHERE r.task_id = #{taskId}
+    </select>
+</mapper>

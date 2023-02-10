@@ -18,19 +18,23 @@ public class ManagerController {
         return managerService.createTask(request);
     }
 
-    @PostMapping("/reports")
-    public ResponseEntity<Response> viewReports() {
+    @GetMapping("/reports")
+    public ResponseEntity<Response> getReports() {
         return managerService.getAllReports();
     }
 
-    @PostMapping("/reports/{reportId}")
-    public ResponseEntity<Response> viewReports(@PathVariable long reportId) {
+    @GetMapping("/reports/{reportId}")
+    public ResponseEntity<Response> getReportByReportId(@PathVariable long reportId) {
         return managerService.getReportById(reportId);
     }
 
+    @GetMapping("/reports/task/{taskId}")
+    public ResponseEntity<Response> viewReportsByTaskId(@PathVariable long taskId) {
+        return managerService.getReportsByTaskId(taskId);
+    }
 
-    @PostMapping("/reports/employee/{employeeId}")
-    public ResponseEntity<Response> viewReportsByEmployeeId(@PathVariable long employeeId) {
+    @GetMapping("/reports/employee/{employeeId}")
+    public ResponseEntity<Response> getReportsByEmployeeId(@PathVariable long employeeId) {
         return managerService.getReportEmployeeId(employeeId);
     }
 
@@ -38,4 +42,8 @@ public class ManagerController {
     public ResponseEntity<Response> viewWorkingSchedule(@PathVariable long monthNumber) {
         return managerService.getWorkingSchedule(monthNumber);
     }
+
+
+
+
 }
