@@ -1,0 +1,57 @@
+//create user table 
+
+create table users (
+	id int primary key auto_increment,
+	first_name varchar(55), 
+    last_name varchar(55),
+    email varchar(55),
+    password varchar(55),
+    role varchar(55),
+    avatar varchar(3000),
+    isLocked boolean default true);
+
+
+// create manager table
+ 
+create table managers (
+	id int primary key,
+    referenced_code varchar(255),
+    foreign key (id) references users(id) 
+    on delete cascade);
+
+// create employee table 
+
+create table employees (
+	id int primary key,
+    manager_id int,
+    foreign key (id) references users(id) on delete cascade,
+    foreign key (manager_id) references managers(id));
+
+// create table working schedules
+
+create table working_schedules(
+	id int primary key auto_increment,
+    date date,
+    at_morning boolean,
+    at_afternoon boolean,
+    user_id int,
+    foreign key (user_id) references users(id)
+    on delete cascade
+)	
+
+// create trash table
+
+create table tasks (
+	id int primary key,
+    title varchar(255),
+    description longtext,
+    start_date date,
+    end_date date,
+    status varchar(25),
+    priority varchar(25),
+    completion int,
+    estimate_hours float,
+    user_id int,
+    parent_id int,
+    foreign key (user_id) references employees(id) on delete cascade,
+    foreign key (parent_id) references tasks(id));
