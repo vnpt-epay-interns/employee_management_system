@@ -1,12 +1,18 @@
 package com.example.Employee_Management_System.service.impl;
 
+import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
+import com.example.Employee_Management_System.domain.WorkingSchedule;
 import com.example.Employee_Management_System.domain.Task;
 
 import com.example.Employee_Management_System.domain.Report;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.repository.ManagerRepository;
+import com.example.Employee_Management_System.repository.UserRepository;
+
 import com.example.Employee_Management_System.mapper.ManagerMapper;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
@@ -21,9 +27,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+import java.sql.Date;
+import java.util.*;
+import java.util.stream.Collectors;
+
+
 @Service
 public class ManagerServiceImpl implements ManagerService {
 
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private ManagerRepository managerRepository;
     @Autowired
@@ -138,9 +151,13 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
+    // ToDo: view working schedule of all employees in a month
     @Override
-    public ResponseEntity<Response> getWorkingSchedule(long monthNumber) {
-        return null;
+    public ResponseEntity<Response> getWorkingSchedules(long monthNumber) {
+        List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedules(monthNumber);
+//        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate));
+        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
+        return ResponseEntity.ok(Response.builder().status(200).message("Get working schedule successfully!").data(collect).build());
     }
 
     @Override
@@ -149,6 +166,12 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
+    public ResponseEntity<Response> getAllEmployees() {
+        Collection<Employee> employeeList = managerRepository.getAllEmployees();
+        return ResponseEntity.ok(Response.builder().status(200).message("!!!").data(employeeList).build());
+    }
+
+
     public ResponseEntity<Response> getReportsByTaskId(long taskId) {
         List<ReportBasicInfo> unreadReportsByTaskId = reportService.getAllUnreadReportsByTaskId(taskId);
 
