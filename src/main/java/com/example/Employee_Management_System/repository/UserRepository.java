@@ -16,6 +16,13 @@ public class UserRepository {
     public void save(User user) {
         userMapper.save(user);
     }
+
+    public boolean existsByUsername(String email) {
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return null;
+    }
 //    User modify(User user);
 //    Optional<User> findByUsername(String username);
 //    void deleteByUsername(String username);

@@ -29,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getEmail())) {
+            // TODO: throw custom exception: RegisterException
             throw new RuntimeException("User already exists");
         }
 
@@ -39,7 +40,9 @@ public class AuthServiceImpl implements AuthService {
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(registerRequest.getRole())
+                .isLocked(false)
                 .build();
+
         userRepository.save(user);
 
         String jwtToken = jwtService.generateToken(user);

@@ -17,7 +17,7 @@ public class AuthController {
    
     private final AuthService authService;
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register-account", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
     }
@@ -27,4 +27,20 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
+
+    @PostMapping("/register-account/manager")
+    public ResponseEntity<Response> registerManager() {
+        // get this current user
+        // unlock him
+        // generate reference code for him
+        // save the code to the manager table
+    }
+
+    @PostMapping("/register-account/employee")
+    public ResponseEntity<Response> registerManager() {
+        // take the reference code from the request
+        // check reference code in the manager table
+        // if it exists, then register the user to be an employee
+        // save the employee to the employee table with the manager id
+    }
 }
