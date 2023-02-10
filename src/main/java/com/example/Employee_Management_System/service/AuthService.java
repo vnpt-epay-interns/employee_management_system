@@ -1,5 +1,6 @@
 package com.example.Employee_Management_System.service;
 
+import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.Response;
@@ -12,5 +13,9 @@ public interface AuthService {
 
     ResponseEntity<Response> login(LoginRequest loginRequest);
 
+<<<<<<< HEAD
     ResponseEntity<Response> registerManager();
+=======
+    ResponseEntity<Response> registerEmployee(User user, String referenceCode);
+>>>>>>> cf18805fb4600c24f6ea39954ce4d31cd083b7fe
 }

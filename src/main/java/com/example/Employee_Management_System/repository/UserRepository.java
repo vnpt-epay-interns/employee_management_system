@@ -1,5 +1,6 @@
 package com.example.Employee_Management_System.repository;
 
+import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,12 @@ public class UserRepository {
 
     public Optional<User> findByUsername(String username) {
         return null;
+    }
+
+    public Manager findManagerByReferenceCode(String referenceCode) {
+    }
+
+    public void update(User user) {
     }
 //    User modify(User user);
 //    Optional<User> findByUsername(String username);

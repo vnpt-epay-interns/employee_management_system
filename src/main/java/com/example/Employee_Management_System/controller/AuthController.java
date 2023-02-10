@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,14 +42,19 @@ public class AuthController {
         return authService.registerManager();
     }
 
-
-
-    @PostMapping("/register-account/employee")
-    public ResponseEntity<Response> registerEmployee() {
+    @PostMapping("/register-account/employee/{referenceCode}")
+    public ResponseEntity<Response> registerEmployee(@PathVariable String referenceCode) {
+        User user = getCurrentUser();
+        return authService.registerEmployee(user, referenceCode);
         // take the reference code from the request
         // check reference code in the manager table
         // if it exists, then register the user to be an employee
         // save the employee to the employee table with the manager id
 
+    }
+
+    private User getCurrentUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        return user;
     }
 }
