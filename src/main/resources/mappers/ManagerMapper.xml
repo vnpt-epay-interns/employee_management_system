@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Employee_Management_System.mapper.ManagerMapper">
+
+    <resultMap id="manager" type="com.example.Employee_Management_System.domain.Manager">
+        <result property="id" column="id" />
+        <result property="referencedCode" column="referenced_code" />
+    </resultMap>
+
+
+    <select id="findByReferenceCode" resultMap="manager">
+        SELECT * FROM managers WHERE referenced_code = #{referencedCode}
+    </select>
+
+</mapper>

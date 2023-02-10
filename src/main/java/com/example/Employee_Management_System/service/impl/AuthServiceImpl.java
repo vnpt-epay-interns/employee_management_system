@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getEmail())) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
             // TODO: throw custom exception: RegisterException
             throw new RuntimeException("User already exists");
         }
@@ -42,8 +42,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(registerRequest.getRole())
-                .isLocked(false)
+                .isLocked(true)
                 .build();
 
         userRepository.save(user);
@@ -102,12 +101,13 @@ public class AuthServiceImpl implements AuthService {
         user.setLocked(false);
         userRepository.update(user);
         managerService.save(manager);
+
         return ResponseEntity.ok(
                 Response
-                        .builder()
-                        .status(200)
-                .message("Register successfully!")
-                .data(user)
+                .builder()
+                .status(200)
+                .message("Register manager successfully!")
+                .data(null)
                 .build()
 
         );
@@ -147,7 +147,7 @@ public class AuthServiceImpl implements AuthService {
                         .builder()
                         .status(200)
                         .message("Register successfully!")
-                        .data(user)
+                        .data(null)
                         .build()
         );
     }
@@ -156,11 +156,6 @@ public class AuthServiceImpl implements AuthService {
         return UUID.randomUUID();
     }
 
-    private User getCurrentUser() {
-        return userRepository
-                .findByUsername(jwtService.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
 
 
 }

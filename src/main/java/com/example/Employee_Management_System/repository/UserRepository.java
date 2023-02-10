@@ -13,26 +13,28 @@ public class UserRepository {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private ManagerRepository managerService;
+
     // ToDo: save, update, find, delete, paging
     public void save(User user) {
         userMapper.save(user);
     }
 
-    public boolean existsByUsername(String email) {
-        return false;
+    public boolean existsByEmail(String email) {
+        return userMapper.findByEmail(email).isPresent();
     }
 
     public Optional<User> findByUsername(String username) {
-        return null;
+        return userMapper.findByEmail(username);
     }
 
     public Manager findManagerByReferenceCode(String referenceCode) {
+        return managerService.findManagerByReferenceCode(referenceCode);
     }
 
     public void update(User user) {
+
     }
-//    User modify(User user);
-//    Optional<User> findByUsername(String username);
-//    void deleteByUsername(String username);
-//    boolean existsByUsername(String email);
+
 }
