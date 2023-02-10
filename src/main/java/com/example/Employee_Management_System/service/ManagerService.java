@@ -14,10 +14,12 @@ public interface ManagerService {
     ResponseEntity<Response> deleteTask(long taskId);
     ResponseEntity<Response> updateTask(long taskId, UpdateTaskRequest updateTaskRequest);
     ResponseEntity<Response> getAllReports();
-    ResponseEntity<Response> getReportById(long employeeId);
+    ResponseEntity<Response> getReportById(long reportId);
 
     ResponseEntity<Response> getReportEmployeeId(long employeeId);
     ResponseEntity<Response> getWorkingSchedule(long monthNumber);
 
     void save(Manager manager);
+
+    ResponseEntity<Response> getReportsByTaskId(long taskId);
 }

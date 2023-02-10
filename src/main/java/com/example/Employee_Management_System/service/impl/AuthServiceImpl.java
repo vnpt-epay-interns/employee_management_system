@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,12 +65,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
+        Authentication authencation = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
+
+        if (authencation.isAuthenticated()) {
+
+        }
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -146,7 +151,7 @@ public class AuthServiceImpl implements AuthService {
                 Response
                         .builder()
                         .status(200)
-                        .message("Register successfully!")
+                        .message("Register employee successfully!")
                         .data(null)
                         .build()
         );
