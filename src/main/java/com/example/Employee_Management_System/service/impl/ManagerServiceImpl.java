@@ -1,5 +1,6 @@
 package com.example.Employee_Management_System.service.impl;
 
+import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
@@ -14,8 +15,6 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Autowired
     private ManagerRepository managerRepository;
-    @Autowired
-    private ManagerMapper managerMapper;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
@@ -40,5 +39,10 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> getWorkingSchedule(long monthNumber) {
         return null;
+    }
+
+    @Override
+    public void save(Manager manager) {
+        managerRepository.save(manager);
     }
 }

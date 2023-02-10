@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Manager extends User {
+public class Manager {
     private Long id;
     private String referencedCode;
 }

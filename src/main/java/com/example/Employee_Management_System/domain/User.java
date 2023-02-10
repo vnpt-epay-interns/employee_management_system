@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
+// setIsLocked
 @Data
 @Builder
 @AllArgsConstructor
@@ -56,6 +56,4 @@ public class User implements UserDetails {
         return true;
     }
 
-    public void setReferenceCode(UUID generateReferenceCode) {
-    }
 }
