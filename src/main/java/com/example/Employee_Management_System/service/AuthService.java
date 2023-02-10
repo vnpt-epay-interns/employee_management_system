@@ -13,9 +13,8 @@ public interface AuthService {
 
     ResponseEntity<Response> login(LoginRequest loginRequest);
 
-<<<<<<< HEAD
-    ResponseEntity<Response> registerManager();
-=======
+
+    ResponseEntity<Response> registerManager(User user);
+
     ResponseEntity<Response> registerEmployee(User user, String referenceCode);
->>>>>>> cf18805fb4600c24f6ea39954ce4d31cd083b7fe
 }

@@ -8,12 +8,8 @@ import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.JwtToken;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.repository.UserRepository;
-import com.example.Employee_Management_System.service.AuthService;
-import com.example.Employee_Management_System.service.EmployeeService;
-import com.example.Employee_Management_System.service.JwtService;
-import com.example.Employee_Management_System.service.UserService;
+import com.example.Employee_Management_System.service.*;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmployeeService employeeService;
+    private final ManagerService managerService;
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.getEmail())) {
@@ -93,13 +90,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Response> registerManager() {
-        User user = getCurrentUser();
-        if (user.getRole() == null) {
-            user.setRole("MANAGER");
+    public ResponseEntity<Response> registerManager(User user) {
+        //TODO: throw custom exception: RegisterException
+        if (user.getRole() != null){
+            throw new RuntimeException("Account already has a role");
         }
-        user.setLocked(true);
-        user.setReferenceCode(generateReferenceCode());
+        Manager manager = Manager
+                .builder().id(user.getId())
+                .referencedCode(generateReferenceCode().toString())
+                .build();
+        user.setLocked(false);
+        userRepository.update(user);
+        managerService.save(manager);
         return ResponseEntity.ok(
                 Response
                         .builder()
