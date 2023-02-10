@@ -12,5 +12,6 @@ public class Report {
     private Date createdAt;
     private Long employeeId;
     private Long taskId;
+    private boolean isRead;
 
 }

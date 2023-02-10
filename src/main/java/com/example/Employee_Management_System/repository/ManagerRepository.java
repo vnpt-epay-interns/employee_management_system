@@ -4,7 +4,9 @@ import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.WorkingSchedule;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
+import com.example.Employee_Management_System.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

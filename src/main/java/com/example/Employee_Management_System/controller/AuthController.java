@@ -10,10 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,11 +18,9 @@ import java.util.UUID;
 public class AuthController {
    
     private final AuthService authService;
-    private final UserService userService;
 
     @PostMapping(value = "/register-account", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) {
-        System.out.println("here");
         return authService.register(registerRequest);
     }
 

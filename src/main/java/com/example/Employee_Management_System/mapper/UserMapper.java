@@ -3,7 +3,6 @@ package com.example.Employee_Management_System.mapper;
 import com.example.Employee_Management_System.domain.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.Optional;
 

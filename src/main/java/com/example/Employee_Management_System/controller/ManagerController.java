@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.controller;
 
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
+import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,24 +14,39 @@ public class ManagerController {
     @Autowired
     private ManagerService managerService;
 
-    @PostMapping("/create-task")
+    @PostMapping("/tasks/create")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
         return managerService.createTask(request);
     }
 
-    @PostMapping("/reports")
-    public ResponseEntity<Response> viewReports() {
+    @DeleteMapping("/tasks/delete/{taskId}")
+    public ResponseEntity<Response> deleteTask(@PathVariable long taskId) {
+        return managerService.deleteTask(taskId);
+    }
+
+    @PutMapping("/tasks/update/{taskId}")
+    public ResponseEntity<Response> updateTask(@PathVariable long taskId, @RequestBody UpdateTaskRequest updateTaskRequest) {
+        return managerService.updateTask(taskId, updateTaskRequest);
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<Response> getReports() {
         return managerService.getAllReports();
     }
 
-    @PostMapping("/reports/{reportId}")
-    public ResponseEntity<Response> viewReportById(@PathVariable long reportId) {
+
+    @GetMapping("/reports/{reportId}")
+    public ResponseEntity<Response> getReportByReportId(@PathVariable long reportId) {
         return managerService.getReportById(reportId);
     }
 
+    @GetMapping("/reports/task/{taskId}")
+    public ResponseEntity<Response> viewReportsByTaskId(@PathVariable long taskId) {
+        return managerService.getReportsByTaskId(taskId);
+    }
 
-    @PostMapping("/reports/employee/{employeeId}")
-    public ResponseEntity<Response> viewReportsByEmployeeId(@PathVariable long employeeId) {
+    @GetMapping("/reports/employee/{employeeId}")
+    public ResponseEntity<Response> getReportsByEmployeeId(@PathVariable long employeeId) {
         return managerService.getReportEmployeeId(employeeId);
     }
 
@@ -43,6 +59,5 @@ public class ManagerController {
     public ResponseEntity<Response> getAllEmployees() {
         return managerService.getAllEmployees();
     }
-
 
 }

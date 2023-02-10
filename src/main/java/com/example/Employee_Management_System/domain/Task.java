@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.annotation.processing.Completion;
 import java.sql.Date;
-
 
 @Data
 @Builder
