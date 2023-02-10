@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Employee_Management_System.mapper.ManagerMapper">
+
+    <resultMap id="manager" type="com.example.Employee_Management_System.domain.Manager">
+        <result property="id" column="id" />
+        <result property="referencedCode" column="referenced_code" />
+    </resultMap>
+
+
+    <select id="findByReferenceCode" resultMap="manager">
+        SELECT * FROM managers WHERE referenced_code = #{referencedCode}
+    </select>
+
+<!--    <resultMap id="getWorkingSchedules" type="com.example.Employee_Management_System.domain.WorkingSchedule">-->
+<!--        <result property="employeeId" column="employee_id" />-->
+<!--        <result property="atMorning" column="at_morning" javaType="boolean"/>-->
+<!--        <result property="atAfternoon" column="at_afternoon" javaType="boolean"/>-->
+<!--    </resultMap>-->
+
+<!--    <select id="getWorkingSchedules" resultMap="getWorkingSchedules">-->
+<!--        SELECT * FROM working_schedules where MONTH(date) = #{monthNumber}-->
+<!--    </select>-->
+
+    <resultMap id="getAllEmployees" type="com.example.Employee_Management_System.domain.Employee">
+        <result property="id" column="id"/>
+        <result property="managerId" column="manager_id"/>
+    </resultMap>
+
+    <select id="getAllEmployees" resultMap="getAllEmployees">
+        SELECT * FROM employees;
+    </select>
+
+    <resultMap id="getWorkingSchedulesWName" type="com.example.Employee_Management_System.dto.response.WorkingScheduleResponse">
+        <result property="employeeId" column="employee_id" />
+        <result property="employeeName" column="employee_name" />
+        <result property="date" column="date" />
+        <result property="atMorning" column="at_morning" javaType="boolean"/>
+        <result property="atAfternoon" column="at_afternoon" javaType="boolean"/>
+    </resultMap>
+
+    <select id="getWorkingSchedules" resultMap="getWorkingSchedulesWName">
+        SELECT w.employee_id AS employee_id,
+        u.first_name as employee_name,
+        w.date AS date,
+        w.at_morning AS at_morning,
+        w.at_afternoon AS at_afternoon
+        FROM working_schedules w
+        JOIN users u
+        ON w.employee_id = u.id;
+    </select>
+</mapper>

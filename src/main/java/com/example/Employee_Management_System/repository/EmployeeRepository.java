@@ -1,4 +1,11 @@
 package com.example.Employee_Management_System.repository;
 
-public interface EmployeeRepository {
+
+
+@Repository
+@AllArgsConstructor
+public class EmployeeRepository {
+    private final EmployeeMapper employeeMapper;
+
+
 }

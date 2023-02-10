@@ -41,4 +41,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseEntity<Response> scheduleWorkingDay(Employee employee, ScheduleWorkingDayRequest request) {
         return null;
     }
+
+    @Override
+    public void save(Employee employee) {
+        employeeMapper.save(employee);
+    }
 }
