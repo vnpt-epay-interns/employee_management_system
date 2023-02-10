@@ -23,10 +23,11 @@ public class User implements UserDetails {
     private String password;
     private String role;
     private String avatar;
+    private boolean isLocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
