@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -85,4 +87,33 @@ public class AuthServiceImpl implements AuthService {
                         .build()
         );
     }
+
+    @Override
+    public ResponseEntity<Response> registerManager() {
+        User user = getCurrentUser();
+        if (user.getRole() == null) {
+            user.setRole("MANAGER");
+        }
+        user.setLocked(true);
+        user.setReferenceCode(generateReferenceCode());
+        return ResponseEntity.ok(
+                Response
+                        .builder()
+                        .status(200)
+                        .message("Register successfully!")
+                        .data(user)
+                        .build()
+        );
+    }
+
+    private UUID generateReferenceCode() {
+        return UUID.randomUUID();
+    }
+
+    private User getCurrentUser() {
+        return userRepository
+                .findByUsername(jwtService.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
 }

@@ -11,4 +11,6 @@ public interface AuthService {
     ResponseEntity<Response> register(RegisterRequest registerRequest);
 
     ResponseEntity<Response> login(LoginRequest loginRequest);
+
+    ResponseEntity<Response> registerManager();
 }

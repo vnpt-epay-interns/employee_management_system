@@ -19,7 +19,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
-
+        return ResponseEntity.ok(Response.builder().status(200).message("Create task successfully!").build());
     }
 
     @Override
