@@ -30,7 +30,7 @@ public class TaskRepository {
     }
 
     public Optional<Task> getTask(long taskId) {
-        return Optional.ofNullable(taskMapper.getTask(taskId));
+        return Optional.ofNullable(taskMapper.getTaskById(taskId));
     }
 
     public User getManagerOfEmployee(Long taskId) {
@@ -44,4 +44,5 @@ public class TaskRepository {
     public User getEmployeeOfTask(Long taskId) {
         return taskMapper.getEmployeeOfTask(taskId);
     }
+
 }

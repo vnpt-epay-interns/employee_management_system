@@ -44,4 +44,13 @@
         FROM employees emp
         WHERE emp.id = #{id}
     </select>
+
+    <resultMap id="get_employees_by_manager_id" type="com.example.Employee_Management_System.domain.Employee">
+        <result property="id" column="id"/>
+        <result property="managerId" column="manager_id"/>
+    </resultMap>
+    <select id="getAllEmployeesByManagerId" resultMap="get_employees_by_manager_id">
+        SELECT * FROM employees WHERE manager_id = #{managerId};
+    </select>
+
 </mapper>

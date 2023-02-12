@@ -1,8 +1,8 @@
 package com.example.Employee_Management_System.controller;
 
-import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
+import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
@@ -20,7 +20,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping("/get-task/{id}")
-    public ResponseEntity<Response> getTaskById(@PathVariable("id") long id) {
+    public ResponseEntity<Response> getTaskById(@PathVariable long id) {
         User employee = getCurrentEmployee();
         return employeeService.getTaskById(id, employee);
     }
@@ -32,10 +32,10 @@ public class EmployeeController {
     }
 
 
-    @PutMapping("/update-task")
-    public ResponseEntity<Response> updateTask(@RequestBody UpdateTaskRequest request) {
+    @PutMapping("/update-task/{taskId}")
+    public ResponseEntity<Response> updateTask(@PathVariable("taskId") Long taskId, @RequestBody UpdateTaskEmployeeRequest request) {
         User employee = getCurrentEmployee();
-        return employeeService.updateTask(employee, request);
+        return employeeService.updateTask(employee, taskId, request);
     }
 
     @PostMapping("/write-report")
@@ -50,11 +50,7 @@ public class EmployeeController {
         return employeeService.scheduleWorkingDay(employee, request);
     }
 
-
     public User getCurrentEmployee() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user;
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-
 }

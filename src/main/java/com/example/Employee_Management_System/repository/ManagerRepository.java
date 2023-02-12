@@ -10,16 +10,18 @@ import com.example.Employee_Management_System.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ManagerRepository {
 
     @Autowired
     private ManagerMapper managerMapper;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     public void save(Manager manager) {
         managerMapper.save(manager);
@@ -35,5 +37,9 @@ public class ManagerRepository {
 
     public List<WorkingScheduleResponse> getWorkingSchedules(long monthNumber) {
         return managerMapper.getWorkingSchedules(monthNumber);
+    }
+
+    public Optional<Task> getTaskById(long taskId) {
+        return Optional.ofNullable(taskMapper.getTaskById(taskId));
     }
 }
