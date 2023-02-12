@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -170,7 +171,6 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber) {
         //TODO:(Vy) only get the schedule of the employees of the manager
-
         List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedules(monthNumber);
 //        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate));
         TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
@@ -186,7 +186,17 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> getAllEmployees(User manager) {
         //TODO: (Vy) only get the employees of the manager
         Collection<Employee> employeeList = managerRepository.getAllEmployees();
+        Manager currentManager = getCurrentManager();
+        employeeList.removeIf(employee -> !Objects.equals(employee.getManagerId(), currentManager.getId()));
         return ResponseEntity.ok(Response.builder().status(200).message("!!!").data(employeeList).build());
+    }
+
+    private Manager getCurrentManager() {
+        Manager manager = (Manager) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (manager == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized!");
+        }
+        return manager;
     }
 
 
