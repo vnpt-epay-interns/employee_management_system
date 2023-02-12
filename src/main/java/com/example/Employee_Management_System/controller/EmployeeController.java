@@ -1,6 +1,5 @@
 package com.example.Employee_Management_System.controller;
 
-import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -50,11 +49,7 @@ public class EmployeeController {
         return employeeService.scheduleWorkingDay(employee, request);
     }
 
-
     public User getCurrentEmployee() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user;
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-
 }
