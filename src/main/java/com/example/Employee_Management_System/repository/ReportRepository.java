@@ -29,4 +29,8 @@ public class ReportRepository {
     public List<ReportBasicInfo> findUnreadReportsByTaskId(long taskId) {
         return reportMapper.findAllReportsByTaskId(taskId);
     }
+
+    public void save(Report report) {
+        reportMapper.save(report);
+    }
 }

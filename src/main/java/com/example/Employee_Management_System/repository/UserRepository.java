@@ -16,7 +16,6 @@ public class UserRepository {
     @Autowired
     private ManagerRepository managerService;
 
-    // ToDo: save, update, find, delete, paging
     public void save(User user) {
         userMapper.save(user);
     }
@@ -34,7 +33,7 @@ public class UserRepository {
     }
 
     public void update(User user) {
-
+        userMapper.update(user);
     }
 
 }
