@@ -1,17 +1,19 @@
 package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.Report;
+import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface ReportMapper {
-    List<ReportBasicInfo> getAllUnreadReports();
+    List<ReportBasicInfo> getAllUnreadReports(User manager);
 
-    Report findById(long reportId);
+    Optional<Report> findById(long reportId);
 
     List<ReportBasicInfo> findUnreadReportsByEmployeeId(long employeeId);
 
@@ -19,4 +21,7 @@ public interface ReportMapper {
 
     @Insert("INSERT INTO reports (title, content, task_id, employee_id, created_at, is_read) VALUES (#{title}, #{content}, #{taskId}, #{employeeId}, #{createdAt}, #{isRead})")
     void save(Report report);
+
+    User getManagerOfEmployeeReport(long reportId);
+
 }

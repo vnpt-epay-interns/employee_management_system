@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Employee_Management_System.mapper.EmployeeMapper">
+
+    <resultMap id="user" type="com.example.Employee_Management_System.domain.User">
+        <result property="id" column="id" />
+        <result property="firstName" column="first_name" />
+        <result property="lastName" column="last_name" />
+        <result property="email" column="email" />
+        <result property="avatar" column="avatar" />
+        <result property="password" column="password" />
+        <result property="role" column="role" />
+        <result property="isLocked" column="is_locked" javaType="boolean"/>
+    </resultMap>
+
+    <select id="getManagerOfEmployee" resultMap="user">
+        SELECT
+            u.id AS id,
+            u.first_name AS first_name,
+            u.last_name AS last_name,
+            u.email AS email,
+            u.avatar AS avatar,
+            u.password AS password,
+            u.role AS role,
+            u.is_locked AS is_locked
+        FROM users u
+        WHERE u.id = (
+            SELECT emp.manager_id
+            FROM employees emp
+            WHERE emp.id = #{id}
+            )
+    </select>
+
+
+    <resultMap id="employee" type="com.example.Employee_Management_System.domain.Employee">
+        <result property="id" column="id"/>
+        <result property="managerId" column="manager_id"/>
+    </resultMap>
+
+    <select id="getEmployeeByEmployeeId" resultMap="employee">
+        SELECT
+            emp.id AS id,
+            emp.manager_id AS manager_id
+        FROM employees emp
+        WHERE emp.id = #{id}
+    </select>
+</mapper>

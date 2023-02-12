@@ -17,4 +17,8 @@ public interface EmployeeService {
     ResponseEntity<Response> writeReport(User employee, WriteReportRequest request);
     ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request);
     void save(Employee employee);
+
+    User getManagerOfEmployee(long employeeId);
+
+    Employee getEmployeeByEmployeeId(long employeeId);
 }

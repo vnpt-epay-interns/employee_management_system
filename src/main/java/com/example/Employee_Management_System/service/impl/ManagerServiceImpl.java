@@ -7,14 +7,13 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.repository.ManagerRepository;
-import com.example.Employee_Management_System.repository.UserRepository;
 
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.TaskRepository;
+import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ReportService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     private final ReportService reportService;
 
+    private final EmployeeService employeeService;
     @Override
     public ResponseEntity<Response> createTask(User manager, CreateTaskRequest request) {
         //TODO: (Vu) check if the employeeId is one of the employees of the manager
@@ -68,6 +68,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> deleteTask(User manager, long taskId) {
+
         //TODO:(Vu) check if the task belongs to an employee of the manager
         Task task = taskRepository
                 .getTask(taskId)
@@ -115,12 +116,12 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getAllReports(User manager) {
-        //TODO: (Hai) get all unread reports from the employees of the manager
-        List<ReportBasicInfo> unreadReports = reportService.getAllUnreadReports();
+        List<ReportBasicInfo> unreadReports = reportService.getAllUnreadReports(manager);
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)
                 .message("Get all reports successfully!")
+                .message("Get report successfully!")
                 .data(unreadReports)
                 .build()
         );
@@ -128,8 +129,13 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getReportById(User manager, long reportId) {
-        //TODO:(Hai) check if the task belongs to an employee of the manager
         Report report = reportService.getReportById(reportId);
+        // check if report belongs to one of the employees of the manager
+        if (!checkIfReportBelongsToEmployeeOfManager(report, manager)) {
+            //TODO: custom exception
+            throw new RuntimeException("You are not allowed to access this report!");
+        }
+
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)
@@ -139,8 +145,16 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
+    private boolean checkIfReportBelongsToEmployeeOfManager(Report report, User manager) {
+        User employeeManager = reportService.getManagerOfEmployeeReport(report.getId());
+        return employeeManager.getId().equals(manager.getId());
+    }
+
     public ResponseEntity<Response> getReportsByTaskId(User manager, long taskId) {
-        //TODO: (Hai) check if the task belongs to an employee of the manager
+
+        if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
+            throw new RuntimeException("You are not allowed to view this report");
+        }
         List<ReportBasicInfo> unreadReportsByTaskId = reportService.getAllUnreadReportsByTaskId(taskId);
 
         return ResponseEntity.ok(Response.builder()
@@ -151,13 +165,20 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
+    private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
+        User employeeManager = taskRepository.getManagerOfTask(taskId);
+        return employeeManager.getId().equals(manager.getId());
+    }
+
 
     @Override
     public ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId) {
-        //TODO:(Hai) check if the employee is one of the employees of the manager
 
-        List<ReportBasicInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(employeeId);
+        List<ReportBasicInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(manager, employeeId);
 
+        if (!checkIfEmployeeIsManagedByManager(employeeId, manager)) {
+            throw new RuntimeException("You are not allowed to access this report!");
+        }
         return ResponseEntity.ok(Response.builder()
                 .status(200)
                 .message("Get all reports successfully!")
@@ -165,6 +186,12 @@ public class ManagerServiceImpl implements ManagerService {
                 .build()
         );
     }
+    private boolean checkIfEmployeeIsManagedByManager(long employeeId, User manager) {
+        Employee employee = employeeService.getEmployeeByEmployeeId(employeeId);
+        User employeeManager = employeeService.getManagerOfEmployee(employeeId);
+        return employeeManager.getId().equals(manager.getId());
+    }
+
 
     // ToDo: view working schedule of all employees in a month
     @Override
@@ -191,3 +218,4 @@ public class ManagerServiceImpl implements ManagerService {
 
 
 }
+

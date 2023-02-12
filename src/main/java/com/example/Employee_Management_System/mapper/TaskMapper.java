@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.Task;
+import com.example.Employee_Management_System.domain.User;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -15,4 +16,10 @@ public interface TaskMapper {
 
     @Update("UPDATE tasks SET title = #{title}, description = #{description}, start_date = #{startDate}, end_date = #{endDate}, status = #{status}, priority = #{priority}, completion = #{completion}, estimate_hours = #{estimateHours}, employee_id = #{employeeId} WHERE id = #{id}")
     void update(Task task);
+
+    User getManagerOfEmployee(Long taskId);
+
+    User getManagerOfTask(long taskId);
+
+    User getEmployeeOfTask(Long taskId);
 }
