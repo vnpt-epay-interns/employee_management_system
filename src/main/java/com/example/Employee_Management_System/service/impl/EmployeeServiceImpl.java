@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.Employee;
+import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -18,27 +19,27 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
 
     @Override
-    public ResponseEntity<Response> getTaskById(long id, Employee employee) {
+    public ResponseEntity<Response> getTaskById(long id, User employee) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Response> getTasks(Employee employee) {
+    public ResponseEntity<Response> getTasks(User employee) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Response> updateTask(Employee employee, UpdateTaskRequest updateTaskRequest) {
+    public ResponseEntity<Response> updateTask(User employee, UpdateTaskRequest updateTaskRequest) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Response> writeReport(Employee employee, WriteReportRequest request) {
+    public ResponseEntity<Response> writeReport(User employee, WriteReportRequest request) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Response> scheduleWorkingDay(Employee employee, ScheduleWorkingDayRequest request) {
+    public ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request) {
         return null;
     }
 
