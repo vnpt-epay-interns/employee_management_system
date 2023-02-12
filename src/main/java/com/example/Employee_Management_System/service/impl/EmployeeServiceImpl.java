@@ -5,7 +5,7 @@ import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.Report;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
-import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
+import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
@@ -25,28 +25,51 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private TaskRepository taskRepository;
+    private ReportService reportService;
 
     @Autowired
-    private ReportService reportService;
+    private TaskRepository taskRepository;
 
     @Override
     public ResponseEntity<Response> getTaskById(long id, User user) {
-        Task task = taskRepository.getTask(id).orElseThrow(() -> new RuntimeException("Task not found"));
-
-        if (task.getId() != user.getId()) {
-            throw new RuntimeException("You are not allowed to access this task");
-        }
+        Task task = employeeRepository
+                .getTaskByIdAndEmployeeId(id, user.getId())
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .data(task)
+                        .build()
+        );
     }
 
     @Override
     public ResponseEntity<Response> getTasks(User employee) {
-        return null;
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .data(employeeRepository.getTasksByEmployeeId(employee.getId()))
+                        .build()
+                );
     }
 
     @Override
-    public ResponseEntity<Response> updateTask(User employee, UpdateTaskRequest updateTaskRequest) {
-        return null;
+    public ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest) {
+        Task task = employeeRepository
+                .getTaskByIdAndEmployeeId(taskId, employee.getId())
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        task.setStatus(updateTaskRequest.getStatus());
+        task.setCompletion(updateTaskRequest.getCompletion());
+        taskRepository.updateTask(task);
+
+        return ResponseEntity.ok(
+                Response
+                        .builder()
+                        .status(200)
+                        .message("Update task successfully!")
+                        .build()
+        );
     }
 
     @Override

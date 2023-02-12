@@ -5,8 +5,6 @@ import com.example.Employee_Management_System.mapper.TaskMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 @AllArgsConstructor
 public class TaskRepository {
@@ -26,9 +24,5 @@ public class TaskRepository {
 
     public void deleteTask(Task task) {
         taskMapper.delete(task);
-    }
-
-    public Optional<Task> getTask(long taskId) {
-        return Optional.ofNullable(taskMapper.getTask(taskId));
     }
 }

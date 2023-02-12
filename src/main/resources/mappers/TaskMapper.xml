@@ -16,7 +16,19 @@
         <result property="priority" column="priority" />
     </resultMap>
 
-    <select id="getTask" resultMap="task">
-        SELECT * FROM tasks WHERE id = #{id}
+    <select id="getTaskByIdAndEmployeeId" resultMap="task">
+        SELECT * FROM tasks WHERE id = #{id} AND employee_id = #{employeeId};
+    </select>
+
+    <select id="getTasks" resultMap="task">
+        SELECT * FROM tasks WHERE employee_id = #{employeeId};
+    </select>
+
+    <select id="getTaskById" resultMap="task">
+        SELECT * FROM tasks WHERE id = #{id};
+    </select>
+
+    <select id="getTasksByEmployeeId" resultMap="task">
+        SELECT * FROM tasks WHERE employee_id = #{employeeId};
     </select>
 </mapper>

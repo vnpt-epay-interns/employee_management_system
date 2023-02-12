@@ -40,8 +40,6 @@ public class ManagerController {
         return managerService.getAllReports(manager);
     }
 
-
-
     @GetMapping("/reports/{reportId}")
     public ResponseEntity<Response> getReportByReportId(@PathVariable long reportId) {
         User manager = getCurrentManager();
@@ -74,7 +72,6 @@ public class ManagerController {
 
 
     private User getCurrentManager() {
-        User manager = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return manager;
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
