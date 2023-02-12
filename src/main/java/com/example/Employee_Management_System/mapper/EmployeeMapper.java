@@ -1,11 +1,23 @@
 package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.Employee;
+import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.domain.WorkingSchedule;
+import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 @Mapper
 public interface EmployeeMapper {
     @Insert("INSERT INTO employees (id, manager_id) VALUES (#{id}, #{managerId})")
     void save(Employee employee);
+    
+    
+    List<WorkingScheduleResponse>getWorkingSchedule(User employee);
+    @Insert("INSERT INTO working_schedules(date, at_morning, at_afternoon, employee_id) VALUES (#{date}, #{atMorning}, #{atAfternoon}, #{employeeId})")
+    void scheduleWorkingDays(WorkingSchedule workingSchedule);
 }

@@ -12,9 +12,12 @@ import org.springframework.http.ResponseEntity;
 public interface EmployeeService {
 
     ResponseEntity<Response> getTaskById(long id, User employee);
-    ResponseEntity<Response> getTasks(User employee);
+    ResponseEntity<Response> getAllTasks();
     ResponseEntity<Response> updateTask(User employee, UpdateTaskRequest updateTaskRequest);
     ResponseEntity<Response> writeReport(User employee, WriteReportRequest request);
     ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request);
+    ResponseEntity<Response> getWorkingDays(User employee);
     void save(Employee employee);
+
+    ResponseEntity<Response> getTasks(User employee);
 }

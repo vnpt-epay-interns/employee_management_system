@@ -50,6 +50,11 @@ public class EmployeeController {
         return employeeService.scheduleWorkingDay(employee, request);
     }
 
+    @GetMapping("/get-working-days")
+    public ResponseEntity<Response> getWorkingDays() {
+        User employee = getCurrentEmployee();
+        return employeeService.getWorkingDays(employee);
+    }
 
     public User getCurrentEmployee() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
