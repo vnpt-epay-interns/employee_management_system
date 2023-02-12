@@ -156,7 +156,6 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId) {
         //TODO:(Hai) check if the employee is one of the employees of the manager
-
         List<ReportBasicInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(employeeId);
 
         return ResponseEntity.ok(Response.builder()
@@ -172,7 +171,7 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber) {
         //TODO:(Vy) only get the schedule of the employees of the manager
         List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedules(monthNumber);
-//        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate));
+        workingSchedules.removeIf(workingSchedule -> !workingSchedule.getEmployeeId().equals(manager.getId()));
         TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
         return ResponseEntity.ok(Response.builder().status(200).message("Get working schedule successfully!").data(collect).build());
     }
@@ -186,18 +185,11 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> getAllEmployees(User manager) {
         //TODO: (Vy) only get the employees of the manager
         Collection<Employee> employeeList = managerRepository.getAllEmployees();
-        Manager currentManager = getCurrentManager();
-        employeeList.removeIf(employee -> !Objects.equals(employee.getManagerId(), currentManager.getId()));
+        employeeList.removeIf(employee -> !Objects.equals(employee.getManagerId(), manager.getId()));
         return ResponseEntity.ok(Response.builder().status(200).message("!!!").data(employeeList).build());
     }
 
-    private Manager getCurrentManager() {
-        Manager manager = (Manager) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (manager == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not authorized!");
-        }
-        return manager;
-    }
+
 
 
 }
