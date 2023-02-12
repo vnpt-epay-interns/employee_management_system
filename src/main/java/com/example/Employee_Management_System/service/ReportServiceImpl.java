@@ -15,6 +15,11 @@ public class ReportServiceImpl implements ReportService {
     private ReportRepository reportRepository;
 
     @Override
+    public void save(Report report) {
+        reportRepository.save(report);
+    }
+
+    @Override
     public List<ReportBasicInfo> getAllUnreadReports() {
         return reportRepository.getAllUnreadReports();
     }

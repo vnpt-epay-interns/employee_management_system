@@ -9,7 +9,6 @@ public class WriteReportRequest {
 
     private String title;
     private String content;
-    private Long employeeId;
-
+    private Long taskId;
 
 }

@@ -27,7 +27,7 @@
             CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
             r.created_at AS created_at
         FROM reports r
-        JOIN users e ON r.id = e.id
+        JOIN users e ON r.employee_id = e.id
         WHERE r.is_read = 0
     </select>
 

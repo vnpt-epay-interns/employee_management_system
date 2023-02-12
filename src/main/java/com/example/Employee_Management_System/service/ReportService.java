@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface ReportService {
+    void save(Report report);
     List<ReportBasicInfo> getAllUnreadReports();
 
     Report getReportById(long reportId);
