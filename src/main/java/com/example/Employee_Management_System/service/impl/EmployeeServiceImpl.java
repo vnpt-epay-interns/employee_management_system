@@ -8,6 +8,7 @@ import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequ
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -35,6 +37,23 @@ public class EmployeeServiceImpl implements EmployeeService {
         Task task = employeeRepository
                 .getTaskByIdAndEmployeeId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if (task.getParentTask() == null) {
+            List<Task> subTasks = employeeRepository.getTasksByParentTask(task.getId());
+            return ResponseEntity.ok(
+                    Response.builder()
+                            .status(200)
+                            .data(
+                                    TaskDTO
+                                            .builder()
+                                            .parentTask(task)
+                                            .subTasks(subTasks)
+                                            .build()
+                            )
+                            .build()
+            );
+        }
+
         return ResponseEntity.ok(
                 Response.builder()
                         .status(200)

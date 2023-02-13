@@ -31,4 +31,8 @@
     <select id="getTasksByEmployeeId" resultMap="task">
         SELECT * FROM tasks WHERE employee_id = #{employeeId};
     </select>
+
+    <select id="getTasksByParentTask" resultMap="task">
+        SELECT * FROM tasks WHERE parent_task = #{parentTask};
+    </select>
 </mapper>

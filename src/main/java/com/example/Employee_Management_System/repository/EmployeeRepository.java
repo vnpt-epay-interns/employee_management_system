@@ -20,6 +20,10 @@ public class EmployeeRepository {
         return Optional.ofNullable(taskMapper.getTaskByIdAndEmployeeId(taskId, employeeId));
     }
 
+    public List<Task> getTasksByParentTask(Long parentTaskId) {
+        return taskMapper.getTasksByParentTask(parentTaskId);
+    }
+
     public List<Task> getTasksByEmployeeId(Long employeeId) {
         return taskMapper.getTasksByEmployeeId(employeeId);
     }
