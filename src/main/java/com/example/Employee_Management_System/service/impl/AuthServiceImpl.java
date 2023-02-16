@@ -12,8 +12,6 @@ import com.example.Employee_Management_System.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
     private final EmployeeService employeeService;
     private final ManagerService managerService;
 
@@ -65,16 +62,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> login(LoginRequest loginRequest) {
-        Authentication authencation = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
-
-        if (authencation.isAuthenticated()) {
-
-        }
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -104,6 +91,7 @@ public class AuthServiceImpl implements AuthService {
                 .referencedCode(generateReferenceCode().toString())
                 .build();
         user.setLocked(false);
+        user.setRole("MANAGER");
         userRepository.update(user);
         managerService.save(manager);
 
