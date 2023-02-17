@@ -7,6 +7,4 @@ public class RegisterException extends RuntimeException{
         super(message);
     }
 
-
-
 }

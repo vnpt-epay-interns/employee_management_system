@@ -7,6 +7,8 @@ import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.JwtToken;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.exception.NotFoundException;
+import com.example.Employee_Management_System.exception.RegisterException;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
 import lombok.AllArgsConstructor;
@@ -30,8 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            // TODO: throw custom exception: RegisterException
-            throw new RuntimeException("User already exists");
+            throw new RegisterException("User already exists");
         }
 
         User user = User
@@ -64,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<Response> login(LoginRequest loginRequest) {
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         String jwtToken = jwtService.generateToken(user);
         JwtToken token = JwtToken
                 .builder()
@@ -82,9 +83,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<Response> registerManager(User user) {
-        //TODO: throw custom exception: RegisterException
         if (user.getRole() != null){
-            throw new RuntimeException("Account already has a role");
+            throw new RegisterException("Account already has a role");
         }
         Manager manager = Manager
                 .builder().id(user.getId())
@@ -111,18 +111,16 @@ public class AuthServiceImpl implements AuthService {
 
     public ResponseEntity<Response> registerEmployee(User user, String referenceCode) {
         if (user.getRole() != null) {
-            // TODO: throw custom Exception RegisterException
-            throw new RuntimeException("Account already has a role");
+            throw new RegisterException("Account already has a role");
         }
 
         if (referenceCode == null) {
-            // TODO: throw custom Exception RegisterException
-            throw new RuntimeException("Reference code is required");
+            throw new RegisterException("Reference code is required");
         }
 
         Manager manager = userRepository.findManagerByReferenceCode(referenceCode);
         if (manager == null) {
-            throw new RuntimeException("Reference code is invalid");
+            throw new RegisterException("Reference code is invalid");
         }
 
         user.setRole("EMPLOYEE");

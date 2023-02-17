@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
@@ -91,7 +92,6 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> updateTask(User manager, long taskId, UpdateTaskRequest updateTaskRequest) {
-        // Todo: throw custom exception
         Task task = managerRepository
                 .getTaskById(taskId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found!"));
@@ -145,8 +145,7 @@ public class ManagerServiceImpl implements ManagerService {
         Report report = reportService.getReportById(reportId);
         // check if report belongs to one of the employees of the manager
         if (!checkIfReportBelongsToEmployeeOfManager(report, manager)) {
-            //TODO: custom exception
-            throw new RuntimeException("You are not allowed to access this report!");
+            throw new ReportException("You are not allowed to access this report!");
         }
 
 
@@ -166,7 +165,7 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> getReportsByTaskId(User manager, long taskId) {
 
         if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
-            throw new RuntimeException("You are not allowed to view this report");
+            throw new ReportException("You are not allowed to view this report");
         }
         List<ReportBasicInfo> unreadReportsByTaskId = reportService.getAllUnreadReportsByTaskId(taskId);
 
@@ -188,7 +187,7 @@ public class ManagerServiceImpl implements ManagerService {
         List<ReportBasicInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(manager, employeeId);
 
         if (!checkIfEmployeeIsManagedByManager(employeeId, manager)) {
-            throw new RuntimeException("You are not allowed to access this report!");
+            throw new ReportException("You are not allowed to access this report!");
         }
         return ResponseEntity.ok(Response.builder()
                 .status(200)
