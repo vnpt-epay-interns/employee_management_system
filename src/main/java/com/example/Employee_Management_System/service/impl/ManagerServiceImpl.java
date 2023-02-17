@@ -42,7 +42,6 @@ public class ManagerServiceImpl implements ManagerService {
     private final EmployeeService employeeService;
     @Override
     public ResponseEntity<Response> createTask(User manager, CreateTaskRequest request) {
-        //TODO: (Vu) check if the employeeId is one of the employees of the manager
         if (checkEmployeeBelongsToManager(manager.getId(), request.getEmployeeId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
         }
@@ -74,7 +73,6 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> deleteTask(User manager, long taskId) {
 
-        //TODO:(Vu) check if the task belongs to an employee of the manager
         Task task = managerRepository
                 .getTaskById(taskId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found!"));
@@ -95,7 +93,6 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> updateTask(User manager, long taskId, UpdateTaskRequest updateTaskRequest) {
-        //TODO:(Vu) check if the task belongs to an employee of the manager
         // Todo: throw custom exception
         Task task = managerRepository
                 .getTaskById(taskId)
@@ -216,7 +213,6 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber) {
         //TODO:(Vy) only get the schedule of the employees of the manager
-
         List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedules(monthNumber);
 //        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate));
         TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
