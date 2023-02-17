@@ -90,9 +90,12 @@ public class AuthServiceImpl implements AuthService {
                 .builder().id(user.getId())
                 .referencedCode(generateReferenceCode().toString())
                 .build();
+
+        user.setRole("MANAGER");
         user.setLocked(false);
         user.setRole("MANAGER");
         userRepository.update(user);
+
         managerService.save(manager);
 
         return ResponseEntity.ok(

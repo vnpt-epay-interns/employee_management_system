@@ -18,4 +18,8 @@ public interface EmployeeService {
     ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request);
     ResponseEntity<Response> getWorkingDays(User employee);
     void save(Employee employee);
+
+    User getManagerOfEmployee(long employeeId);
+
+    Employee getEmployeeByEmployeeId(long employeeId);
 }

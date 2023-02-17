@@ -3,18 +3,90 @@
 <mapper namespace="com.example.Employee_Management_System.mapper.TaskMapper">
 
     <resultMap id="task" type="com.example.Employee_Management_System.domain.Task">
-        <result property="id" column="id" />
-        <result property="title" column="title" />
-        <result property="description" column="description" />
-        <result property="status" column="status" />
-        <result property="completion" column="completion" />
-        <result property="startDate" column="start_date" />
-        <result property="endDate" column="end_date" />
-        <result property="employeeId" column="employee_id" />
-        <result property="estimateHours" column="estimate_hours" />
-        <result property="parentTask" column="parent_task" />
-        <result property="priority" column="priority" />
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="completion" column="completion"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="estimateHours" column="estimate_hours"/>
+        <result property="parentTask" column="parent_task"/>
+        <result property="priority" column="priority"/>
     </resultMap>
+
+    <select id="getTask" resultMap="task">
+        SELECT *
+        FROM tasks
+        WHERE id = #{id}
+    </select>
+
+    <resultMap id="user" type="com.example.Employee_Management_System.domain.User">
+        <result property="id" column="id"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+        <result property="isLocked" column="is_locked" javaType="boolean"/>
+    </resultMap>
+
+    <select id="getManagerOfEmployee" resultMap="user">
+        SELECT u.id         AS id,
+               u.first_name AS first_name,
+               u.last_name  AS last_name,
+               u.email      AS email,
+               u.avatar     AS avatar,
+               u.password   AS password,
+               u.role       AS role,
+               u.is_locked  AS is_locked
+        FROM users u
+        WHERE u.id = (SELECT emp.manager_id
+                      FROM employees emp
+                      WHERE emp.id = (SELECT t.employee_id
+                                      FROM tasks t
+                                      WHERE t.id = #{id}
+                      )
+      )
+    </select>
+
+    <select id="getManagerOfTask" resultMap="user">
+        SELECT u.id         AS id,
+               u.first_name AS first_name,
+               u.last_name  AS last_name,
+               u.email      AS email,
+               u.avatar     AS avatar,
+               u.password   AS password,
+               u.role       AS role,
+               u.is_locked  AS is_locked
+        FROM users u
+        WHERE u.id = (SELECT emp.manager_id
+                      FROM employees emp
+                      WHERE emp.id = (SELECT t.employee_id
+                                      FROM tasks t
+                                      WHERE t.id = #{id}
+                      )
+      )
+
+    </select>
+
+    <select id="getEmployeeOfTask" resultMap="user">
+        SELECT u.id         AS id,
+               u.first_name AS first_name,
+               u.last_name  AS last_name,
+               u.email      AS email,
+               u.avatar     AS avatar,
+               u.password   AS password,
+               u.role       AS role,
+               u.is_locked  AS is_locked
+        FROM users u
+        WHERE u.id = (SELECT t.employee_id
+                      FROM tasks t
+                      WHERE t.id = #{id})
+
+    </select>
 
     <select id="getTaskByIdAndEmployeeId" resultMap="task">
         SELECT * FROM tasks WHERE id = #{id} AND employee_id = #{employeeId};

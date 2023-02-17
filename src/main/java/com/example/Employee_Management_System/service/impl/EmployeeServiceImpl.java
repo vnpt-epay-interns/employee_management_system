@@ -1,35 +1,39 @@
 package com.example.Employee_Management_System.service.impl;
 
-import com.example.Employee_Management_System.domain.Employee;
-import com.example.Employee_Management_System.domain.Task;
-import com.example.Employee_Management_System.domain.Report;
-import com.example.Employee_Management_System.domain.User;
-import com.example.Employee_Management_System.domain.WorkingSchedule;
+import com.example.Employee_Management_System.domain.*;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
-import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ReportService;
+import com.example.Employee_Management_System.service.TaskService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.sql.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private ReportService reportService;
+    private final EmployeeMapper employeeMapper;
+
+    private final ReportService reportService;
+
+    private final TaskService taskService;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -95,6 +99,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<Response> writeReport(User employee, WriteReportRequest request) {
+        // TODO: check if the report is assign to the employee
+        Long taskId = request.getTaskId();
+
+        if (taskId != null && checkIfTaskBelongsToEmployee(employee, taskId)) {
+            //TODO: throw custom exception
+            throw new RuntimeException("The task is not assigned to the you");
+        }
         Report report = Report.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
@@ -113,6 +124,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .data(null)
                         .build()
         );
+    }
+
+    private boolean checkIfTaskBelongsToEmployee(User employee, Long taskId) {
+        Task task = taskService.getTaskByTaskId(taskId);
+        User assignedEmployee = taskService.getEmployeeOfTask(task.getId());
+        return !Objects.equals(assignedEmployee.getId(), employee.getId());
     }
 
     @Override
@@ -135,6 +152,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void save(Employee employee) {
         employeeRepository.save(employee);
+    }
+
+    @Override
+    public User getManagerOfEmployee(long employeeId) {
+        return employeeMapper.getManagerOfEmployee(employeeId);
+    }
+
+    @Override
+    public Employee getEmployeeByEmployeeId(long employeeId) {
+        //TODO: throw custom exception
+        return employeeMapper.getEmployeeByEmployeeId(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 }
 
