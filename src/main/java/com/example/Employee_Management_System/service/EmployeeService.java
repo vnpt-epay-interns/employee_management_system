@@ -16,5 +16,6 @@ public interface EmployeeService {
     ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest);
     ResponseEntity<Response> writeReport(User employee, WriteReportRequest request);
     ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request);
+    ResponseEntity<Response> getWorkingDays(User employee);
     void save(Employee employee);
 }

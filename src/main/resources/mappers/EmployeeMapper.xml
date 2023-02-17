@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.Employee_Management_System.mapper.EmployeeMapper">
-
     <resultMap id="get_employees_by_manager_id" type="com.example.Employee_Management_System.domain.Employee">
         <result property="id" column="id"/>
         <result property="managerId" column="manager_id"/>
     </resultMap>
     <select id="getAllEmployeesByManagerId" resultMap="get_employees_by_manager_id">
         SELECT * FROM employees WHERE manager_id = #{managerId};
+    </select>
+
+    <resultMap id="getScheduleWorkingDay" type="com.example.Employee_Management_System.dto.response.WorkingScheduleResponse">
+        <result property="employeeId" column="employee_id" />
+        <result property="employeeName" column="employee_name" />
+        <result property="date" column="date" />
+        <result property="atMorning" column="at_morning" javaType="boolean" />
+        <result property="atAfternoon" column="af_afternoon" javaType="boolean" />
+    </resultMap>
+
+    <select id="getWorkingSchedule" resultMap="getScheduleWorkingDay">
+        SELECT w.employee_id AS employee_id,
+               u.first_name as employee_name,
+               w.date AS date,
+        w.at_morning AS at_morning,
+        w.at_afternoon AS at_afternoon
+        FROM working_schedules w
+            JOIN users u
+        on u.id = w.employee_id
+        where  u.id = #{id};
     </select>
 
 </mapper>
