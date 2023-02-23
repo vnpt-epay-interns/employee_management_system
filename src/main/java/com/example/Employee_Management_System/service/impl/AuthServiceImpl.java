@@ -43,7 +43,6 @@ public class AuthServiceImpl implements AuthService {
             // TODO: throw custom exception: RegisterException
             throw new RuntimeException("User already exists");
         }
-
         User user = User
                 .builder()
                 .firstName(registerRequest.getFirstName())
@@ -53,15 +52,18 @@ public class AuthServiceImpl implements AuthService {
                 .isLocked(true)
                 .build();
 
-        userRepository.save(user);
+
 
         String jwtToken = jwtService.generateToken(user);
         JwtToken token = JwtToken
                 .builder()
                 .token(jwtToken)
                 .build();
+
         String code = generateCode(user);
-        sendVerificationEmail(user, String.format("localhost:8080/verify/%s", code));
+        sendVerificationEmail(user, String.format("http://127.0.0.1:8080/api/auth/verify/%s", code));
+
+
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -169,46 +171,21 @@ public class AuthServiceImpl implements AuthService {
         return UUID.randomUUID();
     }
 
-    private void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
+    private void sendVerificationEmail(User user, String siteUrl) {
         String toAddress = user.getEmail();
-        String fromAddress = "Your email address";
-        String senderName = "Your company name";
+//        String fromAddress = "Your email address";
+//        String senderName = "Your company name";
         String subject = "Please verify your registration";
-        String content = "Dear [[name]],<br>"
-                + "Please click the link below to verify your registration:<br>"
-                + "<a href='localhost:8080/verify' target=\"_blank\">VERIFY</a>"
-                + "Thank you,<br>"
-                + "Your company name.";
-//
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message);
-//
-//
-//
-//        helper.setFrom(fromAddress, senderName);
-//        helper.setTo(toAddress);
-//        helper.setSubject(subject);
-//
-//        String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
-//
-//        content = content.replace("[[URL]]", verifyURL);
-//
-//        helper.setText(content, true);
-//
-//        mailSender.send(message);
-
-
+        String content;
 
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-//            content = content.replace("[[name]]", user.getUsername());
-            String link = String.format("localhost:8080/verify/%s", generateCode(user));
-            content = HtmlMailVerifiedCreator.generateHTML(user.getFirstName(), link);
+            String sb = siteUrl;
+            content = HtmlMailVerifiedCreator.generateHTML(user.getFirstName(), sb);
             helper.setTo(toAddress);
             helper.setSubject(subject);
             helper.setText(content, true);
-
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
@@ -217,16 +194,17 @@ public class AuthServiceImpl implements AuthService {
 
     public ResponseEntity<Response> verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
-        if (user == null || user.isEnabled()) {
+        if (user == null) {
             return ResponseEntity.badRequest().body(
                     Response.builder()
                             .status(400)
                             .message("Wrong verification code")
+                            .data(verificationCode)
                             .build()
             );
         } else {
             user.setVerificationCode(null);
-            user.setLocked(true);
+            user.setLocked(false);
             userRepository.save(user);
             return ResponseEntity.ok().body(
                     Response.builder()
@@ -241,6 +219,7 @@ public class AuthServiceImpl implements AuthService {
         String randomCode = UUID.randomUUID().toString();
         user.setVerificationCode(randomCode);
         user.setLocked(false);
+        userRepository.save(user);
         return randomCode;
     }
 

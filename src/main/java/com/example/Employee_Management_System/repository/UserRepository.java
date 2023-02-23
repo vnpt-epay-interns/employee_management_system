@@ -12,7 +12,6 @@ import java.util.Optional;
 public class UserRepository {
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private ManagerRepository managerService;
 
@@ -34,6 +33,10 @@ public class UserRepository {
 
     public void update(User user) {
         userMapper.update(user);
+    }
+
+    public void updateVerificationCode(User user) {
+        userMapper.updateVerificationCode(user);
     }
 
     public User findByVerificationCode(String verificationCode) {

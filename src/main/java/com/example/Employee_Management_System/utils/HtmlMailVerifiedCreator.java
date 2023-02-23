@@ -226,7 +226,7 @@ public class HtmlMailVerifiedCreator {
                         "                <p style=\"margin: 0\">" +
                         "                  Hi "+ fullname + ", thanks for signing up to Simple Bank. Please tap the button below to confirm your email address. If you" +
                         "                  didn't create an account with" +
-                        "                  <a href=\"https://blogdesire.com\">Simple Bank</a>, you can safely" +
+                        "                  <a href=\"localhost:8080/home\">EMS</a>, you can safely" +
                         "                  delete this email." +
                         "                </p>" +
                         "              </td>" +
