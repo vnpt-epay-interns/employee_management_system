@@ -9,8 +9,13 @@ import com.example.Employee_Management_System.dto.response.JwtToken;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,12 +23,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private JavaMailSender mailSender;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -31,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeService employeeService;
     private final ManagerService managerService;
 
-    public ResponseEntity<Response> register(RegisterRequest registerRequest) {
+    public ResponseEntity<Response> register(RegisterRequest registerRequest) throws MessagingException, UnsupportedEncodingException {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             // TODO: throw custom exception: RegisterException
             throw new RuntimeException("User already exists");
@@ -53,7 +60,8 @@ public class AuthServiceImpl implements AuthService {
                 .builder()
                 .token(jwtToken)
                 .build();
-
+        String code = generateCode(user);
+        sendVerificationEmail(user, String.format("localhost:8080/verify/%s", code));
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -161,6 +169,79 @@ public class AuthServiceImpl implements AuthService {
         return UUID.randomUUID();
     }
 
+    private void sendVerificationEmail(User user, String siteURL) throws MessagingException, UnsupportedEncodingException {
+        String toAddress = user.getEmail();
+        String fromAddress = "Your email address";
+        String senderName = "Your company name";
+        String subject = "Please verify your registration";
+        String content = "Dear [[name]],<br>"
+                + "Please click the link below to verify your registration:<br>"
+                + "<a href='localhost:8080/verify' target=\"_blank\">VERIFY</a>"
+                + "Thank you,<br>"
+                + "Your company name.";
+//
+//        MimeMessage message = mailSender.createMimeMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(message);
+//
+//
+//
+//        helper.setFrom(fromAddress, senderName);
+//        helper.setTo(toAddress);
+//        helper.setSubject(subject);
+//
+//        String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
+//
+//        content = content.replace("[[URL]]", verifyURL);
+//
+//        helper.setText(content, true);
+//
+//        mailSender.send(message);
 
+
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+//            content = content.replace("[[name]]", user.getUsername());
+            String link = String.format("localhost:8080/verify/%s", generateCode(user));
+            content = HtmlMailVerifiedCreator.generateHTML(user.getFirstName(), link);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResponseEntity<Response> verify(String verificationCode) {
+        User user = userRepository.findByVerificationCode(verificationCode);
+        if (user == null || user.isEnabled()) {
+            return ResponseEntity.badRequest().body(
+                    Response.builder()
+                            .status(400)
+                            .message("Wrong verification code")
+                            .build()
+            );
+        } else {
+            user.setVerificationCode(null);
+            user.setLocked(true);
+            userRepository.save(user);
+            return ResponseEntity.ok().body(
+                    Response.builder()
+                            .status(200)
+                            .message("Right verification code")
+                            .build()
+            );
+        }
+    }
+
+    private String generateCode(User user) {
+        String randomCode = UUID.randomUUID().toString();
+        user.setVerificationCode(randomCode);
+        user.setLocked(false);
+        return randomCode;
+    }
 
 }

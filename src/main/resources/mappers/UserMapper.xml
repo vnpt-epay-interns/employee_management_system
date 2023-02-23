@@ -21,4 +21,7 @@
         SELECT * FROM users WHERE email = #{email}
     </select>
 
+    <select id="findByVerificationCode" resultMap="user">
+        SELECT * FROM users WHERE verification_code = #{verificationCode}
+    </select>
 </mapper>

@@ -36,4 +36,7 @@ public class UserRepository {
         userMapper.update(user);
     }
 
+    public User findByVerificationCode(String verificationCode) {
+        return userMapper.findByVerificationCode(verificationCode);
+    }
 }

@@ -18,4 +18,6 @@ public interface UserMapper {
 
     @Update("UPDATE users SET first_name = #{firstName}, last_name = #{lastName}, password = #{password}, email = #{email}, role = #{role}, avatar = #{avatar}, is_locked = #{isLocked} WHERE id = #{id}")
     void update(User user);
+
+    User findByVerificationCode(String verificationCode);
 }
