@@ -19,7 +19,7 @@ import java.io.UnsupportedEncodingException;
 @AllArgsConstructor
 public class AuthController {
     @Autowired
-    private final AuthService authService;
+    private AuthService authService;
 
     @PostMapping("/register-account")
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) throws UnsupportedEncodingException, MessagingException {
