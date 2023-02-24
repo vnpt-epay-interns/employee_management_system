@@ -45,7 +45,6 @@ public class EmployeeRepository {
         employeeMapper.scheduleWorkingDays(workingSchedule);
     }
 
-
     public List<Task> getTasksByEmployeeId(Long employeeId) {
         return taskMapper.getTasksByEmployeeId(employeeId);
     }

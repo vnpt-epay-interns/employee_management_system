@@ -5,7 +5,11 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <typeAliases>
-        <package name="com.example.Employee_Management_System.mapper"/>
+        <typeAlias type="com.example.Employee_Management_System.domain.User" alias="User"/>
+        <typeAlias type="com.example.Employee_Management_System.domain.Employee" alias="Employee"/>
+        <typeAlias type="com.example.Employee_Management_System.domain.Report" alias="Report"/>
+        <typeAlias type="com.example.Employee_Management_System.domain.Task" alias="Task"/>
+        <typeAlias type="com.example.Employee_Management_System.domain.Manager" alias="Manager"/>
     </typeAliases>
     <mappers>
         <mapper resource="mappers/UserMapper.xml"/>
