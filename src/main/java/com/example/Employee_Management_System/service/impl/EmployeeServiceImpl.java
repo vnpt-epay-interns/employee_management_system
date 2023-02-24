@@ -1,14 +1,12 @@
 package com.example.Employee_Management_System.service.impl;
 
-import com.example.Employee_Management_System.domain.Employee;
-import com.example.Employee_Management_System.domain.Task;
-import com.example.Employee_Management_System.domain.Report;
-import com.example.Employee_Management_System.domain.Task;
-import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.domain.*;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
+import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -21,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Objects;
+
 
 @Service
 @AllArgsConstructor
@@ -59,8 +59,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .status(200)
                         .data(employeeRepository.getTasksByEmployeeId(employee.getId()))
                         .build()
-                );
+        );
     }
+
 
     @Override
     public ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest) {
@@ -118,7 +119,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request) {
-        return null;
+        WorkingSchedule workingSchedule = WorkingSchedule.builder()
+                .date(request.getDate())
+                .atMorning(request.isAtMorning())
+                .atAfternoon(request.isAtAfternoon())
+                .employeeId(employee.getId()).build();
+        employeeRepository.scheduleWorkingDays(workingSchedule);
+        return ResponseEntity.ok(Response.builder().message("!!!").status(200).data(null).build());
+    }
+
+    @Override
+    public ResponseEntity<Response> getWorkingDays(User employee) {
+        List<WorkingScheduleResponse> workingScheduleResponses = employeeRepository.getSchedule(employee);
+        return ResponseEntity.ok(Response.builder().data(workingScheduleResponses).build());
     }
 
     @Override
@@ -137,5 +150,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.getEmployeeByEmployeeId(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
+
 }
 

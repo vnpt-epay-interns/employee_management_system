@@ -11,6 +11,7 @@
         <result property="password" column="password" />
         <result property="role" column="role" />
         <result property="isLocked" column="is_locked" javaType="boolean"/>
+        <result property="verificationCode" column="verification_code" />
     </resultMap>
 
     <select id="findById" resultMap="user">
@@ -21,4 +22,7 @@
         SELECT * FROM users WHERE email = #{email}
     </select>
 
+    <select id="findByVerificationCode" resultMap="user">
+        SELECT * FROM users WHERE verification_code = #{verificationCode}
+    </select>
 </mapper>
