@@ -10,19 +10,19 @@
         <result property="avatar" column="avatar" />
         <result property="password" column="password" />
         <result property="role" column="role" />
-<!--        <result property="isLocked" column="is_locked" javaType="boolean"/>-->
+        <result property="isLocked" column="is_locked" javaType="boolean"/>
         <result property="verificationCode" column="verification_code" />
     </resultMap>
 
-    <select id="findById" resultMap="user">
+    <select id="findById" resultMap="user" parameterType="Long">
         SELECT * FROM users WHERE id = #{id}
     </select>
 
-    <select id="findByEmail" resultMap="user">
+    <select id="findByEmail" resultMap="user" parameterType="String">
         SELECT * FROM users WHERE email = #{email}
     </select>
 
-    <select id="findByVerificationCode" resultMap="user">
+    <select id="findByVerificationCode" resultMap="user" parameterType="String">
         SELECT * FROM users WHERE verification_code = #{verificationCode}
     </select>
 </mapper>
