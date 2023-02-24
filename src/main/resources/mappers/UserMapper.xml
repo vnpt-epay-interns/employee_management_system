@@ -14,15 +14,15 @@
         <result property="verificationCode" column="verification_code" />
     </resultMap>
 
-    <select id="findById" resultMap="user" parameterType="Long" resultType="hashMap">
+    <select id="findById" resultMap="user" parameterType="Long">
         SELECT * FROM users WHERE id = #{id}
     </select>
 
-    <select id="findByEmail" resultMap="user" parameterType="String" resultType="hashMap">
+    <select id="findByEmail" resultMap="user" parameterType="String">
         SELECT * FROM users WHERE email = #{email}
     </select>
 
-    <select id="findByVerificationCode" resultMap="user" parameterType="String" resultType="hashMap">
+    <select id="findByVerificationCode" resultMap="user" parameterType="String">
         SELECT * FROM users WHERE verification_code = #{verificationCode}
     </select>
 </mapper>
