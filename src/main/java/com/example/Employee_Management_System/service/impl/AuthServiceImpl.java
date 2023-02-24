@@ -216,7 +216,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String generateCode(User user) {
-        String randomCode = UUID.randomUUID().toString();
+            String randomCode = UUID.randomUUID().toString();
         user.setVerificationCode(randomCode);
         user.setLocked(false);
         userRepository.save(user);
