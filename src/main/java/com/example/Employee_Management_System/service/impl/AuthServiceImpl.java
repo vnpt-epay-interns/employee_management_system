@@ -5,7 +5,7 @@ import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
-import com.example.Employee_Management_System.dto.response.JwtToken;
+import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
@@ -13,8 +13,6 @@ import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         String jwtToken = jwtService.generateToken(user);
-        JwtToken token = JwtToken
+        LoginResponse token = LoginResponse
                 .builder()
                 .token(jwtToken)
                 .build();
@@ -67,9 +65,10 @@ public class AuthServiceImpl implements AuthService {
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found"));
         String jwtToken = jwtService.generateToken(user);
-        JwtToken token = JwtToken
+        LoginResponse token = LoginResponse
                 .builder()
                 .token(jwtToken)
+                .role(user.getRole())
                 .build();
         return ResponseEntity.ok(
                 Response
@@ -149,7 +148,4 @@ public class AuthServiceImpl implements AuthService {
     private UUID generateReferenceCode() {
         return UUID.randomUUID();
     }
-
-
-
 }
