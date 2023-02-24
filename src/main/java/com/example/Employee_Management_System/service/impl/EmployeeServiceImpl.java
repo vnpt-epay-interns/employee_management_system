@@ -3,6 +3,7 @@ package com.example.Employee_Management_System.service.impl;
 import com.example.Employee_Management_System.domain.*;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
+import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
@@ -77,6 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .build()
         );
     }
+
 
     @Override
     public ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest) {
@@ -165,5 +167,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.getEmployeeByEmployeeId(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
+
 }
 

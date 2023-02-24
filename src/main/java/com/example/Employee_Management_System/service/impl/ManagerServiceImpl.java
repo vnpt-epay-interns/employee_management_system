@@ -186,6 +186,7 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId) {
         List<ReportBasicInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(manager, employeeId);
 
+
         if (!checkIfEmployeeIsManagedByManager(employeeId, manager)) {
             throw new ReportException("You are not allowed to access this report!");
         }
@@ -199,10 +200,12 @@ public class ManagerServiceImpl implements ManagerService {
 
     private boolean checkIfEmployeeIsManagedByManager(long employeeId, User manager) {
         // check if employee is managed by manager
+        // if the employee doesn't exist, an error will be thrown when getting by id
         Employee employee = employeeService.getEmployeeByEmployeeId(employeeId);
         User employeeManager = employeeService.getManagerOfEmployee(employeeId);
         return employeeManager.getId().equals(manager.getId());
     }
+
 
     @Override
     public ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber) {

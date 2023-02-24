@@ -11,30 +11,36 @@ import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private JavaMailSender mailSender;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmployeeService employeeService;
     private final ManagerService managerService;
 
-    public ResponseEntity<Response> register(RegisterRequest registerRequest) {
+    public ResponseEntity<Response> register(RegisterRequest registerRequest) throws MessagingException, UnsupportedEncodingException {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new RegisterException("User already exists");
         }
-
         User user = User
                 .builder()
                 .firstName(registerRequest.getFirstName())
@@ -44,13 +50,17 @@ public class AuthServiceImpl implements AuthService {
                 .isLocked(true)
                 .build();
 
-        userRepository.save(user);
+
 
         String jwtToken = jwtService.generateToken(user);
         JwtToken token = JwtToken
                 .builder()
                 .token(jwtToken)
                 .build();
+
+        String code = generateCode(user);
+        sendVerificationEmail(user, String.format("http://127.0.0.1:8080/api/auth/verify/%s", code));
+
 
         return ResponseEntity.ok(
                 Response
@@ -150,6 +160,56 @@ public class AuthServiceImpl implements AuthService {
         return UUID.randomUUID();
     }
 
+    private void sendVerificationEmail(User user, String siteUrl) {
+        String toAddress = user.getEmail();
+//        String fromAddress = "Your email address";
+//        String senderName = "Your company name";
+        String subject = "Please verify your registration";
+        String content;
 
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            String sb = siteUrl;
+            content = HtmlMailVerifiedCreator.generateHTML(user.getFirstName(), sb);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ResponseEntity<Response> verify(String verificationCode) {
+        User user = userRepository.findByVerificationCode(verificationCode);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(
+                    Response.builder()
+                            .status(400)
+                            .message("Wrong verification code")
+                            .data(verificationCode)
+                            .build()
+            );
+        } else {
+            user.setVerificationCode(null);
+            user.setLocked(false);
+            userRepository.save(user);
+            return ResponseEntity.ok().body(
+                    Response.builder()
+                            .status(200)
+                            .message("Right verification code")
+                            .build()
+            );
+        }
+    }
+
+    private String generateCode(User user) {
+            String randomCode = UUID.randomUUID().toString();
+        user.setVerificationCode(randomCode);
+        user.setLocked(false);
+        userRepository.save(user);
+        return randomCode;
+    }
 
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
 @Repository
 @AllArgsConstructor
 public class EmployeeRepository {
@@ -26,10 +27,6 @@ public class EmployeeRepository {
 
     public List<Task> getTasksByParentTask(Long parentTaskId) {
         return taskMapper.getTasksByParentTask(parentTaskId);
-    }
-
-    public List<Task> getTasksByEmployeeId(Long employeeId) {
-        return taskMapper.getTasksByEmployeeId(employeeId);
     }
 
     public void save(Employee employee) {
@@ -46,5 +43,10 @@ public class EmployeeRepository {
 
     public void scheduleWorkingDays(WorkingSchedule workingSchedule) {
         employeeMapper.scheduleWorkingDays(workingSchedule);
+    }
+
+
+    public List<Task> getTasksByEmployeeId(Long employeeId) {
+        return taskMapper.getTasksByEmployeeId(employeeId);
     }
 }
