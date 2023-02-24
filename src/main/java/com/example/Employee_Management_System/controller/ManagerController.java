@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/manager")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ManagerController {
     @Autowired
     private ManagerService managerService;
