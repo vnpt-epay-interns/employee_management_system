@@ -14,7 +14,6 @@ public interface UserMapper {
 
     Optional<User> findByEmail(String email);
 
-
     @Update("UPDATE users SET first_name = #{firstName}, last_name = #{lastName}, password = #{password}, email = #{email}, role = #{role}, avatar = #{avatar}, is_locked = #{isLocked}, verification_code = #{verificationCode} WHERE id = #{id}")
     void update(User user);
 

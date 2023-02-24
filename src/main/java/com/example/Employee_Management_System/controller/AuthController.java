@@ -17,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class AuthController {
     @Autowired
     private final AuthService authService;
@@ -31,8 +30,6 @@ public class AuthController {
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
-
-
 
     @PostMapping("/register-account/manager")
     public ResponseEntity<Response> registerManager() {
