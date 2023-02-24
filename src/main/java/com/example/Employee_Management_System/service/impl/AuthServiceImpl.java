@@ -18,10 +18,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 @Service
@@ -34,8 +35,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final EmployeeService employeeService;
     private final ManagerService managerService;
+    private final AuthenticationManager authenticationManager;
 
-    public ResponseEntity<Response> register(RegisterRequest registerRequest) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new RegisterException("User already exists");
         }
@@ -71,6 +73,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> login(LoginRequest loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
+        );
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found"));

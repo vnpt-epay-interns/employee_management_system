@@ -22,12 +22,12 @@ public class AuthController {
     @Autowired
     private final AuthService authService;
 
-    @PostMapping(value = "/register-account")
+    @PostMapping("/register-account")
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) throws UnsupportedEncodingException, MessagingException {
         return authService.register(registerRequest);
     }
 
-    @PostMapping(value = "/login")
+    @PostMapping( "/login")
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }

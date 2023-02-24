@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import java.io.UnsupportedEncodingException;
 
 
-public interface  AuthService {
+public interface AuthService {
     ResponseEntity<Response> register(RegisterRequest registerRequest) throws MessagingException, UnsupportedEncodingException;
 
 
@@ -21,5 +21,4 @@ public interface  AuthService {
     ResponseEntity<Response> registerEmployee(User user, String referenceCode);
 
     ResponseEntity<Response> verify(String code);
-//    User findByVerificationCode(String verificationCode);
 }
