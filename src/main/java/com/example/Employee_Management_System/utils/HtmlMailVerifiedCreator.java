@@ -224,9 +224,9 @@ public class HtmlMailVerifiedCreator {
                         "                \"" +
                         "              >" +
                         "                <p style=\"margin: 0\">" +
-                        "                  Hi "+ fullname + ", thanks for signing up to Simple Bank. Please tap the button below to confirm your email address. If you" +
+                        "                  Hi "+ fullname + ", thanks for signing up to EMS. Please tap the button below to confirm your email address. If you" +
                         "                  didn't create an account with" +
-                        "                  <a href=\"localhost:8080/home\">EMS</a>, you can safely" +
+                        "                  <a href=\"http://127.0.0.1:8080/home\">EMS</a>, you can safely" +
                         "                  delete this email." +
                         "                </p>" +
                         "              </td>" +
