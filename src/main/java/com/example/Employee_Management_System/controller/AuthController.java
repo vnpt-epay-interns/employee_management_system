@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 
 @RestController
-//@RequestMapping("/api/auth")
+@RequestMapping("/api/auth")
 @AllArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class AuthController {
@@ -27,7 +27,7 @@ public class AuthController {
         return authService.register(registerRequest);
     }
 
-    @PostMapping( "/api/auth/login")
+    @PostMapping( "/login")
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
