@@ -10,7 +10,7 @@
         <result property="avatar" column="avatar" />
         <result property="password" column="password" />
         <result property="role" column="role" />
-        <result property="isLocked" column="is_locked" javaType="boolean"/>
+<!--        <result property="isLocked" column="is_locked" javaType="boolean"/>-->
         <result property="verificationCode" column="verification_code" />
     </resultMap>
 

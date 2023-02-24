@@ -27,8 +27,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     private final EmployeeMapper employeeMapper;
 
@@ -36,8 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final TaskService taskService;
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public ResponseEntity<Response> getTaskById(long id, User user) {

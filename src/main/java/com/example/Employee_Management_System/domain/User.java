@@ -16,15 +16,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private String role;
-    private String avatar;
-    private String verificationCode;
-    private boolean isLocked;
+    public Long id;
+    public String firstName;
+    public String lastName;
+    public String email;
+    public String password;
+    public String role;
+    public String avatar;
+    public String verificationCode;
+    public boolean isLocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

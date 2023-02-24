@@ -1,7 +1,6 @@
 package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.User;
-import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

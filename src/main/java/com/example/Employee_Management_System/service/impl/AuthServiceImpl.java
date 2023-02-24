@@ -28,7 +28,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
