@@ -16,9 +16,9 @@ public class MyBatisConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://containers-us-west-141.railway.app:5774/railway");
+        dataSource.setUrl("jdbc:mysql://containers-us-west-100.railway.app:6773/railway");
         dataSource.setUsername("root");
-        dataSource.setPassword("yx7jx47vP6OCw7UEEg6E");
+        dataSource.setPassword("11W63OcKT3iMvi8B2GXv");
         return dataSource;
     }
 
