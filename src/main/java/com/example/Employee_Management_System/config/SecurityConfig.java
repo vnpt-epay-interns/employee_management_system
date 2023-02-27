@@ -14,8 +14,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private AuthenticationProvider authenticationProvider;
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -23,8 +21,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .csrf().disable()
-                .cors().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(auth -> auth
@@ -33,8 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/manager/**").hasRole("MANAGER")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authenticationProvider(authenticationProvider);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
           return http.build();
     }
