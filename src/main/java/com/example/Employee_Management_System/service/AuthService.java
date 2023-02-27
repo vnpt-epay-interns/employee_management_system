@@ -21,4 +21,6 @@ public interface AuthService {
     ResponseEntity<Response> registerEmployee(User user, String referenceCode);
 
     ResponseEntity<Response> verify(String code);
+
+    ResponseEntity<Response> existsEmail(String email);
 }

@@ -26,6 +26,11 @@ public class AuthController {
         return authService.register(registerRequest);
     }
 
+    @PostMapping("/exists-email")
+    public ResponseEntity<Response> existsEmail(@RequestBody String email) {
+        return authService.existsEmail(email);
+    }
+
     @PostMapping( "/login")
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);

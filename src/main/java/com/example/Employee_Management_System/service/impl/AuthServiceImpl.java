@@ -209,6 +209,27 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public ResponseEntity<Response> existsEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            return ResponseEntity.ok(
+                    Response
+                            .builder()
+                            .status(200)
+                            .message("Email already exists")
+                            .build()
+            );
+        } else {
+            return ResponseEntity.ok(
+                    Response
+                            .builder()
+                            .status(200)
+                            .message("Email not exists")
+                            .build()
+            );
+        }
+    }
+
     private String generateCode(User user) {
             String randomCode = UUID.randomUUID().toString();
         user.setVerificationCode(randomCode);
