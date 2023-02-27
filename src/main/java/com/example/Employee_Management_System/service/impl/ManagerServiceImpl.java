@@ -42,7 +42,8 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> createTask(User manager, CreateTaskRequest request) {
         if (checkEmployeeBelongsToManager(manager.getId(), request.getEmployeeId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
+            throw new IllegalStateException("Employee not belong to the manager!");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
         }
 
         Task task = Task
@@ -77,7 +78,8 @@ public class ManagerServiceImpl implements ManagerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found!"));
 
         if (checkEmployeeBelongsToManager(manager.getId(), task.getEmployeeId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
+            throw new IllegalStateException("Employee not belong to the manager!");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
         }
 
         taskRepository.deleteTask(task);
@@ -97,7 +99,8 @@ public class ManagerServiceImpl implements ManagerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found!"));
 
         if (checkEmployeeBelongsToManager(manager.getId(), task.getEmployeeId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
+            throw new IllegalStateException("Employee not belong to the manager!");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
         }
 
         task.setTitle(updateTaskRequest.getTitle());

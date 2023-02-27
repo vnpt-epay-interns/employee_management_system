@@ -189,7 +189,7 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<Response> verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
         if (user == null) {
-            return ResponseEntity.badRequest().body(
+            return ResponseEntity.ok().body(
                     Response.builder()
                             .status(400)
                             .message("Wrong verification code")
