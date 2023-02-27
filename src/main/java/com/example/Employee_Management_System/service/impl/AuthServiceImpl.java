@@ -51,23 +51,16 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
 
-
-        String jwtToken = jwtService.generateToken(user);
-        LoginResponse token = LoginResponse
-                .builder()
-                .token(jwtToken)
-                .build();
-
-        String code = generateCode(user);
+        String code = generateVerifyEmailCode();
+        user.setVerificationCode(code);
+        userRepository.save(user);
         sendVerificationEmail(user, String.format("http://127.0.0.1:8080/api/auth/verify/%s", code));
-
 
         return ResponseEntity.ok(
                 Response
                         .builder()
                         .status(200)
                         .message("Register successfully!")
-                        .data(token)
                         .build()
         );
     }
@@ -230,11 +223,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private String generateCode(User user) {
-            String randomCode = UUID.randomUUID().toString();
-        user.setVerificationCode(randomCode);
-        user.setLocked(false);
-        userRepository.save(user);
-        return randomCode;
+    private String generateVerifyEmailCode() {
+        return UUID.randomUUID().toString();
     }
 }

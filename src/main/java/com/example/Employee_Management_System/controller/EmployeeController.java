@@ -1,6 +1,6 @@
 package com.example.Employee_Management_System.controller;
 
-import com.example.Employee_Management_System.domain.User;
+import  com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employee")
+@CrossOrigin(origins = "*", maxAge=3600)
 public class EmployeeController {
 
     @Autowired
