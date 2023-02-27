@@ -10,9 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 @RestController
 @RequestMapping("/api/manager")
+@CrossOrigin(origins = "http://127.0.0.1:5173")
 public class ManagerController {
     @Autowired
     private ManagerService managerService;
