@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
+@CrossOrigin(origins = "*", maxAge=3600)
 public class AuthController {
     @Autowired
     private AuthService authService;
@@ -25,6 +25,11 @@ public class AuthController {
     @PostMapping("/register-account")
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) throws UnsupportedEncodingException, MessagingException {
         return authService.register(registerRequest);
+    }
+
+    @PostMapping("/exists-email")
+    public ResponseEntity<Response> existsEmail(@RequestBody String email) {
+        return authService.existsEmail(email);
     }
 
     @PostMapping( "/login")

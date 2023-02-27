@@ -1,6 +1,6 @@
 package com.example.Employee_Management_System.controller;
 
-import com.example.Employee_Management_System.domain.User;
+import  com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/employee")
+@CrossOrigin(origins = "*", maxAge=3600)
 public class EmployeeController {
 
     @Autowired
