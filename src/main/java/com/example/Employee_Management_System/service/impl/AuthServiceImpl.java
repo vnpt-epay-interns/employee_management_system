@@ -3,14 +3,17 @@ package com.example.Employee_Management_System.service.impl;
 import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CheckEmailExistRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.utils.AvatarLinkCreator;
 import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -46,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
+                .avatar(AvatarLinkCreator.createAvatarLink(registerRequest.getFirstName(), registerRequest.getLastName()))
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .isLocked(true)
                 .build();
@@ -66,12 +70,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new LoginFailedException("Wrong email or password");
+        }
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -182,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<Response> verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
         if (user == null) {
-            return ResponseEntity.badRequest().body(
+            return ResponseEntity.ok().body(
                     Response.builder()
                             .status(400)
                             .message("Wrong verification code")
@@ -203,12 +211,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Response> existsEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
+    public ResponseEntity<Response> existsEmail(CheckEmailExistRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.ok(
                     Response
                             .builder()
-                            .status(200)
+                            .status(400)
                             .message("Email already exists")
                             .build()
             );

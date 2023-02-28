@@ -49,4 +49,8 @@
         JOIN users u
         ON w.employee_id = u.id;
     </select>
+
+  <select id="getReferenceCode" resultType="string">
+    SELECT referenced_code FROM managers WHERE id = #{id}
+  </select>
 </mapper>

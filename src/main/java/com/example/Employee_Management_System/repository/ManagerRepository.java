@@ -7,6 +7,7 @@ import com.example.Employee_Management_System.dto.response.WorkingScheduleRespon
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
 import com.example.Employee_Management_System.mapper.TaskMapper;
+import com.example.Employee_Management_System.model.ManagerInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,5 +42,11 @@ public class ManagerRepository {
 
     public Optional<Task> getTaskById(long taskId) {
         return Optional.ofNullable(taskMapper.getTaskById(taskId));
+    }
+
+
+
+    public String getReferenceCode(Long id) {
+        return managerMapper.getReferenceCode(id);
     }
 }

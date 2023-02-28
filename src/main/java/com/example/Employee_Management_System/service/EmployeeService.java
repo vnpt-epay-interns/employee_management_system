@@ -25,4 +25,6 @@ public interface EmployeeService {
     User getManagerOfEmployee(long employeeId);
 
     Employee getEmployeeByEmployeeId(long employeeId);
+
+    ResponseEntity<Response> getEmployeeInfo(User employee);
 }
