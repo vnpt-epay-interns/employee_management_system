@@ -66,10 +66,16 @@ public class ManagerController {
         return managerService.getWorkingSchedules(manager, monthNumber);
     }
 
-    @GetMapping("/allEmployees")
+    @GetMapping("/all-employees")
     public ResponseEntity<Response> getAllEmployees() {
         User manager = getCurrentManager();
         return managerService.getAllEmployees(manager);
+    }
+
+    @GetMapping("/get-info")
+    public ResponseEntity<Response> getManagerInfo() {
+        User manager = getCurrentManager();
+        return managerService.getManagerInfo(manager);
     }
 
 

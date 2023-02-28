@@ -3,19 +3,18 @@ package com.example.Employee_Management_System.service.impl;
 import com.example.Employee_Management_System.domain.*;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
-import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -164,6 +163,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         //TODO: throw custom exception
         return employeeMapper.getEmployeeByEmployeeId(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    @Override
+    public ResponseEntity<Response> getEmployeeInfo(User employee) {
+
+        // the employee information is the same as the user information, no need query the database
+        EmployeeInformation employeeInformation = new EmployeeInformation();
+        employeeInformation.setId(employee.getId());
+        employeeInformation.setFirstName(employee.getFirstName());
+        employeeInformation.setLastName(employee.getLastName());
+        employeeInformation.setEmail(employee.getEmail());
+        employeeInformation.setAvatar(employee.getAvatar());
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Get employee info successfully")
+                        .data(employeeInformation)
+                        .build()
+        );
     }
 
 }

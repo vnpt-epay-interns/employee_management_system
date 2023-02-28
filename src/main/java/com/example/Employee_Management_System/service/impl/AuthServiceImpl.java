@@ -11,6 +11,7 @@ import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.utils.AvatarLinkCreator;
 import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -46,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
                 .firstName(registerRequest.getFirstName())
                 .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
+                .avatar(AvatarLinkCreator.createAvatarLink(registerRequest.getFirstName(), registerRequest.getLastName()))
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .isLocked(true)
                 .build();

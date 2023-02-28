@@ -6,6 +6,7 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.exception.ReportException;
+import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
@@ -173,6 +174,18 @@ public class ManagerServiceImpl implements ManagerService {
                 .status(200)
                 .message("Get all reports successfully!")
                 .data(unreadReportsByTaskId)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getManagerInfo(User manager) {
+        // the manager information includes the referencedCode that requires to join tables in database
+        ManagerInformation managerInformation = managerRepository.getManagerInfo(manager.getId());
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get manager info successfully!")
+                .data(managerInformation)
                 .build()
         );
     }
