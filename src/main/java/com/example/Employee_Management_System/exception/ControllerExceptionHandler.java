@@ -9,7 +9,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler({ NotFoundException.class ,NotFoundException.class, RegisterException.class, ReportException.class, IllegalStateException.class })
+    @ExceptionHandler({
+            NotFoundException.class,
+            NotFoundException.class,
+            RegisterException.class,
+            ReportException.class,
+            IllegalStateException.class,
+            LoginFailedException.class
+    })
     public ResponseEntity<Response> handleException(Exception ex) {
         return new ResponseEntity<>(
                 Response

@@ -8,6 +8,7 @@ import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
 import com.example.Employee_Management_System.repository.UserRepository;
@@ -77,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
                     )
             );
         } catch (Exception e) {
-            throw new RegisterException("Wrong email or password");
+            throw new LoginFailedException("Wrong email or password");
         }
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
@@ -215,7 +216,7 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.ok(
                     Response
                             .builder()
-                            .status(200)
+                            .status(400)
                             .message("Email already exists")
                             .build()
             );
