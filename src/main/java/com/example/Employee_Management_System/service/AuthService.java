@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.service;
 
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CheckEmailExistRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.Response;
@@ -22,5 +23,5 @@ public interface AuthService {
 
     ResponseEntity<Response> verify(String code);
 
-    ResponseEntity<Response> existsEmail(String email);
+    ResponseEntity<Response> existsEmail(CheckEmailExistRequest request);
 }

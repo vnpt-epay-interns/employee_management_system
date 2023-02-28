@@ -13,7 +13,7 @@ public class UserRepository {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private ManagerRepository managerService;
+    private ManagerRepository managerRepository;
 
     public void save(User user) {
         userMapper.save(user);
@@ -28,7 +28,7 @@ public class UserRepository {
     }
 
     public Manager findManagerByReferenceCode(String referenceCode) {
-        return managerService.findManagerByReferenceCode(referenceCode);
+        return managerRepository.findManagerByReferenceCode(referenceCode);
     }
 
     public void update(User user) {

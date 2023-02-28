@@ -5,6 +5,8 @@ import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.ManagerService;
+import com.example.Employee_Management_System.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,9 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/manager")
 @CrossOrigin(origins = "*", maxAge=3600)
+@AllArgsConstructor
 public class ManagerController {
-    @Autowired
-    private ManagerService managerService;
+    private final ManagerService managerService;
+    private final UserService userService;
 
     @PostMapping("/tasks/create")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
@@ -66,10 +69,16 @@ public class ManagerController {
         return managerService.getWorkingSchedules(manager, monthNumber);
     }
 
-    @GetMapping("/allEmployees")
+    @GetMapping("/all-employees")
     public ResponseEntity<Response> getAllEmployees() {
         User manager = getCurrentManager();
         return managerService.getAllEmployees(manager);
+    }
+
+    @GetMapping("/get-referenced-code")
+    public ResponseEntity<Response> getManagerInfo() {
+        User manager = getCurrentManager();
+        return managerService.getReferenceCode(manager);
     }
 
 

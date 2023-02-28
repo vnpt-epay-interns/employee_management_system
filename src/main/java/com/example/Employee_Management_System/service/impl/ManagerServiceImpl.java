@@ -6,6 +6,7 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.exception.ReportException;
+import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -174,11 +172,26 @@ public class ManagerServiceImpl implements ManagerService {
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)
-                .message("Get all reports successfully!")
+                .message("Get all repor ts successfully!")
                 .data(unreadReportsByTaskId)
                 .build()
         );
     }
+
+    @Override
+    public ResponseEntity<Response> getReferenceCode(User manager) {
+        String referenceCode = managerRepository.getReferenceCode(manager.getId());
+        Map<String, String> map = new HashMap<>();
+        map.put("referenceCode", referenceCode);
+
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get reference code successfully!")
+                .data(map)
+                .build()
+        );
+    }
+
 
     private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
         User employeeManager = taskRepository.getManagerOfTask(taskId);
