@@ -69,12 +69,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new RegisterException("Wrong email or password");
+        }
         User user = userRepository
                 .findByUsername(loginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found"));
