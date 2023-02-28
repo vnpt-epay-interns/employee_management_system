@@ -46,6 +46,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             List<Task> subTasks = employeeRepository.getTasksByParentTask(task.getId());
             return ResponseEntity.ok(
                     Response.builder()
+                            .message("Get task successfully!")
                             .status(200)
                             .data(
                                     TaskDTO
@@ -70,6 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseEntity<Response> getTasks(User employee) {
         return ResponseEntity.ok(
                 Response.builder()
+                        .message("Get tasks successfully!")
                         .status(200)
                         .data(employeeRepository.getTasksByEmployeeId(employee.getId()))
                         .build()
