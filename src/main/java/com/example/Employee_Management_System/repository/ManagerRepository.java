@@ -44,7 +44,9 @@ public class ManagerRepository {
         return Optional.ofNullable(taskMapper.getTaskById(taskId));
     }
 
-    public ManagerInformation getManagerInfo(Long id) {
-        return managerMapper.getManagerInfo(id);
+
+
+    public String getReferenceCode(Long id) {
+        return managerMapper.getReferenceCode(id);
     }
 }

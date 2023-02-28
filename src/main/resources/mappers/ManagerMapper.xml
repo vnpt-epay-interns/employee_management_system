@@ -50,24 +50,7 @@
         ON w.employee_id = u.id;
     </select>
 
-    <resultMap id="managerInfo"  type="com.example.Employee_Management_System.model.ManagerInformation">
-        <result property="id" column="manager_id" />
-        <result property="firstName" column="firstName" />
-        <result property="lastName" column="lastName" />
-        <result property="email" column="email" />
-        <result property="referencedCode" column="referenced_code" />
-        <result property="avatar" column="avatar" />
-    </resultMap>
-    <select id="getManagerInfo" resultMap="managerInfo">
-            SELECT m.id AS manager_id,
-            u.first_name AS firstName,
-            u.last_name AS lastName,
-            u.email AS email,
-            m.referenced_code AS referenced_code,
-            u.avatar AS avatar
-            FROM managers m
-            JOIN users u
-            ON u.id = m.id
-            WHERE m.id = #{id}
-    </select>
+  <select id="getReferenceCode" resultType="string">
+    SELECT referenced_code FROM managers WHERE id = #{id}
+  </select>
 </mapper>

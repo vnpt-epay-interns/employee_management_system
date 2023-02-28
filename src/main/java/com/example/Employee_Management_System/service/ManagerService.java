@@ -24,5 +24,6 @@ public interface ManagerService {
     ResponseEntity<Response> getAllEmployees(User manager);
     ResponseEntity<Response> getReportsByTaskId(User manager, long taskId);
 
-    ResponseEntity<Response> getManagerInfo(User manager);
+
+    ResponseEntity<Response> getReferenceCode(User manager);
 }

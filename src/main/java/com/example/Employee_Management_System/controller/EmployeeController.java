@@ -56,12 +56,6 @@ public class EmployeeController {
         return employeeService.getWorkingDays(employee);
     }
 
-    @GetMapping("/get-info")
-    public ResponseEntity<Response> getEmployeeInfo() {
-        User employee = getCurrentEmployee();
-        return employeeService.getEmployeeInfo(employee);
-    }
-
     public User getCurrentEmployee() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
