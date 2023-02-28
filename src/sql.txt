@@ -57,10 +57,10 @@ create table tasks (
     priority varchar(25),
     completion int,
     estimate_hours float,
-    user_id int not null,
+    employee_id int not null,
     parent_id int,
     project_id int,
-    foreign key (user_id) references employees(id) on delete cascade,
+    foreign key (employee_id) references employees(id) on delete cascade,
     foreign key (parent_id) references tasks(id),
     foreign key (project_id) references projects(id) on delete cascade
     );
