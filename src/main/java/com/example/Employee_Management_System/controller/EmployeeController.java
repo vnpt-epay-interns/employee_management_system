@@ -26,7 +26,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/get-tasks")
-    public ResponseEntity<Response> viewTask() {
+    public ResponseEntity<Response> viewTasks() {
         User employee = getCurrentEmployee();
         return employeeService.getTasks(employee);
     }

@@ -2,7 +2,7 @@ package com.example.Employee_Management_System.domain;
 
 public enum Status {
 
-    DONE, IN_PROGRESS, NEW;
+    DONE, IN_PROGRESS, NEW, READY_FOR_REVIEW;
 
     public static Status from(String val) {
         switch (val) {
@@ -14,6 +14,9 @@ public enum Status {
             }
             case "NEW" -> {
                 return NEW;
+            }
+            case "READY_FOR_REVIEW" -> {
+                return READY_FOR_REVIEW;
             }
             default -> {
                 return null;
