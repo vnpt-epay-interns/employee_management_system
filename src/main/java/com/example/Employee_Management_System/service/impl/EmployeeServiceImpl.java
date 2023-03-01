@@ -42,7 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .getTaskByIdAndEmployeeId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        if (task.getParentTask() == null) {
+        if (task.getParentId() == null) {
             List<Task> subTasks = employeeRepository.getTasksByParentTask(task.getId());
             return ResponseEntity.ok(
                     Response.builder()

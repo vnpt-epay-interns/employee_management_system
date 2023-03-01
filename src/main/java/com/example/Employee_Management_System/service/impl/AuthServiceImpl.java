@@ -110,12 +110,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         user.setRole("MANAGER");
-        user.setLocked(false);
-        user.setRole("MANAGER");
         userRepository.update(user);
 
         managerService.save(manager);
-
         return ResponseEntity.ok(
                 Response
                 .builder()
@@ -143,6 +140,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setRole("EMPLOYEE");
         user.setLocked(false);
+
         // save user to user table
         userRepository.update(user);
 
