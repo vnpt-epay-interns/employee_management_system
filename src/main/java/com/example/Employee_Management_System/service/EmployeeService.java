@@ -27,4 +27,6 @@ public interface EmployeeService {
     Employee getEmployeeByEmployeeId(long employeeId);
 
     ResponseEntity<Response> getEmployeeInfo(User employee);
+
+    ResponseEntity<Response> getManagerInfo(String referencedCode);
 }

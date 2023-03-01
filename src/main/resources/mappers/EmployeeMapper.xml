@@ -74,4 +74,25 @@
     </select>
 
 
+    <resultMap id="managerInformation" type="com.example.Employee_Management_System.model.ManagerInformation">
+        <result property="id" column="manager_id"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+        <result property="referencedCode" column="referenced_ode"/>
+    </resultMap>
+
+    <select id="getManagerInfo" resultMap="managerInformation">
+        SELECT u.id AS manager_id,
+               u.first_name AS first_name,
+               u.last_name AS last_name,
+               u.email AS email,
+               u.avatar AS avatar,
+              m.referenced_code AS referenced_code
+        FROM users u
+        JOIN managers m
+        ON u.id = m.id
+        WHERE u.id = #{id}
+    </select>
 </mapper>

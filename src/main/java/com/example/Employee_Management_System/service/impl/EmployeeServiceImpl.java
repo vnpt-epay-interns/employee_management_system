@@ -7,8 +7,10 @@ import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
+import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
@@ -183,6 +185,21 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .status(200)
                         .message("Get employee info successfully")
                         .data(employeeInformation)
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getManagerInfo(String referencedCode) {
+        ManagerInformation managerInformation =
+                employeeMapper.getManagerInfo(referencedCode)
+                        .orElseThrow(() -> new NotFoundException("Invalid manager code"));
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Get manager info successfully")
+                        .data(managerInformation)
                         .build()
         );
     }

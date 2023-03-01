@@ -56,6 +56,12 @@ public class EmployeeController {
         return employeeService.getWorkingDays(employee);
     }
 
+    @GetMapping("/get-manager-info/{referencedCode}")
+    public ResponseEntity<Response> getManagerInfo(@PathVariable String referencedCode) {
+        return employeeService.getManagerInfo(referencedCode);
+    }
+
+
     public User getCurrentEmployee() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
