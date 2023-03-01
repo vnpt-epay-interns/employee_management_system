@@ -6,7 +6,6 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.exception.ReportException;
-import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
@@ -54,7 +53,7 @@ public class ManagerServiceImpl implements ManagerService {
                 .endDate(request.getEndDate())
                 .employeeId(request.getEmployeeId())
                 .estimateHours(request.getEstimateHours())
-                .parentTask(request.getParentTask())
+                .parentId(request.getParentTask())
                 .priority(request.getPriority())
                 .build();
         taskRepository.createTask(task);

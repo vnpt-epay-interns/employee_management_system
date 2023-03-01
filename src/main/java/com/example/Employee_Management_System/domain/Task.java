@@ -22,5 +22,5 @@ public class Task {
     private int completion;
     private double estimateHours;
     private Long employeeId;
-    private Long parentTask;
+    private Long parentId;
 }

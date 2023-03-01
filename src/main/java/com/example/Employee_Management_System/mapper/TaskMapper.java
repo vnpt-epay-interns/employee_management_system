@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface TaskMapper {
-    @Insert("INSERT INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours, employee_id, parent_task) VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion}, #{estimateHours}, #{employeeId}, #{parentTask})")
+    @Insert("INSERT INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours, employee_id, parent_id) VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion}, #{estimateHours}, #{employeeId}, #{parentId})")
     void save(Task task);
 
     @Delete("DELETE FROM tasks WHERE id = #{id}")
