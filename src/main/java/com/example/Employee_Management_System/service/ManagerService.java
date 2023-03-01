@@ -5,8 +5,11 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.model.ManagerInformation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public interface ManagerService {
@@ -26,4 +29,6 @@ public interface ManagerService {
 
 
     ResponseEntity<Response> getReferenceCode(User manager);
+
+    Optional<ManagerInformation> getManagerInfo(String referencedCode);
 }

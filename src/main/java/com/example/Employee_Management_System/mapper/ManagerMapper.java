@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface ManagerMapper {
@@ -22,4 +23,6 @@ public interface ManagerMapper {
     List<WorkingScheduleResponse> getWorkingSchedules(long monthNumber);
 
     String getReferenceCode(Long id);
+
+    Optional<ManagerInformation> getManagerInfo(String referencedCode);
 }

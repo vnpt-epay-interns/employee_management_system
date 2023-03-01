@@ -49,4 +49,8 @@ public class ManagerRepository {
     public String getReferenceCode(Long id) {
         return managerMapper.getReferenceCode(id);
     }
+
+    public Optional<ManagerInformation> getManagerInfo(String referencedCode) {
+        return managerMapper.getManagerInfo(referencedCode);
+    }
 }

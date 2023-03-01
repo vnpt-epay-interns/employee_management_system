@@ -189,20 +189,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
-    @Override
-    public ResponseEntity<Response> getManagerInfo(String referencedCode) {
-        ManagerInformation managerInformation =
-                employeeMapper.getManagerInfo(referencedCode)
-                        .orElseThrow(() -> new NotFoundException("Invalid manager code"));
 
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .message("Get manager info successfully")
-                        .data(managerInformation)
-                        .build()
-        );
-    }
 
 }
 

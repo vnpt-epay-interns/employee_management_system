@@ -28,5 +28,4 @@ public interface EmployeeService {
 
     ResponseEntity<Response> getEmployeeInfo(User employee);
 
-    ResponseEntity<Response> getManagerInfo(String referencedCode);
 }
