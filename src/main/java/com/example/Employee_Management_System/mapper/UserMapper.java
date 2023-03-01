@@ -1,9 +1,11 @@
 package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.response.Response;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
 
@@ -22,4 +24,5 @@ public interface UserMapper {
 
     User findByVerificationCode(String verificationCode);
 
+    User findById(long employeeId);
 }

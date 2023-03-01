@@ -21,6 +21,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<Response> getUserByEmployeeId(Long employeeId) {
+        User user = userRepository.findUserById(employeeId);
+        return ResponseEntity.ok(
+                Response
+                        .builder()
+                        .status(200)
+                        .message("Successfully")
+                        .data(user)
+                        .build()
+        );
+    }
+
+    @Override
     public ResponseEntity<Response> getUserInfo(User currentUser) {
         // the current user contains all the information of the user, no need to query the database
         UserInformation userInformation = new UserInformation(currentUser);

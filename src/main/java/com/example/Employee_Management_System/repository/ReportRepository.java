@@ -28,7 +28,7 @@ public class ReportRepository {
         return reportMapper.findUnreadReportsByEmployeeId(employeeId);
     }
 
-    public List<ReportBasicInfo> findUnreadReportsByTaskId( long taskId) {
+    public List<ReportBasicInfo> findUnreadReportsByTaskId(long taskId) {
         return reportMapper.findAllReportsByTaskId(taskId);
     }
 

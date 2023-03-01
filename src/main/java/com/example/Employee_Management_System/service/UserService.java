@@ -9,5 +9,7 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
+    ResponseEntity<Response> getUserByEmployeeId(Long employeeId);
+
     ResponseEntity<Response> getUserInfo(User currentUser);
 }

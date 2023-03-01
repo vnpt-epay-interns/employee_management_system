@@ -1,12 +1,12 @@
 package com.example.Employee_Management_System.controller;
 
-import com.example.Employee_Management_System.domain.Employee;
 import  com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.EmployeeService;
+import com.example.Employee_Management_System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +19,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/get-task/{id}")
     public ResponseEntity<Response> getTaskById(@PathVariable long id) {
@@ -58,8 +61,8 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable Long id) {
-        return employeeService.getEmployeeByEmployeeId(id);
+    public ResponseEntity<Response> getEmployeeById(@PathVariable Long id) {
+        return userService.getUserByEmployeeId(id);
     }
 
     public User getCurrentEmployee() {
