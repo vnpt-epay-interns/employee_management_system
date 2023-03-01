@@ -59,7 +59,6 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationCode(code);
         userRepository.save(user);
         sendVerificationEmail(user, String.format("http://127.0.0.1:8080/api/auth/verify/%s", code));
-
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -196,9 +195,10 @@ public class AuthServiceImpl implements AuthService {
                             .build()
             );
         } else {
-            user.setVerificationCode(null);
+//            user.setVerificationCode(null);
             user.setLocked(false);
-            userRepository.save(user);
+            userRepository.updateVerificationCode(user);
+            userRepository.update(user);
             return ResponseEntity.ok().body(
                     Response.builder()
                             .status(200)
