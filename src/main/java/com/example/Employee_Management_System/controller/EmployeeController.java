@@ -1,5 +1,6 @@
 package com.example.Employee_Management_System.controller;
 
+import com.example.Employee_Management_System.domain.Employee;
 import  com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
@@ -54,6 +55,11 @@ public class EmployeeController {
     public ResponseEntity<Response> getWorkingDays() {
         User employee = getCurrentEmployee();
         return employeeService.getWorkingDays(employee);
+    }
+
+    @GetMapping("/{id}")
+    public Employee getEmployeeById(@PathVariable Long id) {
+        return employeeService.getEmployeeByEmployeeId(id);
     }
 
     public User getCurrentEmployee() {
