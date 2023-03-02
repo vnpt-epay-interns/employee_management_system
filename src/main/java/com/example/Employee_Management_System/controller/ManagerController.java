@@ -80,6 +80,10 @@ public class ManagerController {
         return managerService.getReferenceCode(manager);
     }
 
+    @GetMapping("/get-user-info/{employeeId}")
+    public ResponseEntity<Response> getEmployeeById(@PathVariable Long employeeId) {
+        return userService.getUserByEmployeeId(employeeId);
+    }
 
     private User getCurrentManager() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

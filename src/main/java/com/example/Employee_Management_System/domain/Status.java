@@ -9,13 +9,13 @@ public enum Status {
             case "DONE" -> {
                 return DONE;
             }
-            case "IN_PROGRESS" -> {
+            case "IN-PROGRESS" -> {
                 return IN_PROGRESS;
             }
             case "NEW" -> {
                 return NEW;
             }
-            case "READY_FOR_REVIEW" -> {
+            case "READY FOR REVIEW" -> {
                 return READY_FOR_REVIEW;
             }
             default -> {

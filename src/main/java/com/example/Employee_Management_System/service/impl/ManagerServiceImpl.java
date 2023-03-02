@@ -40,7 +40,6 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> createTask(User manager, CreateTaskRequest request) {
         if (checkEmployeeBelongsToManager(manager.getId(), request.getEmployeeId())) {
             throw new IllegalStateException("Employee not belong to the manager!");
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
         }
 
         Task task = Task
@@ -171,7 +170,7 @@ public class ManagerServiceImpl implements ManagerService {
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)
-                .message("Get all repor ts successfully!")
+                .message("Get all reports ts successfully!")
                 .data(unreadReportsByTaskId)
                 .build()
         );
@@ -239,7 +238,7 @@ public class ManagerServiceImpl implements ManagerService {
     public ResponseEntity<Response> getAllEmployees(User manager) {
         Collection<Employee> employeeList = managerRepository.getAllEmployees();
         employeeList.removeIf(employee -> !Objects.equals(employee.getManagerId(), manager.getId()));
-        return ResponseEntity.ok(Response.builder().status(200).message("!!!").data(employeeList).build());
+        return ResponseEntity.ok(Response.builder().status(200).message("Successfully!").data(employeeList).build());
     }
 
 }

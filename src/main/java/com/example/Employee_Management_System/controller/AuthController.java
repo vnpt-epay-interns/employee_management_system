@@ -9,7 +9,6 @@ import com.example.Employee_Management_System.service.AuthService;
 import com.example.Employee_Management_System.service.UserService;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
