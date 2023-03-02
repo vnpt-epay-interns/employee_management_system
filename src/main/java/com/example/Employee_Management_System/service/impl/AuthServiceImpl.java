@@ -189,19 +189,19 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.ok().body(
                     Response.builder()
                             .status(400)
-                            .message("Wrong verification code")
+                            .message("Invalid verification code")
                             .data(verificationCode)
                             .build()
             );
         } else {
-//            user.setVerificationCode(null);
-            user.setLocked(false);
+
+            user.setVerificationCode(null);
             userRepository.updateVerificationCode(user);
             userRepository.update(user);
             return ResponseEntity.ok().body(
                     Response.builder()
                             .status(200)
-                            .message("Right verification code")
+                            .message("Verify successfully")
                             .build()
             );
         }
