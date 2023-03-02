@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         String code = generateVerifyEmailCode();
         user.setVerificationCode(code);
         userRepository.save(user);
-        sendVerificationEmail(user, String.format("http://127.0.0.1:8080/api/auth/verify/%s", code));
+        sendVerificationEmail(user, code);
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -165,7 +165,7 @@ public class AuthServiceImpl implements AuthService {
         return UUID.randomUUID();
     }
 
-    private void sendVerificationEmail(User user, String siteUrl) {
+    private void sendVerificationEmail(User user, String code) {
         String toAddress = user.getEmail();
         String subject = "Please verify your registration";
         String content;
@@ -173,8 +173,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-            String sb = siteUrl;
-            content = HtmlMailVerifiedCreator.generateHTML(user.getFirstName(), sb);
+            content = HtmlMailVerifiedCreator.generateHTML(user.getFirstName(), code);
             helper.setTo(toAddress);
             helper.setSubject(subject);
             helper.setText(content, true);
