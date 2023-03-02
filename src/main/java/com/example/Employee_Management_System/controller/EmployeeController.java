@@ -9,6 +9,7 @@ import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +60,8 @@ public class EmployeeController {
         User employee = getCurrentEmployee();
         return employeeService.getWorkingDays(employee);
     }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Response> getEmployeeById(@PathVariable Long id) {

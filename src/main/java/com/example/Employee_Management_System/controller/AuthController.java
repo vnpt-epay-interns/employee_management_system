@@ -46,6 +46,12 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
+    @GetMapping("/get-manager-info/{referencedCode}")
+    public ResponseEntity<Response> getManagerInfo(@PathVariable String referencedCode) {
+        return authService.getManagerInfo(referencedCode);
+    }
+
+
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/register-account/manager")
     public ResponseEntity<Response> registerManager() {
@@ -66,8 +72,10 @@ public class AuthController {
     }
 
     private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext()
+        User user = (User) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
+
+        return user;
     }
 }

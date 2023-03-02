@@ -25,4 +25,6 @@ public interface UserMapper {
     User findByVerificationCode(String verificationCode);
 
     User findById(long employeeId);
+    @Update("UPDATE users SET verification_code = #{verificationCode} WHERE id = #{id}")
+    void updateIsLocked(User user);
 }

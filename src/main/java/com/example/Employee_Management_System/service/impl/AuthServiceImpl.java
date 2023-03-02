@@ -11,6 +11,7 @@ import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
+import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
 import com.example.Employee_Management_System.utils.AvatarLinkCreator;
@@ -59,7 +60,6 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationCode(code);
         userRepository.save(user);
         sendVerificationEmail(user, String.format("http://127.0.0.1:8080/api/auth/verify/%s", code));
-
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -87,7 +87,6 @@ public class AuthServiceImpl implements AuthService {
         LoginResponse token = LoginResponse
                 .builder()
                 .token(jwtToken)
-                .role(user.getRole())
                 .build();
         return ResponseEntity.ok(
                 Response
@@ -196,9 +195,10 @@ public class AuthServiceImpl implements AuthService {
                             .build()
             );
         } else {
-            user.setVerificationCode(null);
+//            user.setVerificationCode(null);
             user.setLocked(false);
-            userRepository.save(user);
+            userRepository.updateVerificationCode(user);
+            userRepository.update(user);
             return ResponseEntity.ok().body(
                     Response.builder()
                             .status(200)
@@ -227,6 +227,21 @@ public class AuthServiceImpl implements AuthService {
                             .build()
             );
         }
+    }
+
+    @Override
+    public ResponseEntity<Response> getManagerInfo(String referencedCode) {
+        ManagerInformation managerInformation =
+        managerService.getManagerInfo(referencedCode)
+                        .orElseThrow(() -> new NotFoundException("Invalid manager code"));
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Get manager info successfully")
+                        .data(managerInformation)
+                        .build()
+        );
     }
 
     private String generateVerifyEmailCode() {

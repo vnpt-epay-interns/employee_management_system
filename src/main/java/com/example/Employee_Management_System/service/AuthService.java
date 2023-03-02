@@ -24,4 +24,6 @@ public interface AuthService {
     ResponseEntity<Response> verify(String code);
 
     ResponseEntity<Response> existsEmail(CheckEmailExistRequest request);
+    ResponseEntity<Response> getManagerInfo(String referencedCode);
+
 }

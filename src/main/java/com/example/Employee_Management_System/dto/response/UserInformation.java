@@ -21,7 +21,7 @@ public class UserInformation {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.avatar = user.getAvatar();
-        this.isEmailVerified = user.getVerificationCode() == null; // if verificationCode is null, it means that the user has verified their email
+        this.isEmailVerified = user.getVerificationCode() == null || user.getVerificationCode().length() == 0; // if verificationCode is null, it means that the user has verified their email
         this.isLocked = user.isLocked();
         this.role = user.getRole();
     }
