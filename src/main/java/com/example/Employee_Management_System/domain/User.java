@@ -24,6 +24,7 @@ public class User implements UserDetails {
     public String role;
     public String avatar;
     public String verificationCode;
+    public String registrationMethod;
     public boolean isLocked;
 
     @Override

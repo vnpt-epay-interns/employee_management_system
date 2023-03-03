@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.controller;
 
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.CheckEmailExistRequest;
+import com.example.Employee_Management_System.dto.request.GoogleLoginRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.Response;
@@ -43,7 +44,7 @@ public class AuthController {
 
     @PostMapping( "/login")
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+        return authService.formLogin(loginRequest);
     }
 
     @GetMapping("/get-manager-info/{referencedCode}")
@@ -51,18 +52,22 @@ public class AuthController {
         return authService.getManagerInfo(referencedCode);
     }
 
+    @PostMapping("/google-login")
+    public ResponseEntity<Response> googleLogin(@RequestBody GoogleLoginRequest loginRequest) {
+        return authService.googleLogin(loginRequest);
+    }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/register-account/manager")
     public ResponseEntity<Response> registerManager() {
-        return authService.registerManager(getCurrentUser());
+        return authService.selectRoleManager(getCurrentUser());
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/register-account/employee/{referenceCode}")
     public ResponseEntity<Response> registerEmployee(@PathVariable String referenceCode) {
         User user = getCurrentUser();
-        return authService.registerEmployee(user, referenceCode);
+        return authService.selectRoleEmployee(user, referenceCode);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -143,6 +143,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .atAfternoon(request.isAtAfternoon())
                 .employeeId(employee.getId()).build();
         employeeRepository.scheduleWorkingDays(workingSchedule);
+        //TODO: rewrite the response
         return ResponseEntity.ok(Response.builder().message("!!!").status(200).data(null).build());
     }
 

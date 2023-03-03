@@ -2,7 +2,7 @@ package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
-import com.example.Employee_Management_System.domain.WorkingSchedule;
+import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
@@ -36,8 +36,8 @@ public class ManagerRepository {
         return managerMapper.getAllEmployees();
     }
 
-    public List<WorkingScheduleResponse> getWorkingSchedules(long monthNumber) {
-        return managerMapper.getWorkingSchedules(monthNumber);
+    public List<WorkingScheduleResponse> getWorkingSchedulesOfEmployeeByManagerId(User manager, long monthNumber) {
+        return managerMapper.getWorkingSchedules(manager.getId(), monthNumber);
     }
 
     public Optional<Task> getTaskById(long taskId) {

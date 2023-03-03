@@ -12,6 +12,7 @@
         <result property="role" column="role" />
         <result property="isLocked" column="is_locked" javaType="boolean"/>
         <result property="verificationCode" column="verification_code" />
+        <result property="registrationMethod" column="registration_method" />
     </resultMap>
 
     <select id="findById" resultMap="user">

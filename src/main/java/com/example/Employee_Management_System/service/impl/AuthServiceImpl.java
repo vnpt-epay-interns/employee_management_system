@@ -4,17 +4,21 @@ import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.CheckEmailExistRequest;
+import com.example.Employee_Management_System.dto.request.GoogleLoginRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.enums.RegistrationMethod;
 import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
+import com.example.Employee_Management_System.model.GoogleUserInfo;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.*;
 import com.example.Employee_Management_System.utils.AvatarLinkCreator;
+import com.example.Employee_Management_System.utils.GoogleAPIHelper;
 import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -27,6 +31,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -51,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
                 .avatar(AvatarLinkCreator.createAvatarLink(registerRequest.getFirstName(), registerRequest.getLastName()))
+                .registrationMethod(RegistrationMethod.FORM.toString())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .isLocked(true)
                 .build();
@@ -58,6 +64,7 @@ public class AuthServiceImpl implements AuthService {
 
         String code = generateVerifyEmailCode();
         user.setVerificationCode(code);
+
         userRepository.save(user);
         sendVerificationEmail(user, code);
         return ResponseEntity.ok(
@@ -69,7 +76,8 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    public ResponseEntity<Response> login(LoginRequest loginRequest) {
+    public ResponseEntity<Response> formLogin(LoginRequest loginRequest) {
+        // wrong email or password
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -80,26 +88,44 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new LoginFailedException("Wrong email or password");
         }
-        User user = userRepository
-                .findByUsername(loginRequest.getEmail())
-                .orElseThrow(() -> new NotFoundException("User not found"));
-        String jwtToken = jwtService.generateToken(user);
-        LoginResponse token = LoginResponse
-                .builder()
-                .token(jwtToken)
-                .build();
+
+        // when user try to login by form for the email that was registered by other method
+        User user = getUserByEmail(loginRequest.getEmail());
+        if (!user.getRegistrationMethod().equals(RegistrationMethod.FORM.toString())) {
+            throw new LoginFailedException("Email was registered by other method");
+        }
+
+
+        LoginResponse response = generateAccessTokenAndCreateLoginResponse(user);
+
         return ResponseEntity.ok(
                 Response
                         .builder()
                         .status(200)
                         .message("Login successfully!")
-                        .data(token)
+                        .data(response)
                         .build()
         );
     }
 
+    private LoginResponse generateAccessTokenAndCreateLoginResponse(User user) {
+        String jwtToken = jwtService.generateToken(user);
+        LoginResponse token = LoginResponse
+                .builder()
+                .token(jwtToken)
+                .build();
+        return token;
+    }
+
+    private User getUserByEmail(String email) {
+        User user = userRepository
+                .findByUsername(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        return user;
+    }
+
     @Override
-    public ResponseEntity<Response> registerManager(User user) {
+    public ResponseEntity<Response> selectRoleManager(User user) {
         if (user.getRole() != null){
             throw new RegisterException("Account already has a role");
         }
@@ -123,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    public ResponseEntity<Response> registerEmployee(User user, String referenceCode) {
+    public ResponseEntity<Response> selectRoleEmployee(User user, String referenceCode) {
         if (user.getRole() != null) {
             throw new RegisterException("Account already has a role");
         }
@@ -241,6 +267,54 @@ public class AuthServiceImpl implements AuthService {
                         .data(managerInformation)
                         .build()
         );
+    }
+
+    @Override
+    public ResponseEntity<Response> googleLogin(GoogleLoginRequest loginRequest) {
+
+        GoogleUserInfo googleUserInfo = GoogleAPIHelper.getUserInfo(loginRequest.getAuthorizationCode());
+
+        String email = googleUserInfo.getEmail();
+        User user = null;
+
+        if (userRepository.existsByEmail(email)) {
+            // if the email exists, it means the user has already registered
+            // so we just need to login
+            user = getUserByEmail(email);
+
+            // if the user has registered by form, but login with google, we need to throw an exception
+            if (!user.getRegistrationMethod().equals(RegistrationMethod.GOOGLE.toString())) {
+                throw new LoginFailedException("Email was registered by other method");
+            }
+
+
+        } else {
+            // if the email does not exist, it means the user has not registered yet
+            // so we need to register the user first
+            user = User.builder()
+                    .email(email)
+                    .firstName(googleUserInfo.getFirstName())
+                    .lastName(googleUserInfo.getLastName())
+                    .avatar(googleUserInfo.getAvatar())
+                    .verificationCode(null) // verified code is null, meaning this user has already verified, no need to verify email again
+                    .isLocked(true)
+                    .registrationMethod(RegistrationMethod.GOOGLE.toString())
+                    .build();
+
+            userRepository.save(user);
+        }
+
+        // generate access token
+        LoginResponse response = generateAccessTokenAndCreateLoginResponse(user);
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Login successfully")
+                        .data(response)
+                        .build()
+        );
+
     }
 
     private String generateVerifyEmailCode() {

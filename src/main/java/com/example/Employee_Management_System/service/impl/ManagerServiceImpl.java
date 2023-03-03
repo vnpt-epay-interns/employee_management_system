@@ -230,9 +230,13 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber) {
-        List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedules(monthNumber);
-        workingSchedules.removeIf(workingSchedule -> !workingSchedule.getEmployeeId().equals(manager.getId()));
-        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream().collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
+        List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedulesOfEmployeeByManagerId(manager, monthNumber);
+//        workingSchedules.removeIf(workingSchedule -> !workingSchedule.getEmployeeId().equals(manager.getId()));
+
+        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream()
+                .collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
+
+        System.out.println(collect);
         return ResponseEntity.ok(Response.builder().status(200).message("Get working schedule successfully!").data(collect).build());
     }
 

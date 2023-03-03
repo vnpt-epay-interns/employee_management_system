@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Mapper
 public interface UserMapper {
-    @Insert("INSERT INTO users (first_name, last_name, password, email, role, avatar, is_locked, verification_code) VALUES (#{firstName}, #{lastName}, #{password}, #{email}, #{role}, #{avatar}, #{isLocked}, #{verificationCode})")
+@Insert("INSERT INTO users (first_name, last_name, password, email, role, avatar, is_locked, verification_code, registration_method) VALUES (#{firstName}, #{lastName}, #{password}, #{email}, #{role}, #{avatar}, #{isLocked}, #{verificationCode}, #{registrationMethod})")
     void save(User user);
 
     Optional<User> findByEmail(String email);

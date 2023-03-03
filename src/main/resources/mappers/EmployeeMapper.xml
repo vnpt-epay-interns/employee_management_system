@@ -58,7 +58,7 @@
         <result property="employeeName" column="employee_name" />
         <result property="date" column="date" />
         <result property="atMorning" column="at_morning" javaType="boolean" />
-        <result property="atAfternoon" column="af_afternoon" javaType="boolean" />
+        <result property="atAfternoon" column="at_afternoon" javaType="boolean" />
     </resultMap>
 
     <select id="getWorkingSchedule" resultMap="getScheduleWorkingDay">

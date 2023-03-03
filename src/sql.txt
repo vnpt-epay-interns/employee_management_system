@@ -8,7 +8,8 @@ create table users (
     role varchar(255),
     avatar varchar(3000),
     verification_code varchar(255),
-    is_locked boolean default true
+    is_locked boolean default true,
+    registration_method varchar(255) not null default 'FORM',
 );
     
     
@@ -64,3 +65,15 @@ create table tasks (
     foreign key (parent_id) references tasks(id),
     foreign key (project_id) references projects(id) on delete cascade
     );
+
+create table reports (
+	id int primary key auto_increment,
+    title varchar(255),
+    content longtext,
+    created_at date,
+    created_by int not null,
+    task_id int,
+    is_read boolean default false,
+    foreign key (created_by) references users(id) on delete cascade,
+    foreign key (task_id) references tasks(id) on delete cascade
+);
