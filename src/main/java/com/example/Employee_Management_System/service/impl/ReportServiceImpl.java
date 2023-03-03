@@ -43,8 +43,6 @@ public class ReportServiceImpl implements ReportService {
         return reportRepository.findUnreadReportsByTaskId(taskId);
     }
 
-
-
     @Override
     public User getManagerOfEmployeeReport(long reportId) {
         return reportRepository.getManagerOfEmployeeReport(reportId);

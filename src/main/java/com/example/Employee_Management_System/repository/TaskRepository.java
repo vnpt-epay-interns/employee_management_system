@@ -29,8 +29,8 @@ public class TaskRepository {
         taskMapper.delete(task);
     }
 
-    public Optional<Task> getTask(long taskId) {
-        return Optional.ofNullable(taskMapper.getTaskById(taskId));
+    public Task getTask(long taskId) {
+        return taskMapper.getTaskById(taskId);
     }
 
     public User getManagerOfEmployee(Long taskId) {

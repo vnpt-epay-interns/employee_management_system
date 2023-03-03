@@ -14,21 +14,17 @@ import java.util.Optional;
 @Service
 public interface ManagerService {
 
-    ResponseEntity<Response> createTask(User manager, CreateTaskRequest request);
-    ResponseEntity<Response> deleteTask(User manager, long taskId);
-    ResponseEntity<Response> updateTask(User manager, long taskId, UpdateTaskRequest updateTaskRequest);
+    ResponseEntity<Response> createTask(CreateTaskRequest request);
+    ResponseEntity<Response> deleteTask(long taskId);
+    ResponseEntity<Response> updateTask(long taskId, UpdateTaskRequest updateTaskRequest);
     ResponseEntity<Response> getAllReports(User manager);
     ResponseEntity<Response> getReportById(User manager, long reportId);
     ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId);
     ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber);
-
     void save(Manager manager);
-
     ResponseEntity<Response> getAllEmployees(User manager);
     ResponseEntity<Response> getReportsByTaskId(User manager, long taskId);
-
-
     ResponseEntity<Response> getReferenceCode(User manager);
-
     Optional<ManagerInformation> getManagerInfo(String referencedCode);
+    ResponseEntity<Response> getAllTasks(User manager);
 }

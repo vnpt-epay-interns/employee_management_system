@@ -22,13 +22,23 @@
 <!--        SELECT * FROM working_schedules where MONTH(date) = #{monthNumber}-->
 <!--    </select>-->
 
-    <resultMap id="getAllEmployees" type="com.example.Employee_Management_System.domain.Employee">
+    <resultMap id="getAllEmployees" type="com.example.Employee_Management_System.model.EmployeeInformation">
         <result property="id" column="id"/>
-        <result property="managerId" column="manager_id"/>
+        <result property="firstName" column="first_name" />
+        <result property="lastName" column="last_name" />
+        <result property="email" column="email" />
+        <result property="avatar" column="avatar" />
     </resultMap>
 
     <select id="getAllEmployees" resultMap="getAllEmployees">
-        SELECT * FROM employees;
+        SELECT e.id AS id,
+            u.first_name AS first_name,
+            u.last_name AS last_name,
+            u.email AS email,
+            u.avatar AS avatar
+        FROM employees e
+        JOIN users u ON e.id = u.id
+        WHERE e.manager_id = #{managerId}
     </select>
 
     <resultMap id="getWorkingSchedulesWName" type="com.example.Employee_Management_System.dto.response.WorkingScheduleResponse">
@@ -83,5 +93,58 @@
                  JOIN users u
                       ON u.id = m.id
         WHERE m.referenced_code = #{referencedCode}
+    </select>
+
+    <resultMap id="task_user_info" type="com.example.Employee_Management_System.dto.response.TaskDTO">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="completion" column="completion"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="estimateHours" column="estimate_hours"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="priority" column="priority"/>
+        <result property="projectId" column="project_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="employeeName" column="employee_name"/>
+        <result property="numberReports" column="number_reports"/>
+    </resultMap>
+    <select id="getAllTasks" resultMap="task_user_info">
+        SELECT t.id,
+               t.title,
+               t.description,
+               t.status,
+               t.completion,
+               t.start_date,
+               t.end_date,
+               t.employee_id,
+               t.estimate_hours,
+               t.parent_id,
+               t.priority,
+               t.project_id,
+               t.employee_name,
+               count(r.id) as number_reports
+        FROM(SELECT t.id,
+                    t.title,
+                    t.description,
+                    t.status,
+                    t.completion,
+                    t.start_date,
+                    t.end_date,
+                    t.employee_id,
+                    t.estimate_hours,
+                    t.parent_id,
+                    t.priority,
+                    t.project_id,
+                    CONCAT(u.first_name, ' ', u.last_name) AS employee_name
+             FROM employees e
+                      JOIN users u on u.id = e.id
+                      JOIN tasks t on t.employee_id = e.id
+             WHERE e.manager_id = 4) t
+                left join reports r on r.task_id = t.id
+        group by t.id
     </select>
 </mapper>

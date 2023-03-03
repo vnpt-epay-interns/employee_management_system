@@ -16,6 +16,6 @@ public class CreateTaskRequest {
     private Date startDate;
     private Date endDate;
     private Long employeeId;
-    private double estimateHours;
-    private Long parentTask;
+    private Double estimateHours;
+    private Long parentId;
 }

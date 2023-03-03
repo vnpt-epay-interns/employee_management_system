@@ -23,9 +23,7 @@ public interface EmployeeMapper {
     List<Employee> getAllEmployeesByManagerId(long managerId);
 
     List<WorkingScheduleResponse>getWorkingSchedule(User employee);
+
     @Insert("INSERT INTO working_schedules(date, at_morning, at_afternoon, employee_id) VALUES (#{date}, #{atMorning}, #{atAfternoon}, #{employeeId})")
     void scheduleWorkingDays(WorkingSchedule workingSchedule);
-
-    Optional<ManagerInformation> getManagerInfo(String referencedCode);
-
 }

@@ -2,7 +2,7 @@ package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.Manager;
-import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import org.apache.ibatis.annotations.Insert;
@@ -20,11 +20,13 @@ public interface ManagerMapper {
 
     Manager findByReferenceCode(String referenceCode);
 
-    Collection<Employee> getAllEmployees();
-
     List<WorkingScheduleResponse> getWorkingSchedules(long managerId, long monthNumber);
+
+    Collection<Employee> getAllEmployees(Long managerId);
 
     String getReferenceCode(Long id);
 
     Optional<ManagerInformation> getManagerInfo(String referencedCode);
+
+    List<TaskDTO> getAllTasks(Long managerId);
 }

@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.domain.Task;
 
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.domain.WorkingSchedule;
+import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.mapper.TaskMapper;
@@ -45,7 +46,7 @@ public class EmployeeRepository {
         employeeMapper.scheduleWorkingDays(workingSchedule);
     }
 
-    public List<Task> getTasksByEmployeeId(Long employeeId) {
+    public List<TaskDTO> getTasksByEmployeeId(Long employeeId) {
         return taskMapper.getTasksByEmployeeId(employeeId);
     }
 }

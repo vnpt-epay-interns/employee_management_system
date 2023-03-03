@@ -15,6 +15,7 @@ public class UserInformation {
     private String role;
     private boolean isEmailVerified;
     private boolean isLocked;
+
     public UserInformation(User user) {
         this.id = user.getId();
         this.firstName = user.getFirstName();

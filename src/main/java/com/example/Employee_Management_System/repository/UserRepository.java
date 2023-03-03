@@ -2,10 +2,8 @@ package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
-import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -44,7 +42,6 @@ public class UserRepository {
     public User findByVerificationCode(String verificationCode) {
         return userMapper.findByVerificationCode(verificationCode);
     }
-
 
     public User findUserById(Long employeeId) {
         return userMapper.findById(employeeId);

@@ -16,12 +16,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task getTaskByTaskId(long taskId) {
         // TODO: custom exception
-        return taskRepository.getTask(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
-    }
-
-    @Override
-    public User getManagerOfEmployee(Long taskId) {
-        return taskRepository.getManagerOfEmployee(taskId);
+        return taskRepository.getTask(taskId);
     }
 
     @Override

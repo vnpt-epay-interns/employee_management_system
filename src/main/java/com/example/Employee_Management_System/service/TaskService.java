@@ -6,9 +6,6 @@ import com.example.Employee_Management_System.domain.User;
 public interface TaskService {
     //tODO: this one
     Task getTaskByTaskId(long taskId);
-
-    User getManagerOfEmployee(Long employeeId);
-
     User getEmployeeOfTask(Long taskId);
 
 }
