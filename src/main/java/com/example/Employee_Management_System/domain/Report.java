@@ -3,6 +3,7 @@ package com.example.Employee_Management_System.domain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.sql.Date;
 @Data
@@ -14,7 +15,7 @@ public class Report {
     private String title;
     private String content;
     private Date createdAt;
-    private Long employeeId;
+    private Long createdBy;
     private Long taskId;
     private boolean isRead;
 

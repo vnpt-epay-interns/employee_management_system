@@ -1,10 +1,12 @@
 package com.example.Employee_Management_System.controller;
 
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.ManagerService;
+import com.example.Employee_Management_System.service.ProjectService;
 import com.example.Employee_Management_System.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ public class ManagerController {
     private final ManagerService managerService;
     private final UserService userService;
 
+    private ProjectService projectService;
     @PostMapping("/tasks/create")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
         User manager = getCurrentManager();
@@ -68,11 +71,11 @@ public class ManagerController {
         return managerService.getWorkingSchedules(manager, monthNumber);
     }
 
-    @GetMapping("/all-employees")
-    public ResponseEntity<Response> getAllEmployees() {
-        User manager = getCurrentManager();
-        return managerService.getAllEmployees(manager);
-    }
+//    @GetMapping("/all-employees")
+//    public ResponseEntity<Response> getAllEmployees() {
+//        User manager = getCurrentManager();
+//        return managerService.getAllEmployees(manager);
+//    }
 
     @GetMapping("/get-referenced-code")
     public ResponseEntity<Response> getManagerInfo() {
@@ -84,4 +87,33 @@ public class ManagerController {
     private User getCurrentManager() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+
+    @GetMapping("/get-all-employees")
+    public ResponseEntity<Response> getEmployeeBelongToManager() {
+        User manager = getCurrentManager();
+        return managerService.getEmployeeBelongToManager(manager.getId());
+    }
+
+    @PostMapping("/create-project")
+    public ResponseEntity<Response> createProject(@RequestBody CreateProjectRequest request) {
+        Long managerId = getCurrentManager().getId();
+        return managerService.createProject(request, managerId);
+    }
+
+    @GetMapping("/get-project/{id}")
+    public ResponseEntity<Response> getProjectById(@PathVariable Long id) {
+        return managerService.getProjectById(id);
+    }
+
+    @GetMapping("/get-all-projects")
+    public ResponseEntity<Response> getAllProjects() {
+        return managerService.getAllProjects();
+    }
+
+//    @GetMapping("/get-all-projects")
+//    public ResponseEntity<Response> getAllProjects() {
+//        User manager = getCurrentManager();
+//        return managerService.getAllProjects();
+//    }
 }

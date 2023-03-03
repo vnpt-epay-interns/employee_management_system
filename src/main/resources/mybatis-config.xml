@@ -10,6 +10,8 @@
         <typeAlias type="com.example.Employee_Management_System.domain.Report" alias="Report"/>
         <typeAlias type="com.example.Employee_Management_System.domain.Task" alias="Task"/>
         <typeAlias type="com.example.Employee_Management_System.domain.Manager" alias="Manager"/>
+        <typeAlias type="com.example.Employee_Management_System.domain.Project" alias="Project"/>
+
     </typeAliases>
     <mappers>
         <mapper resource="mappers/UserMapper.xml"/>
@@ -17,5 +19,8 @@
         <mapper resource="mappers/ReportMapper.xml"/>
         <mapper resource="mappers/TaskMapper.xml"/>
         <mapper resource="mappers/ManagerMapper.xml"/>
+        <mapper resource="mappers/ProjectMapper.xml"/>
+
+
     </mappers>
 </configuration>

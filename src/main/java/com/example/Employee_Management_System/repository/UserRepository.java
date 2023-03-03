@@ -4,10 +4,13 @@ import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.mapper.UserMapper;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -37,6 +40,11 @@ public class UserRepository {
         userMapper.update(user);
     }
 
+    //update only firstname and lastName
+    public void updateName(User user) {
+        userMapper.updateName(user);
+    }
+
     public void updateVerificationCode(User user) {
         userMapper.updateVerificationCode(user);
     }
@@ -48,5 +56,9 @@ public class UserRepository {
 
     public User findUserById(Long employeeId) {
         return userMapper.findById(employeeId);
+    }
+
+    public List<EmployeeInformation> getEmployeeBelongToManager(long managerId) {
+        return userMapper.getEmployeeBelongToManager(managerId);
     }
 }

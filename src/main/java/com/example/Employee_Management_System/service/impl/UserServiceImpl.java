@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.UpdateProfileRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.repository.UserRepository;
@@ -42,6 +43,19 @@ public class UserServiceImpl implements UserService {
                         .status(200)
                         .message("Get user information successfully")
                         .data(userInformation)
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> updateUserInfo(User user, UpdateProfileRequest updateProfileRequest) {
+        user.setFirstName(updateProfileRequest.getFirstName());
+        user.setLastName(updateProfileRequest.getLastName());
+        userRepository.updateName(user);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Update user information successfully")
                         .build()
         );
     }

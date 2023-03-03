@@ -19,7 +19,7 @@ public interface ReportMapper {
 
     List<ReportBasicInfo> findAllReportsByTaskId(long taskId);
 
-    @Insert("INSERT INTO reports (title, content, task_id, employee_id, created_at, is_read) VALUES (#{title}, #{content}, #{taskId}, #{employeeId}, #{createdAt}, #{isRead})")
+    @Insert("INSERT INTO reports (title, content, task_id, created_by, created_at, is_read) VALUES (#{title}, #{content}, #{taskId}, #{createdBy}, #{createdAt}, #{isRead})")
     void save(Report report);
 
     User getManagerOfEmployeeReport(long reportId);

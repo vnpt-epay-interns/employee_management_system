@@ -3,16 +3,17 @@
 <mapper namespace="com.example.Employee_Management_System.mapper.UserMapper">
 
     <resultMap id="user" type="com.example.Employee_Management_System.domain.User">
-        <result property="id" column="id" />
-        <result property="firstName" column="first_name" />
-        <result property="lastName" column="last_name" />
-        <result property="email" column="email" />
-        <result property="avatar" column="avatar" />
-        <result property="password" column="password" />
-        <result property="role" column="role" />
+        <result property="id" column="id"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
         <result property="isLocked" column="is_locked" javaType="boolean"/>
-        <result property="verificationCode" column="verification_code" />
+        <result property="verificationCode" column="verification_code"/>
     </resultMap>
+
 
     <select id="findById" resultMap="user">
         SELECT * FROM users WHERE id = #{id}
@@ -24,5 +25,19 @@
 
     <select id="findByVerificationCode" resultMap="user">
         SELECT * FROM users WHERE verification_code = #{verificationCode}
+    </select>
+
+    <resultMap id="employeeInformation" type="com.example.Employee_Management_System.model.EmployeeInformation">
+        <result property="id" column="id"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+
+    <select id="getEmployeeBelongToManager"
+            resultMap="employeeInformation">
+        SELECT e.id, u.first_name, u.last_name, u.email, u.avatar from employees as e join users as u on e.id = u.id
+        where e.manager_id = #{managerId}
     </select>
 </mapper>

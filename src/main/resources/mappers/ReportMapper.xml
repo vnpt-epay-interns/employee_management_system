@@ -10,17 +10,15 @@
     </resultMap>
 
 
-
-
     <select id="getAllUnreadReports" resultMap="reportBasic">
         SELECT
-            r.id AS report_id,
-            r.title AS report_title,
-            CONCAT(emp_info.first_name, ' ', emp_info.last_name) AS employee_name,
-            r.created_at AS created_at
+        r.id AS report_id,
+        r.title AS report_title,
+        CONCAT(emp_info.first_name, ' ', emp_info.last_name) AS employee_name,
+        r.created_at AS created_at
         FROM reports r
-                 JOIN users emp_info ON r.employee_id = emp_info.id
-                 JOIN employees emp_extended_info ON emp_info.id = emp_extended_info.id
+        JOIN users emp_info ON r.created_by = emp_info.id
+        JOIN employees emp_extended_info ON emp_info.id = emp_extended_info.id
         WHERE emp_extended_info.manager_id = #{id} AND r.is_read = 0
     </select>
 
@@ -30,27 +28,27 @@
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="createdAt" column="created_at"/>
-        <result property="employeeId" column="employee_id" javaType="java.lang.Long"/>
+        <result property="createdBy" column="created_by" javaType="java.lang.Long"/>
         <result property="taskId" column="task_id"/>
         <result property="isRead" column="is_read" javaType="boolean"/>
     </resultMap>
     <select id="findById" resultMap="report">
-            SELECT
-                id,
-                title,
-                content,
-                created_at,
-                employee_id,
-                task_id,
-                is_read
-                FROM reports WHERE id = #{id}
+        SELECT
+        id,
+        title,
+        content,
+        created_at,
+        employee_id,
+        task_id,
+        is_read
+        FROM reports WHERE id = #{id}
     </select>
 
     <select id="findUnreadReportsByEmployeeId" resultMap="reportBasic">
         SELECT r.id AS report_id,
-            r.title AS report_title,
-            CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-            r.created_at AS created_at
+        r.title AS report_title,
+        CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+        r.created_at AS created_at
         FROM reports r
         JOIN users e ON r.employee_id = e.id
         WHERE r.is_read = 0 AND r.employee_id = #{employeeId}
@@ -58,9 +56,9 @@
 
     <select id="findAllReportsByTaskId" resultMap="reportBasic">
         SELECT r.id AS report_id,
-               r.title AS report_title,
-               CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-               r.created_at AS created_at
+        r.title AS report_title,
+        CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+        r.created_at AS created_at
         FROM reports r
         JOIN users e ON r.employee_id = e.id
         WHERE r.task_id = #{taskId}
@@ -78,22 +76,22 @@
 
     <select id="getManagerOfEmployeeReport" resultMap="manager">
         SELECT
-            u.id AS id,
-            u.first_name AS first_name,
-            u.last_name AS last_name,
-            u.email AS email,
-            u.password AS password,
-            u.role AS role,
-            u.is_locked AS is_locked
+        u.id AS id,
+        u.first_name AS first_name,
+        u.last_name AS last_name,
+        u.email AS email,
+        u.password AS password,
+        u.role AS role,
+        u.is_locked AS is_locked
         FROM users u
         WHERE u.id = (
-            SELECT emp.manager_id
-            FROM employees emp
-            WHERE emp.id = (
-                 SELECT r.employee_id
-                 FROM reports r
-                 WHERE r.id = #{reportId}
-            )
+        SELECT emp.manager_id
+        FROM employees emp
+        WHERE emp.id = (
+        SELECT r.employee_id
+        FROM reports r
+        WHERE r.id = #{reportId}
+        )
         )
     </select>
 </mapper>
