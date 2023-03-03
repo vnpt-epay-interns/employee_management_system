@@ -39,10 +39,8 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
         if (request.getParentId() != null) {
-            System.out.println(request.getParentId());
             Task parenTask = managerRepository
                     .getTaskById(request.getParentId());
-            System.out.println(parenTask);
             if (parenTask == null) {
                 throw new IllegalStateException("Parent task is not exist!");
             }
