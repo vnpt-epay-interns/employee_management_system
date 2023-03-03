@@ -35,8 +35,8 @@ create table working_schedules(
     date date,
     at_morning boolean,
     at_afternoon boolean,
-    user_id int,
-    foreign key (user_id) references users(id)
+    employee_id int,
+    foreign key (employee_id) references users(id)
     on delete cascade
 );
 

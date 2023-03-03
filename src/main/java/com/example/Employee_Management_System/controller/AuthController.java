@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.dto.request.CheckEmailExistRequest
 import com.example.Employee_Management_System.dto.request.GoogleLoginRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
+import com.example.Employee_Management_System.dto.request.UpdateProfileRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.AuthService;
 import com.example.Employee_Management_System.service.UserService;
@@ -82,5 +83,12 @@ public class AuthController {
                 .getPrincipal();
 
         return user;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/update-user-info")
+    public ResponseEntity<Response> updateUserInfo(@RequestBody UpdateProfileRequest updateProfileRequest) {
+        User user = getCurrentUser();
+        return userService.updateUserInfo(user, updateProfileRequest);
     }
 }

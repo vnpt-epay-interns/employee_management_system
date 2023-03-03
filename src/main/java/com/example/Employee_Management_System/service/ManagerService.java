@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.service;
 
 import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
@@ -22,9 +23,16 @@ public interface ManagerService {
     ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId);
     ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber);
     void save(Manager manager);
-    ResponseEntity<Response> getAllEmployees(User manager);
+
     ResponseEntity<Response> getReportsByTaskId(User manager, long taskId);
     ResponseEntity<Response> getReferenceCode(User manager);
     Optional<ManagerInformation> getManagerInfo(String referencedCode);
     ResponseEntity<Response> getAllTasks(User manager);
+    ResponseEntity<Response> getEmployeeBelongToManager(User manager);
+
+    ResponseEntity<Response> createProject(CreateProjectRequest createProjectRequest, Long managerId);
+
+    ResponseEntity<Response> getProjectById(Long id);
+
+    ResponseEntity<Response> getAllProjects();
 }

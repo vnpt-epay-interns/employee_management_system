@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.Employee_Management_System.mapper.ProjectMapper">
+    <resultMap id="project" type="com.example.Employee_Management_System.domain.Project">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="managerId" column="manager_id" />
+    </resultMap>
+
+    <select id="getAllProjects" resultMap="project">
+        SELECT * FROM projects;
+    </select>
+
+    <select id="getProjectById" resultMap="project">
+        SELECT * FROM projects WHERE id = #{id};
+    </select>
+
+<!--    <select id="findByName" resultMap="project">-->
+<!--        SELECT * FROM projects WHERE name = #{name};-->
+<!--    </select>-->
+</mapper>

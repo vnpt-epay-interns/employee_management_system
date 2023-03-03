@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -107,12 +108,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         Report report = Report.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
-                .createdAt(new Date(System.currentTimeMillis()))
-                .createBy(employee.getId())
+                .createdAt(Date.valueOf(LocalDate.now()))
+                .createdBy(employee.getId())
                 .taskId(request.getTaskId())
                 .isRead(false)
                 .build();
 
+        System.out.println(report);
         reportService.save(report);
 
         return ResponseEntity.ok(

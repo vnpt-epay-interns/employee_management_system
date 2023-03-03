@@ -1,16 +1,20 @@
 package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.*;
+import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.exception.ReportException;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
+import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
+import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ReportService;
@@ -29,6 +33,8 @@ public class ManagerServiceImpl implements ManagerService {
     private final TaskRepository taskRepository;
     private final ReportService reportService;
     private final EmployeeService employeeService;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
@@ -195,6 +201,52 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
+    public ResponseEntity<Response> getEmployeeBelongToManager(User manager) {
+        List<EmployeeInformation> employees = userRepository.getEmployeeBelongToManager(manager.getId());
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get all employees successfully!")
+                .data(employees)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> createProject(CreateProjectRequest createProjectRequest, Long managerId) {
+        Project project = Project.builder()
+                .name(createProjectRequest.getName())
+                .managerId(managerId).build();
+        projectRepository.save(project);
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Create project successfully!")
+                .data(project)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getProjectById(Long id) {
+        Project findProject = projectRepository.getProjectById(id);
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get project successfully!")
+                .data(findProject)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getAllProjects() {
+        List<Project> allProjects = projectRepository.getAllProjects();
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get all projects successfully!")
+                .data(allProjects)
+                .build()
+        );
+    }
+
 
     private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
         User employeeManager = taskRepository.getManagerOfTask(taskId);
@@ -243,11 +295,6 @@ public class ManagerServiceImpl implements ManagerService {
         managerRepository.save(manager);
     }
 
-    @Override
-    public ResponseEntity<Response> getAllEmployees(User manager) {
-        Collection<Employee> employeeList = managerRepository.getAllEmployees(manager.getId());
-        return ResponseEntity.ok(Response.builder().status(200).message("Successfully!").data(employeeList).build());
-    }
 
 }
 
