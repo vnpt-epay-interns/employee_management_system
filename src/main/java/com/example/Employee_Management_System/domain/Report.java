@@ -9,13 +9,11 @@ import java.sql.Date;
 @Builder
 @AllArgsConstructor
 public class Report {
-
     private Long id;
     private String title;
     private String content;
     private Date createdAt;
-    private Long employeeId;
+    private Long createBy;
     private Long taskId;
     private boolean isRead;
-
 }

@@ -17,4 +17,5 @@ public class UpdateTaskRequest {
     private Date endDate;
     private Long employeeId;
     private double estimateHours;
+    private Long parentId;
 }

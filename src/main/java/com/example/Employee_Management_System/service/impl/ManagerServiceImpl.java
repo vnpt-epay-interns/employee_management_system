@@ -4,21 +4,19 @@ import com.example.Employee_Management_System.domain.*;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
-import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ReportService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
 import java.util.*;
@@ -27,20 +25,21 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ManagerServiceImpl implements ManagerService {
-
     private final ManagerRepository managerRepository;
-
-    private final EmployeeRepository employeeRepository;
-
     private final TaskRepository taskRepository;
-
     private final ReportService reportService;
-
     private final EmployeeService employeeService;
+
     @Override
-    public ResponseEntity<Response> createTask(User manager, CreateTaskRequest request) {
-        if (checkEmployeeBelongsToManager(manager.getId(), request.getEmployeeId())) {
-            throw new IllegalStateException("Employee not belong to the manager!");
+    public ResponseEntity<Response> createTask(CreateTaskRequest request) {
+        if (request.getParentId() != null) {
+            System.out.println(request.getParentId());
+            Task parenTask = managerRepository
+                    .getTaskById(request.getParentId());
+            System.out.println(parenTask);
+            if (parenTask == null) {
+                throw new IllegalStateException("Parent task is not exist!");
+            }
         }
 
         Task task = Task
@@ -53,7 +52,7 @@ public class ManagerServiceImpl implements ManagerService {
                 .endDate(request.getEndDate())
                 .employeeId(request.getEmployeeId())
                 .estimateHours(request.getEstimateHours())
-                .parentId(request.getParentTask())
+                .parentId(request.getParentId())
                 .priority(request.getPriority())
                 .build();
         taskRepository.createTask(task);
@@ -68,15 +67,11 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public ResponseEntity<Response> deleteTask(User manager, long taskId) {
-
+    public ResponseEntity<Response> deleteTask(long taskId) {
         Task task = managerRepository
-                .getTaskById(taskId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found!"));
-
-        if (checkEmployeeBelongsToManager(manager.getId(), task.getEmployeeId())) {
-            throw new IllegalStateException("Employee not belong to the manager!");
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
+                .getTaskById(taskId);
+        if (task == null) {
+            throw new IllegalStateException("Task not found!");
         }
 
         taskRepository.deleteTask(task);
@@ -90,14 +85,11 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public ResponseEntity<Response> updateTask(User manager, long taskId, UpdateTaskRequest updateTaskRequest) {
+    public ResponseEntity<Response> updateTask(long taskId, UpdateTaskRequest updateTaskRequest) {
         Task task = managerRepository
-                .getTaskById(taskId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found!"));
-
-        if (checkEmployeeBelongsToManager(manager.getId(), task.getEmployeeId())) {
-            throw new IllegalStateException("Employee not belong to the manager!");
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not belong to the manager!");
+                .getTaskById(taskId);
+        if (task == null) {
+            throw new IllegalStateException("Task not found!");
         }
 
         task.setTitle(updateTaskRequest.getTitle());
@@ -109,6 +101,7 @@ public class ManagerServiceImpl implements ManagerService {
         task.setEndDate(updateTaskRequest.getEndDate());
         task.setEmployeeId(updateTaskRequest.getEmployeeId());
         task.setEstimateHours(updateTaskRequest.getEstimateHours());
+        task.setParentId(updateTaskRequest.getParentId());
 
         taskRepository.updateTask(task);
         return ResponseEntity.ok(
@@ -118,13 +111,6 @@ public class ManagerServiceImpl implements ManagerService {
                         .message("Update task successfully!")
                         .build()
         );
-    }
-
-    private boolean checkEmployeeBelongsToManager(Long managerId, Long employeeId) {
-        return employeeRepository
-                .getAllEmployeesByManagerId(managerId)
-                .stream()
-                .noneMatch(employee -> Objects.equals(employee.getId(), employeeId));
     }
 
     @Override
@@ -196,6 +182,18 @@ public class ManagerServiceImpl implements ManagerService {
         return managerRepository.getManagerInfo(referencedCode);
     }
 
+    @Override
+    public ResponseEntity<Response> getAllTasks(User manager) {
+        List<TaskDTO> tasks = managerRepository.getAllTasks(manager.getId());
+        return ResponseEntity.ok(
+                Response
+                        .builder()
+                        .status(200)
+                        .message("Get all tasks successfully!")
+                        .data(tasks)
+                        .build()
+        );
+    }
 
 
     private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
@@ -243,8 +241,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getAllEmployees(User manager) {
-        Collection<Employee> employeeList = managerRepository.getAllEmployees();
-        employeeList.removeIf(employee -> !Objects.equals(employee.getManagerId(), manager.getId()));
+        Collection<Employee> employeeList = managerRepository.getAllEmployees(manager.getId());
         return ResponseEntity.ok(Response.builder().status(200).message("Successfully!").data(employeeList).build());
     }
 

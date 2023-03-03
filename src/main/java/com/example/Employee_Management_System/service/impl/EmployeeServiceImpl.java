@@ -7,10 +7,7 @@ import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
-import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
-import com.example.Employee_Management_System.model.EmployeeInformation;
-import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
@@ -53,8 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                             .data(
                                     TaskDTO
                                             .builder()
-                                            .parentTask(task)
-                                            .subTasks(subTasks)
+
                                             .build()
                             )
                             .build()
@@ -73,13 +69,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseEntity<Response> getTasks(User employee) {
         return ResponseEntity.ok(
                 Response.builder()
-                        .message("Get tasks successfully!")
+                        .message("Get all tasks successfully!")
                         .status(200)
                         .data(employeeRepository.getTasksByEmployeeId(employee.getId()))
                         .build()
         );
     }
-
 
     @Override
     public ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest) {
@@ -113,7 +108,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .title(request.getTitle())
                 .content(request.getContent())
                 .createdAt(new Date(System.currentTimeMillis()))
-                .employeeId(employee.getId())
+                .createBy(employee.getId())
                 .taskId(request.getTaskId())
                 .isRead(false)
                 .build();
@@ -168,28 +163,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.getEmployeeByEmployeeId(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
-
-    @Override
-    public ResponseEntity<Response> getEmployeeInfo(User employee) {
-
-        // the employee information is the same as the user information, no need query the database
-        EmployeeInformation employeeInformation = new EmployeeInformation();
-        employeeInformation.setId(employee.getId());
-        employeeInformation.setFirstName(employee.getFirstName());
-        employeeInformation.setLastName(employee.getLastName());
-        employeeInformation.setEmail(employee.getEmail());
-        employeeInformation.setAvatar(employee.getAvatar());
-
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .message("Get employee info successfully")
-                        .data(employeeInformation)
-                        .build()
-        );
-    }
-
-
-
 }
 

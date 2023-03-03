@@ -12,11 +12,11 @@
         <result property="endDate" column="end_date"/>
         <result property="employeeId" column="employee_id"/>
         <result property="estimateHours" column="estimate_hours"/>
-        <result property="parentTask" column="parent_task"/>
+        <result property="parentId" column="parent_id"/>
         <result property="priority" column="priority"/>
     </resultMap>
 
-    <select id="getTask" resultMap="task">
+    <select id="getTaskById" resultMap="task">
         SELECT *
         FROM tasks
         WHERE id = #{id}
@@ -92,16 +92,76 @@
         SELECT * FROM tasks WHERE id = #{id} AND employee_id = #{employeeId};
     </select>
 
-    <select id="getTasks" resultMap="task">
-        SELECT * FROM tasks WHERE employee_id = #{employeeId};
+    <resultMap id="task_user_info" type="com.example.Employee_Management_System.dto.response.TaskDTO">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="completion" column="completion"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="estimateHours" column="estimate_hours"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="priority" column="priority"/>
+        <result property="projectId" column="project_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="employeeName" column="employee_name"/>
+    </resultMap>
+    <select id="getTasks" resultMap="task_user_info">
+        SELECT t.id AS id,
+               t.title AS title,
+               t.description AS description,
+               t.status AS status,
+               t.completion AS completion,
+               t.start_date AS start_date,
+               t.end_date AS end_date,
+               t.employee_id AS employee_id,
+               t.estimate_hours AS estimate_hours,
+               t.parent_id AS parent_id,
+               t.priority AS priority,
+               t.project_id AS project_id,
+               CONCAT(u.first_name, ' ', u.last_name) AS employee_name
+        FROM tasks t
+        JOIN users u ON t.employee_id = u.id
     </select>
 
-    <select id="getTaskById" resultMap="task">
-        SELECT * FROM tasks WHERE id = #{id};
+    <select id="getTaskAndEmployeeInfo" resultMap="task_user_info">
+        SELECT t.id AS id,
+               t.title AS title,
+               t.description AS description,
+               t.status AS status,
+               t.completion AS completion,
+               t.start_date AS start_date,
+               t.end_date AS end_date,
+               t.employee_id AS employee_id,
+               t.estimate_hours AS estimate_hours,
+               t.parent_id AS parent_id,
+               t.priority AS priority,
+               t.project_id AS project_id,
+               CONCAT(u.first_name, ' ', u.last_name) AS employee_name
+        FROM tasks t
+        JOIN users u ON t.employee_id = u.id
+        WHERE t.id = #{id}
     </select>
 
-    <select id="getTasksByEmployeeId" resultMap="task">
-        SELECT * FROM tasks WHERE employee_id = #{employeeId};
+    <select id="getTasksByEmployeeId" resultMap="task_user_info">
+        SELECT t.id AS id,
+               t.title AS title,
+               t.description AS description,
+               t.status AS status,
+               t.completion AS completion,
+               t.start_date AS start_date,
+               t.end_date AS end_date,
+               t.employee_id AS employee_id,
+               t.estimate_hours AS estimate_hours,
+               t.parent_id AS parent_id,
+               t.priority AS priority,
+               t.project_id AS project_id,
+               CONCAT(u.first_name, ' ', u.last_name) AS employee_name
+        FROM tasks t
+        JOIN users u ON t.employee_id = u.id
+        WHERE t.employee_id = #{employeeId}
     </select>
 
     <select id="getTasksByParentTask" resultMap="task">

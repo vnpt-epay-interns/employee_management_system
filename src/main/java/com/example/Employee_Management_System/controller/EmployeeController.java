@@ -6,10 +6,8 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequ
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.EmployeeService;
-import com.example.Employee_Management_System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,16 +19,13 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @Autowired
-    private UserService userService;
-
     @GetMapping("/get-task/{id}")
     public ResponseEntity<Response> getTaskById(@PathVariable long id) {
         User employee = getCurrentEmployee();
         return employeeService.getTaskById(id, employee);
     }
 
-    @GetMapping("/get-tasks")
+    @GetMapping("/get-all-tasks")
     public ResponseEntity<Response> viewTasks() {
         User employee = getCurrentEmployee();
         return employeeService.getTasks(employee);
@@ -59,13 +54,6 @@ public class EmployeeController {
     public ResponseEntity<Response> getWorkingDays() {
         User employee = getCurrentEmployee();
         return employeeService.getWorkingDays(employee);
-    }
-
-
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Response> getEmployeeById(@PathVariable Long id) {
-        return userService.getUserByEmployeeId(id);
     }
 
     public User getCurrentEmployee() {

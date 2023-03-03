@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.response.TaskDTO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -14,11 +15,11 @@ public interface TaskMapper {
     @Delete("DELETE FROM tasks WHERE id = #{id}")
     void delete(Task task);
 
-    Task getTaskById(Long taskId);
+    Task getTaskAndEmployeeInfo(Long taskId);
 
     Task getTaskByIdAndEmployeeId(@Param("id") Long taskId, Long employeeId);
 
-    List<Task> getTasksByEmployeeId(Long employeeId);
+    List<TaskDTO> getTasksByEmployeeId(Long employeeId);
 
     List<Task> getTasks(Long employeeId);
 
@@ -32,4 +33,6 @@ public interface TaskMapper {
     User getManagerOfTask(long taskId);
 
     User getEmployeeOfTask(Long taskId);
+
+    Task getTaskById(Long taskId);
 }

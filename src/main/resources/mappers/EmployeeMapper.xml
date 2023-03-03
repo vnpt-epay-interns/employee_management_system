@@ -72,7 +72,4 @@
         on u.id = w.employee_id
         where  u.id = #{id};
     </select>
-
-
-
 </mapper>

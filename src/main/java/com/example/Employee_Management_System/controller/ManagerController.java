@@ -5,7 +5,6 @@ import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.ManagerService;
-import com.example.Employee_Management_System.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,24 +17,26 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class ManagerController {
     private final ManagerService managerService;
-    private final UserService userService;
 
     @PostMapping("/tasks/create")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
-        User manager = getCurrentManager();
-        return managerService.createTask(manager, request);
+        return managerService.createTask(request);
     }
 
     @DeleteMapping("/tasks/delete/{taskId}")
     public ResponseEntity<Response> deleteTask(@PathVariable long taskId) {
-        User manager = getCurrentManager();
-        return managerService.deleteTask(manager, taskId);
+        return managerService.deleteTask(taskId);
     }
 
     @PutMapping("/tasks/update/{taskId}")
     public ResponseEntity<Response> updateTask(@PathVariable long taskId, @RequestBody UpdateTaskRequest updateTaskRequest) {
+        return managerService.updateTask(taskId, updateTaskRequest);
+    }
+
+    @GetMapping("/get-all-tasks")
+    public ResponseEntity<Response> getAllTasks() {
         User manager = getCurrentManager();
-        return managerService.updateTask(manager, taskId, updateTaskRequest);
+        return managerService.getAllTasks(manager);
     }
 
     @GetMapping("/reports")
@@ -78,11 +79,6 @@ public class ManagerController {
     public ResponseEntity<Response> getManagerInfo() {
         User manager = getCurrentManager();
         return managerService.getReferenceCode(manager);
-    }
-
-    @GetMapping("/get-user-info/{employeeId}")
-    public ResponseEntity<Response> getEmployeeById(@PathVariable Long employeeId) {
-        return userService.getUserByEmployeeId(employeeId);
     }
 
     private User getCurrentManager() {
