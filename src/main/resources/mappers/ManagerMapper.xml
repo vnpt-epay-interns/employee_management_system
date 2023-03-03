@@ -40,17 +40,23 @@
     </resultMap>
 
     <select id="getWorkingSchedules" resultMap="getWorkingSchedulesWName">
+
         SELECT
-        w.employee_id AS employee_id,
-        u.first_name as employee_name,
-        w.date AS date,
-        w.at_morning AS at_morning,
-        w.at_afternoon AS at_afternoon
+            w.date,
+            w.at_morning,
+            w.at_afternoon,
+            w.employee_id,
+            u.first_name as employee_name
         FROM working_schedules w
-        JOIN users u
-        JOIN employees e
-        ON w.employee_id = u.id
-        WHERE MONTH(w.date) = #{monthNumber} AND e.manager_id = #{managerId}
+                 JOIN users u ON u.id = w.employee_id
+        WHERE MONTH(w.date) = #{monthNumber} AND w.employee_id IN (
+            SELECT id
+            FROM employees
+            WHERE manager_id = #{managerId}
+        )
+        ORDER BY DATE
+
+
     </select>
 
   <select id="getReferenceCode" resultType="string">

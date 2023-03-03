@@ -21,6 +21,7 @@ public interface ManagerMapper {
     Manager findByReferenceCode(String referenceCode);
 
     Collection<Employee> getAllEmployees();
+
     List<WorkingScheduleResponse> getWorkingSchedules(long managerId, long monthNumber);
 
     String getReferenceCode(Long id);
