@@ -72,7 +72,7 @@ public class ManagerController {
         User manager = getCurrentManager();
         return managerService.getEmployeeWorkingSchedules(manager, year,  monthNumber);
     }
-    git
+
     @GetMapping("/get-referenced-code")
     public ResponseEntity<Response> getManagerInfo() {
         User manager = getCurrentManager();
