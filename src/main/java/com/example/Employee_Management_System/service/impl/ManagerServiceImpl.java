@@ -95,12 +95,16 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> updateTask(long taskId, UpdateTaskRequest updateTaskRequest) {
-        Task task = managerRepository
-                .getTaskById(taskId);
-        if (task == null) {
-            throw new IllegalStateException("Task not found!");
+        if (updateTaskRequest.getParentId() != null) {
+            Task parentTask = managerRepository
+                    .getTaskById(updateTaskRequest.getParentId());
+            if (parentTask == null) {
+                throw new IllegalStateException("Parent task is not exist!");
+            }
         }
 
+        Task task = managerRepository
+                .getTaskById(taskId);
         task.setTitle(updateTaskRequest.getTitle());
         task.setDescription(updateTaskRequest.getDescription());
         task.setStatus(updateTaskRequest.getStatus());

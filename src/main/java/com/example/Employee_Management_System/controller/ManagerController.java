@@ -21,17 +21,18 @@ public class ManagerController {
     private final ManagerService managerService;
 
     private ProjectService projectService;
-    @PostMapping("/tasks/create")
+
+    @PostMapping("/create-task")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
         return managerService.createTask(request);
     }
 
-    @DeleteMapping("/tasks/delete/{taskId}")
+    @DeleteMapping("/delete-task/{taskId}")
     public ResponseEntity<Response> deleteTask(@PathVariable long taskId) {
         return managerService.deleteTask(taskId);
     }
 
-    @PutMapping("/tasks/update/{taskId}")
+    @PutMapping("/update-task/{taskId}")
     public ResponseEntity<Response> updateTask(@PathVariable long taskId, @RequestBody UpdateTaskRequest updateTaskRequest) {
         return managerService.updateTask(taskId, updateTaskRequest);
     }
@@ -71,7 +72,7 @@ public class ManagerController {
         User manager = getCurrentManager();
         return managerService.getEmployeeWorkingSchedules(manager, year,  monthNumber);
     }
-
+    git
     @GetMapping("/get-referenced-code")
     public ResponseEntity<Response> getManagerInfo() {
         User manager = getCurrentManager();
@@ -105,9 +106,5 @@ public class ManagerController {
         return managerService.getAllProjects();
     }
 
-//    @GetMapping("/get-all-projects")
-//    public ResponseEntity<Response> getAllProjects() {
-//        User manager = getCurrentManager();
-//        return managerService.getAllProjects();
-//    }
+
 }
