@@ -6,9 +6,9 @@ import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.domain.WorkingSchedule;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
-import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.mapper.TaskMapper;
+import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -38,12 +38,12 @@ public class EmployeeRepository {
         return employeeMapper.getAllEmployeesByManagerId(managerId);
     }
 
-    public List<WorkingScheduleResponse> getSchedule(User employee) {
-        return employeeMapper.getWorkingSchedule(employee);
+    public List<WorkingScheduleDetailedInfo> getWorkingSchedule(long employeeId, int year, int month) {
+        return employeeMapper.getWorkingSchedule(employeeId, year, month + 1); // in Java month starts from 0, but in SQL month starts from 1
     }
 
-    public void scheduleWorkingDays(WorkingSchedule workingSchedule) {
-        employeeMapper.scheduleWorkingDays(workingSchedule);
+    public void scheduleWorkingDays(List<WorkingSchedule> workingSchedules) {
+        employeeMapper.saveWorkingSchedules(workingSchedules);
     }
 
     public List<TaskDTO> getTasksByEmployeeId(Long employeeId) {

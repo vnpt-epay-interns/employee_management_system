@@ -66,17 +66,11 @@ public class ManagerController {
         return managerService.getReportEmployeeId(manager, employeeId);
     }
 
-    @PostMapping("/working-schedule/{monthNumber}")
-    public ResponseEntity<Response> viewWorkingSchedule(@PathVariable long monthNumber) {
+    @GetMapping("/working-schedules/{year}/{monthNumber}")
+    public ResponseEntity<Response> viewWorkingSchedule(@PathVariable int year, @PathVariable int monthNumber) {
         User manager = getCurrentManager();
-        return managerService.getWorkingSchedules(manager, monthNumber);
+        return managerService.getEmployeeWorkingSchedules(manager, year,  monthNumber);
     }
-
-//    @GetMapping("/all-employees")
-//    public ResponseEntity<Response> getAllEmployees() {
-//        User manager = getCurrentManager();
-//        return managerService.getAllEmployees(manager);
-//    }
 
     @GetMapping("/get-referenced-code")
     public ResponseEntity<Response> getManagerInfo() {

@@ -21,7 +21,7 @@ public interface ManagerService {
     ResponseEntity<Response> getAllReports(User manager);
     ResponseEntity<Response> getReportById(User manager, long reportId);
     ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId);
-    ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber);
+    ResponseEntity<Response> getEmployeeWorkingSchedules(User manager, int year, int month);
     void save(Manager manager);
 
     ResponseEntity<Response> getReportsByTaskId(User manager, long taskId);

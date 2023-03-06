@@ -3,8 +3,7 @@ package com.example.Employee_Management_System.mapper;
 import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.domain.WorkingSchedule;
-import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
-import com.example.Employee_Management_System.model.ManagerInformation;
+import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -22,8 +21,7 @@ public interface EmployeeMapper {
 
     List<Employee> getAllEmployeesByManagerId(long managerId);
 
-    List<WorkingScheduleResponse>getWorkingSchedule(User employee);
+    List<WorkingScheduleDetailedInfo> getWorkingSchedule(long employeeId, int year, int month);
 
-    @Insert("INSERT INTO working_schedules(date, at_morning, at_afternoon, employee_id) VALUES (#{date}, #{atMorning}, #{atAfternoon}, #{employeeId})")
-    void scheduleWorkingDays(WorkingSchedule workingSchedule);
+    void saveWorkingSchedules(List<WorkingSchedule> workingSchedules);
 }

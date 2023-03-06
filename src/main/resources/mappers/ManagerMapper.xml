@@ -41,33 +41,6 @@
         WHERE e.manager_id = #{managerId}
     </select>
 
-    <resultMap id="getWorkingSchedulesWName" type="com.example.Employee_Management_System.dto.response.WorkingScheduleResponse">
-        <result property="employeeId" column="employee_id" />
-        <result property="employeeName" column="employee_name" />
-        <result property="date" column="date" />
-        <result property="atMorning" column="at_morning" javaType="boolean"/>
-        <result property="atAfternoon" column="at_afternoon" javaType="boolean"/>
-    </resultMap>
-
-    <select id="getWorkingSchedules" resultMap="getWorkingSchedulesWName">
-
-        SELECT
-            w.date,
-            w.at_morning,
-            w.at_afternoon,
-            w.employee_id,
-            u.first_name as employee_name
-        FROM working_schedules w
-                 JOIN users u ON u.id = w.employee_id
-        WHERE MONTH(w.date) = #{monthNumber} AND w.employee_id IN (
-            SELECT id
-            FROM employees
-            WHERE manager_id = #{managerId}
-        )
-        ORDER BY DATE
-
-
-    </select>
 
   <select id="getReferenceCode" resultType="string">
     SELECT referenced_code FROM managers WHERE id = #{id}

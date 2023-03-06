@@ -15,6 +15,5 @@ public class WorkingSchedule {
     private Long id;
     private Long employeeId;
     private Date date;
-    private boolean atMorning;
-    private boolean atAfternoon;
+    private String status;
 }

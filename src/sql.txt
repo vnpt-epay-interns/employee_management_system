@@ -33,8 +33,7 @@ create table employees (
 create table working_schedules(
 	id int primary key auto_increment,
     date date,
-    at_morning boolean,
-    at_afternoon boolean,
+    status VARCHAR(255),
     employee_id int,
     foreign key (employee_id) references users(id)
     on delete cascade

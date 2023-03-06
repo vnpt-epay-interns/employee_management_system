@@ -53,23 +53,31 @@
         SELECT * FROM employees WHERE manager_id = #{managerId};
     </select>
 
-    <resultMap id="getScheduleWorkingDay" type="com.example.Employee_Management_System.dto.response.WorkingScheduleResponse">
+    <resultMap id="workingScheduleDetailedInfo" type="com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo">
         <result property="employeeId" column="employee_id" />
         <result property="employeeName" column="employee_name" />
-        <result property="date" column="date" />
-        <result property="atMorning" column="at_morning" javaType="boolean" />
-        <result property="atAfternoon" column="at_afternoon" javaType="boolean" />
+        <result property="day" column="day" />
+        <result property="status" column="status" />
     </resultMap>
 
-    <select id="getWorkingSchedule" resultMap="getScheduleWorkingDay">
-        SELECT w.employee_id AS employee_id,
-               u.first_name as employee_name,
-               w.date AS date,
-        w.at_morning AS at_morning,
-        w.at_afternoon AS at_afternoon
+    <select id="getWorkingSchedule" resultMap="workingScheduleDetailedInfo">
+        SELECT
+            w.employee_id AS employee_id,
+            u.first_name as employee_name,
+            DAY(w.date) AS day,
+            w.status AS status
         FROM working_schedules w
-            JOIN users u
+        JOIN users u
         on u.id = w.employee_id
-        where  u.id = #{id};
+        where u.id = #{employeeId} AND MONTH(w.date) = #{month} AND YEAR(w.date) = #{year};
     </select>
+
+
+    <insert id="saveWorkingSchedules" parameterType="java.util.List">
+        INSERT INTO working_schedules (employee_id, date, status)
+        VALUES
+            <foreach collection="workingSchedules" item="workingSchedule" index="index" open="(" separator="),(" close=")">
+                #{workingSchedule.employeeId}, #{workingSchedule.date}, #{workingSchedule.status}
+            </foreach>
+    </insert>
 </mapper>

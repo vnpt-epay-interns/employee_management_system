@@ -5,10 +5,10 @@ import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
-import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
 import com.example.Employee_Management_System.mapper.TaskMapper;
 import com.example.Employee_Management_System.model.ManagerInformation;
+import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -37,9 +37,6 @@ public class ManagerRepository {
         return managerMapper.getAllEmployees(managerId);
     }
 
-    public List<WorkingScheduleResponse> getWorkingSchedulesOfEmployeeByManagerId(User manager, long monthNumber) {
-        return managerMapper.getWorkingSchedules(manager.getId(), monthNumber);
-    }
 
     public Task getTaskById(long taskId) {
         return taskMapper.getTaskById(taskId);

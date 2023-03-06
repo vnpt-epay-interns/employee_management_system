@@ -44,16 +44,16 @@ public class EmployeeController {
         return employeeService.writeReport(employee, request);
     }
 
-    @PostMapping("/schedule-working-day")
+    @PostMapping("/working-schedules")
     public ResponseEntity<Response> scheduleWorkingDay(@RequestBody ScheduleWorkingDayRequest request) {
         User employee = getCurrentEmployee();
         return employeeService.scheduleWorkingDay(employee, request);
     }
 
-    @GetMapping("/get-working-days")
-    public ResponseEntity<Response> getWorkingDays() {
+    @GetMapping("/working-schedules/{year}/{monthNumber}")
+    public ResponseEntity<Response> getWorkingDays(@PathVariable int year, @PathVariable int monthNumber) {
         User employee = getCurrentEmployee();
-        return employeeService.getWorkingDays(employee);
+        return employeeService.getWorkingSchedule(employee, year, monthNumber);
     }
 
     public User getCurrentEmployee() {

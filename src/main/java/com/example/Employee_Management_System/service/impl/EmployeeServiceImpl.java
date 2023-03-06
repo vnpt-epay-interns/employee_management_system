@@ -7,20 +7,26 @@ import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
+import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
+import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
 @Service
 @AllArgsConstructor
@@ -134,20 +140,95 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<Response> scheduleWorkingDay(User employee, ScheduleWorkingDayRequest request) {
-        WorkingSchedule workingSchedule = WorkingSchedule.builder()
-                .date(request.getDate())
-                .atMorning(request.isAtMorning())
-                .atAfternoon(request.isAtAfternoon())
-                .employeeId(employee.getId()).build();
-        employeeRepository.scheduleWorkingDays(workingSchedule);
+        List<WorkingSchedule> workingSchedules = new ArrayList<>();
+
+        int year = request.getYear();
+        int month = request.getMonth();
+        long employeeId = employee.getId();
+
+        // the day of the month starts from 1
+        for (int i = 1; i <= request.getDays().size(); i++) {
+            int day = i;
+            String status = request.getStatuses().get(i - 1);
+
+            // ignore the day that employee not working
+            if (!status.equals("OFF")) {
+                // this is java.sql.Date
+                Date date = Date.valueOf(LocalDate.of(year, month + 1, day)); // because in Java month starts from 0, but in SQA it starts from 1
+
+                WorkingSchedule workingSchedule = WorkingSchedule.builder()
+                        .date(date)
+                        .status(status)
+                        .employeeId(employeeId)
+                        .build();
+
+                workingSchedules.add(workingSchedule);
+            }
+        }
+
+        employeeRepository.scheduleWorkingDays(workingSchedules);
         //TODO: rewrite the response
-        return ResponseEntity.ok(Response.builder().message("!!!").status(200).data(null).build());
+        return ResponseEntity.ok(
+                Response.builder()
+                        .message("Save working schedule successfully!")
+                        .status(200)
+                        .data(null)
+                        .build()
+        );
     }
 
     @Override
-    public ResponseEntity<Response> getWorkingDays(User employee) {
-        List<WorkingScheduleResponse> workingScheduleResponses = employeeRepository.getSchedule(employee);
-        return ResponseEntity.ok(Response.builder().data(workingScheduleResponses).build());
+    public ResponseEntity<Response> getWorkingSchedule(User employee, int year, int month) {
+        MonthInfo monthInfo = CalendarHelper.getMonthInfo(year, month);
+        EmployeeSchedule schedule = getEmployeeSchedule(employee.getId(), year, month, monthInfo);
+
+        WorkingScheduleResponse response = WorkingScheduleResponse.builder()
+                .monthInfo(monthInfo)
+                .schedules(List.of(schedule))
+                .build();
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .data(response)
+                        .build()
+
+        );
+    }
+
+    public EmployeeSchedule getEmployeeSchedule(long employeeId, int year, int monthNumber, MonthInfo monthInfo) {
+        List<WorkingScheduleDetailedInfo> workingSchedule = employeeRepository.getWorkingSchedule(employeeId, year, monthNumber);
+
+        // format multiple working schedules into one employee schedule
+        // because all the schedules belong to the same employee
+        String employeeName = workingSchedule.get(0).getEmployeeName();
+
+        List<Integer> days = new ArrayList<Integer>();
+        List<String> statuses = new ArrayList<String>();
+
+
+        // the day will start from 1 to the number of days in the month
+        for (int day = 1; day <= monthInfo.getNumberOfDays(); day++) {
+            // initialize the days with the day of the month and the status with OFF
+            days.add(day); // the index of a day will be the day - 1, for example the index of day 1 is 0 [1,2,3,...,30]
+            statuses.add("OFF");
+        }
+
+        // then update the days and statuses with the working schedules of the employee
+        for (WorkingScheduleDetailedInfo workingDay : workingSchedule) {
+            statuses.set(workingDay.getDay() - 1, workingDay.getStatus());
+        }
+
+
+        EmployeeSchedule employeeSchedule = EmployeeSchedule.builder()
+                .employeeId(employeeId)
+                .employeeName(employeeName)
+                .days(days)
+                .statuses(statuses)
+                .build();
+
+
+        return employeeSchedule;
     }
 
     @Override

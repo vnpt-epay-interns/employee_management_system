@@ -7,10 +7,12 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
+import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -18,13 +20,16 @@ import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ReportService;
+import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
 @Service
 @AllArgsConstructor
@@ -277,15 +282,43 @@ public class ManagerServiceImpl implements ManagerService {
 
 
     @Override
-    public ResponseEntity<Response> getWorkingSchedules(User manager, long monthNumber) {
-        List<WorkingScheduleResponse> workingSchedules = managerRepository.getWorkingSchedulesOfEmployeeByManagerId(manager, monthNumber);
-//        workingSchedules.removeIf(workingSchedule -> !workingSchedule.getEmployeeId().equals(manager.getId()));
+    public ResponseEntity<Response> getEmployeeWorkingSchedules(User manager, int year,  int month) {
+        // the year is set to the current year
+//        int year = Year.now().getValue();
 
-        TreeMap<Date, List<WorkingScheduleResponse>> collect = workingSchedules.stream()
-                .collect(Collectors.groupingBy(WorkingScheduleResponse::getDate, TreeMap::new, Collectors.toList()));
+        MonthInfo monthInfo = CalendarHelper.getMonthInfo(year, month);
+        List<EmployeeSchedule> schedules = getEmployeeWorkingSchedule(manager, year, month, monthInfo);
 
-        System.out.println(collect);
-        return ResponseEntity.ok(Response.builder().status(200).message("Get working schedule successfully!").data(collect).build());
+        WorkingScheduleResponse body = WorkingScheduleResponse.builder()
+                .monthInfo(monthInfo)
+                .schedules(schedules)
+                .build();
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Get employee working schedules successfully!")
+                        .data(body)
+                        .build()
+        );
+
+    }
+
+    private List<EmployeeSchedule> getEmployeeWorkingSchedule(User manager, int year, int month, MonthInfo monthInfo) {
+
+        List<EmployeeInformation> managedEmployee = userRepository.getEmployeeBelongToManager(manager.getId());
+        List<EmployeeSchedule> employeeSchedules = new ArrayList<>();
+
+        // sort the employees by first name
+        managedEmployee.sort(Comparator.comparing(EmployeeInformation::getFirstName));
+
+        // get all employee schedules of employees who are managed by the manager
+        for (EmployeeInformation employeeInfo : managedEmployee) {
+            EmployeeSchedule employeeSchedule = employeeService.getEmployeeSchedule(employeeInfo.getId(), year, month, monthInfo);
+            employeeSchedules.add(employeeSchedule);
+
+        }
+        return employeeSchedules;
     }
 
     @Override
