@@ -18,17 +18,17 @@ import org.springframework.web.bind.annotation.*;
 public class ManagerController {
     private final ManagerService managerService;
 
-    @PostMapping("/tasks/create")
+    @PostMapping("/create-task")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
         return managerService.createTask(request);
     }
 
-    @DeleteMapping("/tasks/delete/{taskId}")
+    @DeleteMapping("/delete-task/{taskId}")
     public ResponseEntity<Response> deleteTask(@PathVariable long taskId) {
         return managerService.deleteTask(taskId);
     }
 
-    @PutMapping("/tasks/update/{taskId}")
+    @PutMapping("/update-task/{taskId}")
     public ResponseEntity<Response> updateTask(@PathVariable long taskId, @RequestBody UpdateTaskRequest updateTaskRequest) {
         return managerService.updateTask(taskId, updateTaskRequest);
     }
@@ -69,7 +69,7 @@ public class ManagerController {
         return managerService.getWorkingSchedules(manager, monthNumber);
     }
 
-    @GetMapping("/all-employees")
+    @GetMapping("/get-all-employees")
     public ResponseEntity<Response> getAllEmployees() {
         User manager = getCurrentManager();
         return managerService.getAllEmployees(manager);
