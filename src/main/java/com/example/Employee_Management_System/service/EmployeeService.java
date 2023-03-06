@@ -7,6 +7,7 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequ
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.springframework.http.ResponseEntity;
 
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
@@ -23,5 +24,5 @@ public interface EmployeeService {
     User getManagerOfEmployee(long employeeId);
     Employee getEmployeeByEmployeeId(long employeeId);
 
-     EmployeeSchedule getEmployeeSchedule(long employeeId, int year, int monthNumber, MonthInfo monthInfo);
+     EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
 }

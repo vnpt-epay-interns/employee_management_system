@@ -314,7 +314,7 @@ public class ManagerServiceImpl implements ManagerService {
 
         // get all employee schedules of employees who are managed by the manager
         for (EmployeeInformation employeeInfo : managedEmployee) {
-            EmployeeSchedule employeeSchedule = employeeService.getEmployeeSchedule(employeeInfo.getId(), year, month, monthInfo);
+            EmployeeSchedule employeeSchedule = employeeService.getEmployeeSchedule(employeeInfo, year, month, monthInfo);
             employeeSchedules.add(employeeSchedule);
 
         }

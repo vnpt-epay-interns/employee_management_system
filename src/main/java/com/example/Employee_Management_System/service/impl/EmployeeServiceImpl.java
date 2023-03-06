@@ -9,6 +9,7 @@ import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -180,7 +181,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public ResponseEntity<Response> getWorkingSchedule(User employee, int year, int month) {
         MonthInfo monthInfo = CalendarHelper.getMonthInfo(year, month);
-        EmployeeSchedule schedule = getEmployeeSchedule(employee.getId(), year, month, monthInfo);
+
+        EmployeeInformation employeeInfo = new EmployeeInformation();
+        employeeInfo.setId(employee.getId());
+        employeeInfo.setFirstName(employee.getFirstName());
+
+        EmployeeSchedule schedule = getEmployeeSchedule(employeeInfo, year, month, monthInfo);
 
         WorkingScheduleResponse response = WorkingScheduleResponse.builder()
                 .monthInfo(monthInfo)
@@ -196,12 +202,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
-    public EmployeeSchedule getEmployeeSchedule(long employeeId, int year, int monthNumber, MonthInfo monthInfo) {
-        List<WorkingScheduleDetailedInfo> workingSchedule = employeeRepository.getWorkingSchedule(employeeId, year, monthNumber);
+    public EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo , int year, int monthNumber, MonthInfo monthInfo) {
+        List<WorkingScheduleDetailedInfo> workingSchedule = employeeRepository.getWorkingSchedule(employeeInfo.getId(), year, monthNumber);
 
         // format multiple working schedules into one employee schedule
         // because all the schedules belong to the same employee
-        String employeeName = workingSchedule.get(0).getEmployeeName();
 
         List<Integer> days = new ArrayList<Integer>();
         List<String> statuses = new ArrayList<String>();
@@ -221,8 +226,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         EmployeeSchedule employeeSchedule = EmployeeSchedule.builder()
-                .employeeId(employeeId)
-                .employeeName(employeeName)
+                .employeeId(employeeInfo.getId())
+                .employeeName(employeeInfo.getFirstName())
                 .days(days)
                 .statuses(statuses)
                 .build();
