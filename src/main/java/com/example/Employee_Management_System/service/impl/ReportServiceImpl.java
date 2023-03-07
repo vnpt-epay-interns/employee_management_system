@@ -2,7 +2,7 @@ package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.Report;
 import com.example.Employee_Management_System.domain.User;
-import com.example.Employee_Management_System.model.ReportBasicInfo;
+import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.repository.ReportRepository;
 import com.example.Employee_Management_System.service.ReportService;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportBasicInfo> getAllUnreadReports(User manager) {
+    public List<ReportDetailedInfo> getAllUnreadReports(User manager) {
         return reportRepository.getAllUnreadReports(manager);
     }
 
@@ -34,13 +34,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportBasicInfo> getAllUnreadReportsByEmployeeId(User manager, long employeeId) {
-        return reportRepository.findUnreadReportsByEmployeeId(employeeId);
+    public List<ReportDetailedInfo> getAllUnreadReportsByEmployeeId(User manager, long employeeId) {
+        return reportRepository.findReportsByEmployeeId(employeeId);
     }
 
     @Override
-    public List<ReportBasicInfo> getAllUnreadReportsByTaskId(long taskId) {
-        return reportRepository.findUnreadReportsByTaskId(taskId);
+    public List<ReportDetailedInfo> getAllReportsByTaskId(long taskId) {
+        return reportRepository.findReportsByTaskId(taskId);
     }
 
     @Override
@@ -49,7 +49,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportBasicInfo> getReportsByEmployeeId(Long id) {
+    public List<ReportDetailedInfo> getReportsByEmployeeId(Long id) {
         return reportRepository.getReportsByEmployeeId(id);
     }
+
+    @Override
+    public List<ReportDetailedInfo> getReportsByTaskId(long taskId) {
+        return reportRepository.getReportsByTaskId(taskId);
+    }
+
 }

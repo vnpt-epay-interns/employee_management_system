@@ -50,6 +50,12 @@ public class EmployeeController {
         return employeeService.getReports(employee);
     }
 
+    @GetMapping("/get-all-reports-of-task/{taskId}")
+    public ResponseEntity<Response> viewReportsByTaskId(@PathVariable long taskId) {
+        User employee = getCurrentEmployee();
+        return employeeService.getReportsByTaskId(employee, taskId);
+    }
+
     @PostMapping("/working-schedules")
     public ResponseEntity<Response> scheduleWorkingDay(@RequestBody ScheduleWorkingDayRequest request) {
         User employee = getCurrentEmployee();

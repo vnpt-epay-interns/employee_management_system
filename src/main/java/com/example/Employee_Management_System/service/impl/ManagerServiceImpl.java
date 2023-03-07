@@ -11,8 +11,7 @@ import com.example.Employee_Management_System.dto.response.WorkingScheduleRespon
 import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
-import com.example.Employee_Management_System.model.ReportBasicInfo;
-import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
+import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -25,9 +24,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.Month;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
@@ -128,7 +125,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getAllReports(User manager) {
-        List<ReportBasicInfo> unreadReports = reportService.getAllUnreadReports(manager);
+        List<ReportDetailedInfo> unreadReports = reportService.getAllUnreadReports(manager);
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)
@@ -166,7 +163,7 @@ public class ManagerServiceImpl implements ManagerService {
         if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
             throw new ReportException("You are not allowed to view this report");
         }
-        List<ReportBasicInfo> unreadReportsByTaskId = reportService.getAllUnreadReportsByTaskId(taskId);
+        List<ReportDetailedInfo> unreadReportsByTaskId = reportService.getAllReportsByTaskId(taskId);
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)
@@ -262,7 +259,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getReportEmployeeId(User manager, long employeeId) {
-        List<ReportBasicInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(manager, employeeId);
+        List<ReportDetailedInfo> unreadReportsByEmployeeId = reportService.getAllUnreadReportsByEmployeeId(manager, employeeId);
 
 
         if (!checkIfEmployeeIsManagedByManager(employeeId, manager)) {

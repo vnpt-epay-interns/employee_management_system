@@ -27,4 +27,6 @@ public interface EmployeeService {
      EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
 
     ResponseEntity<Response> getReports(User employee);
+
+    ResponseEntity<Response> getReportsByTaskId(User employee, long taskId);
 }
