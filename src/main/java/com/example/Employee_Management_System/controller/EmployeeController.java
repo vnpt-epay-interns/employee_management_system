@@ -44,6 +44,12 @@ public class EmployeeController {
         return employeeService.writeReport(employee, request);
     }
 
+    @GetMapping("/get-all-reports")
+    public ResponseEntity<Response> viewReports() {
+        User employee = getCurrentEmployee();
+        return employeeService.getReports(employee);
+    }
+
     @PostMapping("/working-schedules")
     public ResponseEntity<Response> scheduleWorkingDay(@RequestBody ScheduleWorkingDayRequest request) {
         User employee = getCurrentEmployee();

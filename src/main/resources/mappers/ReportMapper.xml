@@ -96,4 +96,14 @@
             )
         )
     </select>
+
+    <select id="getReportsByEmployeeId" resultMap="reportBasic">
+        SELECT r.id AS report_id,
+               r.title AS report_title,
+               CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+               r.created_at AS created_at
+        FROM reports r
+                 JOIN users e ON r.created_by = e.id
+        WHERE  r.created_by = #{id}
+    </select>
 </mapper>

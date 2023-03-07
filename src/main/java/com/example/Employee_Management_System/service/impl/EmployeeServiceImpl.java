@@ -10,6 +10,7 @@ import com.example.Employee_Management_System.dto.response.WorkingScheduleRespon
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
+import com.example.Employee_Management_System.model.ReportBasicInfo;
 import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -234,6 +235,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         return employeeSchedule;
+    }
+
+    @Override
+    public ResponseEntity<Response> getReports(User employee) {
+        List<ReportBasicInfo> reports = reportService.getReportsByEmployeeId(employee.getId());
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .data(reports)
+                        .build()
+        );
     }
 
     @Override
