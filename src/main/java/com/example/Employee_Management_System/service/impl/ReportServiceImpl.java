@@ -47,4 +47,9 @@ public class ReportServiceImpl implements ReportService {
     public User getManagerOfEmployeeReport(long reportId) {
         return reportRepository.getManagerOfEmployeeReport(reportId);
     }
+
+    @Override
+    public List<ReportBasicInfo> getReportsByEmployeeId(Long id) {
+        return reportRepository.getReportsByEmployeeId(id);
+    }
 }

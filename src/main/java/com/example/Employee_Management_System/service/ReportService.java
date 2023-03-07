@@ -17,4 +17,6 @@ public interface ReportService {
     List<ReportBasicInfo> getAllUnreadReportsByTaskId(long taskId);
 
     User getManagerOfEmployeeReport(long reportId);
+
+    List<ReportBasicInfo> getReportsByEmployeeId(Long id);
 }

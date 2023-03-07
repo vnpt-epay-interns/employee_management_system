@@ -21,6 +21,7 @@ public interface EmployeeService {
     void save(Employee employee);
     User getManagerOfEmployee(long employeeId);
     Employee getEmployeeByEmployeeId(long employeeId);
-    EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
     ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request);
+    EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
+    ResponseEntity<Response> getReports(User employee);
 }

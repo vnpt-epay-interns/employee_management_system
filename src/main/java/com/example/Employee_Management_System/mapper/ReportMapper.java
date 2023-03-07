@@ -24,4 +24,5 @@ public interface ReportMapper {
 
     User getManagerOfEmployeeReport(long reportId);
 
+    List<ReportBasicInfo> getReportsByEmployeeId(Long id);
 }

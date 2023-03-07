@@ -39,4 +39,8 @@ public class ReportRepository {
     public User getManagerOfEmployeeReport(long reportId) {
         return reportMapper.getManagerOfEmployeeReport(reportId);
     }
+
+    public List<ReportBasicInfo> getReportsByEmployeeId(Long id) {
+        return reportMapper.getReportsByEmployeeId(id);
+    }
 }
