@@ -6,9 +6,6 @@ import java.sql.Date;
 
 @Data
 public class WriteReportRequest {
-
     private String title;
     private String content;
-    private Long taskId;
-
 }

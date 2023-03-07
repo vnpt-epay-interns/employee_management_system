@@ -12,7 +12,6 @@ import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportBasicInfo;
-import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -25,9 +24,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.Month;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 

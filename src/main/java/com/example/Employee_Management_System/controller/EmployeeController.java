@@ -38,6 +38,12 @@ public class EmployeeController {
         return employeeService.updateTask(employee, taskId, request);
     }
 
+    @PostMapping("write-report/task/{taskId}")
+    public ResponseEntity<Response> writeReportForTask(@PathVariable("taskId") Long taskId, @RequestBody WriteReportRequest request) {
+        User employee = getCurrentEmployee();
+        return employeeService.writeReportForTask(employee, taskId, request);
+    }
+
     @PostMapping("/write-report")
     public ResponseEntity<Response> writeReport(@RequestBody WriteReportRequest request) {
         User employee = getCurrentEmployee();
