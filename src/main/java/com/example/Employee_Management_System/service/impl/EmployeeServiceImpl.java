@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
@@ -273,6 +271,19 @@ public class EmployeeServiceImpl implements EmployeeService {
                 Response.builder()
                         .status(200)
                         .data(reportService.getReportsByTaskId(taskId))
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getReferenceCode(User employee) {
+        String referenceCode = employeeRepository.getReferenceCode(employee.getId());
+        Map<String, String> map = new HashMap<>();
+        map.put("referenceCode", referenceCode);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .data(map)
                         .build()
         );
     }

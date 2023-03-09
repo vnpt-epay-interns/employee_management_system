@@ -26,4 +26,5 @@ public interface EmployeeService {
     ResponseEntity<Response> getReports(User employee);
 
     ResponseEntity<Response> getReportsByTaskId(User employee, long taskId);
+    ResponseEntity<Response> getReferenceCode(User employee);
 }
