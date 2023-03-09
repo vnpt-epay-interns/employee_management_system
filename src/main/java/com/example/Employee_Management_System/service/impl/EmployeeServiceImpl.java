@@ -8,6 +8,7 @@ import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
+import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
@@ -19,6 +20,7 @@ import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,34 +46,29 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final TaskRepository taskRepository;
 
+    @Cacheable(value = "taskById", key = "#id")
     @Override
     public ResponseEntity<Response> getTaskById(long id, User user) {
         Task task = employeeRepository
                 .getTaskByIdAndEmployeeId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        if (task.getParentId() == null) {
-            List<Task> subTasks = employeeRepository.getTasksByParentTask(task.getId());
-            return ResponseEntity.ok(
-                    Response.builder()
-                            .message("Get task successfully!")
-                            .status(200)
-                            .data(
-                                    TaskDTO
-                                            .builder()
+        Response response = Response.builder()
+                .status(200)
+                .data(task)
+                .build();
+        return ResponseEntity.ok(response);
 
-                                            .build()
-                            )
-                            .build()
-            );
-        }
+    }
 
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .data(task)
-                        .build()
-        );
+    @Cacheable(value = "taskById", key = "#id")
+    public Task getTaskByIdTest(long id, User user) {
+        Task task = employeeRepository
+                .getTaskByIdAndEmployeeId(id, user.getId())
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+
+        return task;
+
     }
 
     @Override
@@ -203,7 +200,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
-    public EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo , int year, int monthNumber, MonthInfo monthInfo) {
+    public EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo) {
         List<WorkingScheduleDetailedInfo> workingSchedule = employeeRepository.getWorkingSchedule(employeeInfo.getId(), year, monthNumber);
 
         // format multiple working schedules into one employee schedule

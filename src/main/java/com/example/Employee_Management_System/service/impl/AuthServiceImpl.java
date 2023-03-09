@@ -23,6 +23,7 @@ import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -233,6 +234,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Cacheable(value = "user", key = "#request.email")
     @Override
     public ResponseEntity<Response> existsEmail(CheckEmailExistRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -254,6 +256,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Cacheable(value = "manager", key = "#referencedCode")
     @Override
     public ResponseEntity<Response> getManagerInfo(String referencedCode) {
         ManagerInformation managerInformation =

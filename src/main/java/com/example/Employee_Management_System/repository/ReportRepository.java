@@ -16,7 +16,7 @@ public class ReportRepository {
     @Autowired
     private ReportMapper reportMapper;
 
-    public List<ReportDetailedInfo> getAllUnreadReports(User manager) {
+    public List<ReportDetailedInfo> getAllReports(User manager) {
         return reportMapper.getAllReports(manager.getId());
     }
 

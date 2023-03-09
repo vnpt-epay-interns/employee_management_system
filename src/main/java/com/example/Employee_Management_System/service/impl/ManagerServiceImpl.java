@@ -125,7 +125,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getAllReports(User manager) {
-        List<ReportDetailedInfo> unreadReports = reportService.getAllUnreadReports(manager);
+        List<ReportDetailedInfo> unreadReports = reportService.getAllReports(manager);
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReportService {
     void save(Report report);
-    List<ReportDetailedInfo> getAllUnreadReports(User manager);
+    List<ReportDetailedInfo> getAllReports(User manager);
 
     Report getReportById(long reportId);
 

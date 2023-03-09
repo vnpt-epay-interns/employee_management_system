@@ -22,8 +22,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ReportDetailedInfo> getAllUnreadReports(User manager) {
-        return reportRepository.getAllUnreadReports(manager);
+    public List<ReportDetailedInfo> getAllReports(User manager) {
+        return reportRepository.getAllReports(manager);
     }
 
     @Override
