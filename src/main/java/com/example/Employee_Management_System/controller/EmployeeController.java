@@ -77,7 +77,7 @@ public class EmployeeController {
     public User getCurrentEmployee() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-    @GetMapping("/reference-code")
+    @GetMapping("/get-referenced-code")
     public ResponseEntity<Response> getReferenceCode() {
         User employee = getCurrentEmployee();
         return employeeService.getReferenceCode(employee);
