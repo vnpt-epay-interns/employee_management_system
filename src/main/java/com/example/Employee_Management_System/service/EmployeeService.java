@@ -6,14 +6,12 @@ import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequ
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
-import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.springframework.http.ResponseEntity;
 
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
 public interface EmployeeService {
-
     ResponseEntity<Response> getTaskById(long id, User employee);
     ResponseEntity<Response> getTasks(User employee);
     ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest);
@@ -23,9 +21,8 @@ public interface EmployeeService {
     void save(Employee employee);
     User getManagerOfEmployee(long employeeId);
     Employee getEmployeeByEmployeeId(long employeeId);
-
-     EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
-
+    ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request);
+    EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
     ResponseEntity<Response> getReports(User employee);
 
     ResponseEntity<Response> getReportsByTaskId(User employee, long taskId);

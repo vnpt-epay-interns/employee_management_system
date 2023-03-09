@@ -103,23 +103,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<Response> writeReport(User employee, WriteReportRequest request) {
-        // TODO: check if the report is assign to the employee
-        Long taskId = request.getTaskId();
-
-        if (taskId != null && checkIfTaskBelongsToEmployee(employee, taskId)) {
-            //TODO: throw custom exception
-            throw new RuntimeException("The task is not assigned to the you");
-        }
         Report report = Report.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
                 .createdAt(Date.valueOf(LocalDate.now()))
                 .createdBy(employee.getId())
-                .taskId(request.getTaskId())
                 .isRead(false)
                 .build();
 
-        System.out.println(report);
         reportService.save(report);
 
         return ResponseEntity.ok(
@@ -235,6 +226,35 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request) {
+        Task task = taskService.getTaskByTaskId(taskId);
+        if (task == null) {
+            throw new RuntimeException("Task not found");
+        }
+        if (checkIfTaskBelongsToEmployee(employee, taskId)) {
+            //TODO: throw custom exception
+            throw new RuntimeException("The task is not assigned to the you");
+        }
+
+        Report report = Report.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .taskId(taskId)
+                .createdAt(Date.valueOf(LocalDate.now()))
+                .createdBy(employee.getId())
+                .isRead(false)
+                .build();
+
+        reportService.save(report);
+
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Report has been saved successfully")
+                        .data(null)
+                        .build());
+    }
+
     public ResponseEntity<Response> getReports(User employee) {
         List<ReportDetailedInfo> reports = reportService.getReportsByEmployeeId(employee.getId());
         return ResponseEntity.ok(

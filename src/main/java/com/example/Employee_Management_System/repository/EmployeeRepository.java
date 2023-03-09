@@ -34,10 +34,6 @@ public class EmployeeRepository {
         employeeMapper.save(employee);
     }
 
-    public List<Employee> getAllEmployeesByManagerId(Long managerId) {
-        return employeeMapper.getAllEmployeesByManagerId(managerId);
-    }
-
     public List<WorkingScheduleDetailedInfo> getWorkingSchedule(long employeeId, int year, int month) {
         return employeeMapper.getWorkingSchedule(employeeId, year, month + 1); // in Java month starts from 0, but in SQL month starts from 1
     }
