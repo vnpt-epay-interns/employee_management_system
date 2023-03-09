@@ -46,7 +46,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final TaskRepository taskRepository;
 
-    @Cacheable(value = "taskById", key = "#id")
     @Override
     public ResponseEntity<Response> getTaskById(long id, User user) {
         Task task = employeeRepository
