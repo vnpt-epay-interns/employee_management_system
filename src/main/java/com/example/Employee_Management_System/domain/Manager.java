@@ -12,4 +12,4 @@ import lombok.NoArgsConstructor;
 public class Manager {
     private Long id;
     private String referencedCode;
-}
+                                                                                                                            }

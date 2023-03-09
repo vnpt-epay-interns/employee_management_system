@@ -45,4 +45,8 @@ public class EmployeeRepository {
     public List<TaskDTO> getTasksByEmployeeId(Long employeeId) {
         return taskMapper.getTasksByEmployeeId(employeeId);
     }
+
+    public String getReferenceCode(Long id) {
+        return employeeMapper.getReferenceCode(id);
+    }
 }

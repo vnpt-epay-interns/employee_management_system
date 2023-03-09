@@ -19,6 +19,8 @@ public interface EmployeeMapper {
 
     Optional<Employee> getEmployeeByEmployeeId(long employeeId);
 
+    String getReferenceCode(long employeeId);
+
     List<Employee> getAllEmployeesByManagerId(long managerId);
 
     List<WorkingScheduleDetailedInfo> getWorkingSchedule(long employeeId, int year, int month);
