@@ -41,4 +41,20 @@
         SELECT e.id, u.first_name, u.last_name, u.email, u.avatar from employees as e join users as u on e.id = u.id
         where e.manager_id = #{managerId}
     </select>
+
+    <resultMap id="userInfo" type="com.example.Employee_Management_System.domain.User">
+        <result property="id" column="id"/>
+        <result property="firstName" column="first_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+        <result property="verificationCode" column="verification_code" />
+        <result property="registrationMethod" column="registration_method" />
+        <result property="role" column="role"/>
+    </resultMap>
+
+    <select id="getAllManagerUnverified"
+            resultMap="userInfo">
+        SELECT * FROM users WHERE role = 'MANAGER' AND is_locked = true
+    </select>
 </mapper>

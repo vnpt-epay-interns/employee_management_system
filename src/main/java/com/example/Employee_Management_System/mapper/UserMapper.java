@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -32,5 +33,8 @@ public interface UserMapper {
 
     List<EmployeeInformation> getEmployeeBelongToManager(long managerId);
 
+    @Update("UPDATE users SET is_locked = false WHERE id = #{id}")
     void unlockUser(long id);
+
+    List<User> getAllManagerUnverified();
 }

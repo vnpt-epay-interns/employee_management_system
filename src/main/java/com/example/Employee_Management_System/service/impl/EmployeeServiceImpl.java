@@ -226,11 +226,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request) {
         Task task = taskService.getTaskByTaskId(taskId);
         if (task == null) {
-            throw new RuntimeException("Task not found");
+            throw new IllegalStateException("Task not found");
         }
-        if (checkIfTaskBelongsToEmployee(employee, taskId)) {
-            //TODO: throw custom exception
-            throw new RuntimeException("The task is not assigned to the you");
+        if (!checkIfTaskBelongsToEmployee(employee, taskId)) {
+            throw new IllegalStateException("The task is not assigned to the you");
         }
 
         Report report = Report.builder()

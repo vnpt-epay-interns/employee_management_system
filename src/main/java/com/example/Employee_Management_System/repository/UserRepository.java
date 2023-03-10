@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.mapper.UserMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.apache.ibatis.annotations.Update;
@@ -63,5 +64,9 @@ public class UserRepository {
     @Update("UPDATE users SET is_locked = false WHERE id = #{id}")
     public void unlockUser(Long id) {
         userMapper.unlockUser(id);
+    }
+
+    public List<User> findAllManagerUnverified() {
+        return userMapper.getAllManagerUnverified();
     }
 }
