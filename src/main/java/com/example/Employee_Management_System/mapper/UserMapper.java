@@ -32,4 +32,5 @@ public interface UserMapper {
 
     List<EmployeeInformation> getEmployeeBelongToManager(long managerId);
 
+    void unlockUser(long id);
 }

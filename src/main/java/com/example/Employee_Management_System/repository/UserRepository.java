@@ -4,6 +4,7 @@ import com.example.Employee_Management_System.domain.Manager;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.mapper.UserMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -57,5 +58,10 @@ public class UserRepository {
 
     public List<EmployeeInformation> getEmployeeBelongToManager(long managerId) {
         return userMapper.getEmployeeBelongToManager(managerId);
+    }
+
+    @Update("UPDATE users SET is_locked = false WHERE id = #{id}")
+    public void unlockUser(Long id) {
+        userMapper.unlockUser(id);
     }
 }

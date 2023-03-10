@@ -46,4 +46,16 @@ public class UserServiceImpl implements UserService {
                         .build()
         );
     }
+
+    @Override
+    public ResponseEntity<Response> unlockUser(User user) {
+        userRepository.unlockUser(user.getId());
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Unlock user successfully")
+                        .data(user)
+                        .build()
+        );
+    }
 }

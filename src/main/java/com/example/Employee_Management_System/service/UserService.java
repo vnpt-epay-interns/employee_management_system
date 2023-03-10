@@ -12,4 +12,6 @@ public interface UserService {
     ResponseEntity<Response> getUserInfo(User currentUser);
 
     ResponseEntity<Response> updateUserInfo(User user, UpdateProfileRequest updateProfileRequest);
+
+    ResponseEntity<Response> unlockUser(User user);
 }
