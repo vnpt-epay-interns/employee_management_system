@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -48,13 +51,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<Response> unlockUser(User user) {
-        userRepository.unlockUser(user.getId());
+    public ResponseEntity<Response> unlockUser(Long id) {
+        User user = userRepository.findUserById(id);
+        if (!user.isLocked) {
+            throw new IllegalStateException("Manager already approved");
+        }
+        userRepository.unlockUser(id);
         return ResponseEntity.ok(
                 Response.builder()
                         .status(200)
                         .message("Unlock user successfully")
-                        .data(user)
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getAllManagerUnverified() {
+        List<User> users = userRepository.findAllManagerUnverified();
+        List<UserInformation> usersInfo = users.stream().map(UserInformation::new).toList();
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .message("Get all manager unverified successfully")
+                        .data(usersInfo)
                         .build()
         );
     }
