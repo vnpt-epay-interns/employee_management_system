@@ -16,4 +16,6 @@ public interface UserService {
     ResponseEntity<Response> unlockUser(Long id);
 
     ResponseEntity<Response> getAllManagerUnverified();
+
+    ResponseEntity<Response> uploadAvatar(User user, String avatar);
 }
