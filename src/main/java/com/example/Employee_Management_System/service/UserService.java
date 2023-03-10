@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.UpdateProfileRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -16,4 +17,6 @@ public interface UserService {
     ResponseEntity<Response> unlockUser(Long id);
 
     ResponseEntity<Response> getAllManagerUnverified();
+
+    ResponseEntity<Response> changeAvatar(User currentUser, MultipartFile file);
 }

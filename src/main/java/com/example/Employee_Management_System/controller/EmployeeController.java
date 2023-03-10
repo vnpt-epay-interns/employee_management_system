@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employee")
-@CrossOrigin(origins = "*", maxAge=3600)
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class EmployeeController {
 
     @Autowired
