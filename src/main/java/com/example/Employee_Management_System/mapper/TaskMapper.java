@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface TaskMapper {
-    @Insert("INSERT INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours, employee_id, parent_id) VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion}, #{estimateHours}, #{employeeId}, #{parentId})")
+    @Insert("INSERT INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours, employee_id, parent_id, project_id) VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion}, #{estimateHours}, #{employeeId}, #{parentId}, #{projectId})")
     void save(Task task);
 
     @Delete("DELETE FROM tasks WHERE id = #{id}")
@@ -25,7 +25,7 @@ public interface TaskMapper {
 
     List<Task> getTasksByParentTask(Long parentTaskId);
 
-    @Update("UPDATE tasks SET title = #{title}, description = #{description}, start_date = #{startDate}, end_date = #{endDate}, status = #{status}, priority = #{priority}, completion = #{completion}, estimate_hours = #{estimateHours}, employee_id = #{employeeId} WHERE id = #{id}")
+    @Update("UPDATE tasks SET title = #{title}, description = #{description}, start_date = #{startDate}, end_date = #{endDate}, status = #{status}, priority = #{priority}, completion = #{completion}, estimate_hours = #{estimateHours}, employee_id = #{employeeId}, parent_id = #{parentId}, project_id= #{projectId} WHERE id = #{id}")
     void update(Task task);
 
     User getManagerOfEmployee(Long taskId);

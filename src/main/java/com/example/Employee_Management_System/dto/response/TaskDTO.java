@@ -30,4 +30,5 @@ public class TaskDTO {
     private Long employeeId;
     private String employeeName;
     private Integer numberReports;
+    private String projectName;
 }

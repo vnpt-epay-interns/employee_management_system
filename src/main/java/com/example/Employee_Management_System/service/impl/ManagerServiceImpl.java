@@ -60,6 +60,7 @@ public class ManagerServiceImpl implements ManagerService {
                 .estimateHours(request.getEstimateHours())
                 .parentId(request.getParentId())
                 .priority(request.getPriority())
+                .projectId(request.getProjectId())
                 .build();
         taskRepository.createTask(task);
 
@@ -112,6 +113,7 @@ public class ManagerServiceImpl implements ManagerService {
         task.setEmployeeId(updateTaskRequest.getEmployeeId());
         task.setEstimateHours(updateTaskRequest.getEstimateHours());
         task.setParentId(updateTaskRequest.getParentId());
+        task.setProjectId(updateTaskRequest.getProjectId());
 
         taskRepository.updateTask(task);
         return ResponseEntity.ok(

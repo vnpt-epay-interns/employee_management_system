@@ -14,6 +14,7 @@
         <result property="estimateHours" column="estimate_hours"/>
         <result property="parentId" column="parent_id"/>
         <result property="priority" column="priority"/>
+        <result property="projectId" column="project_id"/>
     </resultMap>
 
     <select id="getTaskById" resultMap="task">
@@ -161,6 +162,7 @@
         <result property="employeeId" column="employee_id"/>
         <result property="employeeName" column="employee_name"/>
         <result property="numberReports" column="number_reports"/>
+        <result property="projectName" column="project_name"/>
     </resultMap>
     <select id="getTasksByEmployeeId" resultMap="tasks_number_report">
         SELECT t.id,
@@ -176,7 +178,8 @@
                t.priority,
                t.project_id,
                t.employee_name,
-               count(r.id) as number_reports
+               count(r.id) as number_reports,
+               t.project_name
         FROM(SELECT t.id,
                     t.title,
                     t.description,
@@ -189,10 +192,12 @@
                     t.parent_id,
                     t.priority,
                     t.project_id,
-                    CONCAT(u.first_name, ' ', u.last_name) AS employee_name
+                    CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
+                    p.name as project_name
              FROM employees e
                       JOIN users u on u.id = e.id
                       JOIN tasks t on t.employee_id = e.id
+                      join projects p on p.id = t.project_id
              WHERE e.id = #{employeeId}) t
                 left join reports r on r.task_id = t.id
         group by t.id
