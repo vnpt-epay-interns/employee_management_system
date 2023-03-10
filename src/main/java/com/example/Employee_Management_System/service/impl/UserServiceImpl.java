@@ -9,6 +9,7 @@ import com.example.Employee_Management_System.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,5 +77,12 @@ public class UserServiceImpl implements UserService {
                         .data(usersInfo)
                         .build()
         );
+    }
+
+    @Override
+    public ResponseEntity<Response> changeAvatar(User currentUser, MultipartFile file) {
+        System.out.println("change avatar");
+        System.out.println(file.getOriginalFilename());
+        return null;
     }
 }

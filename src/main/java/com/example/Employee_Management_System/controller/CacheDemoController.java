@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cache-demo")
-@CrossOrigin(origins = "*", maxAge=3600)
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @AllArgsConstructor
 public class CacheDemoController {
 
