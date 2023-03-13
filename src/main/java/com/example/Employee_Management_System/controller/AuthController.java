@@ -82,6 +82,7 @@ public class AuthController {
     @PostMapping("/change-avatar")
     public ResponseEntity<Response> changeAvatar(@RequestParam("file") MultipartFile file) {
         User user = getCurrentUser();
+        System.out.println(file.getOriginalFilename());
         return userService.changeAvatar(user, file);
     }
 
