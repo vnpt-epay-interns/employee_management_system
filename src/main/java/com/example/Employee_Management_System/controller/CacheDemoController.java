@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.controller;
 
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.service.impl.EmployeeServiceImpl;
@@ -34,6 +35,12 @@ public class CacheDemoController {
     public List<TaskDTO> viewTasks() {
         User employee = getCurrentEmployee();
         return employeeServiceImpl.getAllTasksCaching(employee);
+    }
+
+    @PutMapping("/update-task/{taskId}")
+    public Task updateTask(@PathVariable("taskId") Long taskId, @RequestBody UpdateTaskEmployeeRequest request) {
+        User employee = getCurrentEmployee();
+        return employeeServiceImpl.updateTaskCaching(employee, taskId, request);
     }
 
     public User getCurrentEmployee() {

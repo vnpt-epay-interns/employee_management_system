@@ -20,6 +20,7 @@ import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -322,6 +323,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        }
         List<TaskDTO> tasksByEmployeeId = employeeRepository.getTasksByEmployeeId(employee.getId());
         return tasksByEmployeeId;
+    }
+
+    @CachePut(value = "taskById", key = "#taskId")
+    public Task updateTaskCaching(User employee, Long taskId, UpdateTaskEmployeeRequest request) {
+        Task task = employeeRepository
+                .getTaskByIdAndEmployeeId(taskId, employee.getId())
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        task.setStatus(request.getStatus());
+        task.setCompletion(request.getCompletion());
+        taskRepository.updateTask(task);
+
+        List<TaskDTO> old =  (List<TaskDTO>) redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
+//        System.out.println(old);
+        if (old == null) {
+            for (TaskDTO taskDTO : old) {
+                if (taskDTO.getId() == taskId) {
+                    taskDTO.setStatus(request.getStatus());
+                    taskDTO.setCompletion(request.getCompletion());
+                }
+            }
+            redisTemplate.opsForValue().set("tasksByEmployee::" + employee.getId(), old);
+        }
+
+
+        return task;
+
     }
 }
 
