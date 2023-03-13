@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,11 +131,12 @@ public class UserServiceImpl implements UserService {
 
 
     public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename();
+        String fileName = UUID.randomUUID().toString();
         InputStream inputStream = file.getInputStream();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
+
 
         s3client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata).withCannedAcl(CannedAccessControlList.PublicRead));
         return s3client.getUrl(bucketName, fileName).toString();
