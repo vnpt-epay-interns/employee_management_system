@@ -78,7 +78,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> formLogin(LoginRequest loginRequest) {
-        // wrong email or password
+        if (!userRepository.existsByEmail(loginRequest.getEmail())) {
+            throw new LoginFailedException("Email is not registered!");
+        }
+
+        // when user try to login by form for the email that was registered by other method
+        User user = getUserByEmail(loginRequest.getEmail());
+        if (!user.getRegistrationMethod().equals(RegistrationMethod.FORM.toString())) {
+            throw new LoginFailedException("Email was registered by other method");
+        }
+
+        // wrong password
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -87,14 +97,9 @@ public class AuthServiceImpl implements AuthService {
                     )
             );
         } catch (Exception e) {
-            throw new LoginFailedException("Wrong email or password");
+            throw new LoginFailedException("Wrong password!");
         }
 
-        // when user try to login by form for the email that was registered by other method
-        User user = getUserByEmail(loginRequest.getEmail());
-        if (!user.getRegistrationMethod().equals(RegistrationMethod.FORM.toString())) {
-            throw new LoginFailedException("Email was registered by other method");
-        }
 
 
         LoginResponse response = generateAccessTokenAndCreateLoginResponse(user);
