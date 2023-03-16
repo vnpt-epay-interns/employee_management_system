@@ -2,10 +2,12 @@ package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.response.TaskDTO;
 import com.example.Employee_Management_System.mapper.TaskMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -45,4 +47,7 @@ public class TaskRepository {
         return taskMapper.getEmployeeOfTask(taskId);
     }
 
+    public List<TaskDTO> getSubTasks(long taskId) {
+        return taskMapper.getSubTasks(taskId);
+    }
 }

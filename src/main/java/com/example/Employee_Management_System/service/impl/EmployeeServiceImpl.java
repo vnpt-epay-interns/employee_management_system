@@ -288,6 +288,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public ResponseEntity<Response> getSubTasks(User employee, long taskId) {
+        if (!checkIfTaskBelongsToEmployee(employee, taskId)) {
+            throw new IllegalStateException("The task is not assigned to the you");
+        }
+        return ResponseEntity.ok(
+                Response.builder()
+                        .status(200)
+                        .data(taskService.getSubTasks(taskId))
+                        .build()
+        );
+    }
+
+    @Override
     public void save(Employee employee) {
         employeeRepository.save(employee);
     }
