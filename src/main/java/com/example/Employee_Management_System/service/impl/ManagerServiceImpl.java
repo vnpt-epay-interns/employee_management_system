@@ -22,7 +22,7 @@ import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +40,7 @@ public class ManagerServiceImpl implements ManagerService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final TaskService taskService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
@@ -211,9 +212,11 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    @Cacheable(value = "employees", key = "#manager.id")
     public List<EmployeeInformation> getEmployeeBelongToManager(User manager) {
         List<EmployeeInformation> employees = userRepository.getEmployeeBelongToManager(manager.getId());
+
+//        List<EmployeeInformation> employees = redisTemplate.opsForHash().values("employees");
+
         return employees;
     }
 

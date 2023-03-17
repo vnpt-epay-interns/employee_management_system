@@ -246,7 +246,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    @Cacheable(value = "user", key = "#request.email")
     @Override
     public ResponseEntity<Response> existsEmail(CheckEmailExistRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -268,7 +267,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    @Cacheable(value = "manager", key = "#referencedCode")
     @Override
     public ResponseEntity<Response> getManagerInfo(String referencedCode) {
         ManagerInformation managerInformation =
