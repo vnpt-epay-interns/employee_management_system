@@ -12,15 +12,14 @@ import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
-import com.example.Employee_Management_System.repository.ManagerRepository;
-import com.example.Employee_Management_System.repository.ProjectRepository;
-import com.example.Employee_Management_System.repository.TaskRepository;
-import com.example.Employee_Management_System.repository.UserRepository;
+import com.example.Employee_Management_System.repository.*;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +36,8 @@ public class ManagerServiceImpl implements ManagerService {
     private final EmployeeService employeeService;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final ReportRepository reportRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
@@ -330,5 +331,41 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
 
+    @Cacheable(value = "referenceCode", key = "#empl")
+    public String getReferenceCodeCache(User manager) {
+        Object dataUser = redisTemplate.opsForValue().get("referenceCode: " + manager.getId());
+        if (dataUser != null) {
+            return (String) dataUser;
+        }
+        else {
+            String referenceCode = managerRepository.getReferenceCode(manager.getId());
+            redisTemplate.opsForValue().set("referenceCode: " + manager.getId(), referenceCode);
+            return referenceCode;
+        }
+    }
+
+    @Cacheable(value = "allProject", key = "#manager")
+    public List<Project> getAllProjectCache(User manager) {
+        List<Project> allProjects = projectRepository.getAllProjects();
+        return allProjects;
+    }
+
+    @Cacheable(value = "allReport", key = "#manager")
+    public List<ReportDetailedInfo> getAllReportCache(User manager) {
+        List<ReportDetailedInfo> allReports = reportRepository.getAllReports(manager);
+        return allReports;
+    }
+
+    @Cacheable(value = "reportsByEmployeeID", key = "#manager")
+    public List<ReportDetailedInfo> getReportsByEmployeeId(User manager) {
+        List<ReportDetailedInfo> allReports = reportRepository.getReportsByEmployeeId(manager.getId());
+        return allReports;
+    }
+
+    @Cacheable(value = "project", key = "#manager.id")
+    public Project getProjectByIdCache(Long id) {
+        Project project = projectRepository.getProjectById(id);
+        return project;
+    }
 }
 
