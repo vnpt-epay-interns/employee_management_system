@@ -7,8 +7,8 @@
         <result property="title" column="report_title"/>
         <result property="content" column="content" />
         <result property="taskId" column="task_id" />
-        <result property="employeeName" column="employee_name"/>
         <result property="createdAt" column="created_at"/>
+        <result property="employeeName" column="employee_name"/>
         <result property="isRead" column="is_read" javaType="boolean"/>
     </resultMap>
 
@@ -17,10 +17,11 @@
         SELECT
         r.id AS report_id,
         r.title AS report_title,
+        r.content AS content,
+        r.task_id AS task_id,
         CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
         r.created_at AS created_at,
-        r.task_id AS task_id,
-        r.content AS content
+        r.is_read AS is_read
         FROM reports r
              JOIN users u ON r.created_by = u.id
              JOIN employees e ON u.id = e.id

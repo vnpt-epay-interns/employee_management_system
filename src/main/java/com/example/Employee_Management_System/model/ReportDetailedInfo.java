@@ -11,8 +11,8 @@ public class ReportDetailedInfo {
     private long id;
     private String title;
     private String content;
+    private Long taskId;
     private String employeeName;
     private Date createdAt;
-    private Long taskId;
     private boolean isRead;
 }
