@@ -69,21 +69,35 @@ public class AuthController {
     @PostMapping("/register-account/employee/{referenceCode}")
     public ResponseEntity<Response> registerEmployee(@PathVariable String referenceCode) {
         User user = getCurrentUser();
-        return authService.selectRoleEmployee(user, referenceCode);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(authService.selectRoleEmployee(user, referenceCode))
+                        .status(200)
+                        .message("Register employee successfully!")
+                        .build());
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user-info")
     public ResponseEntity<Response> userInfo() {
-        return userService.getUserInfo(getCurrentUser());
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(userService.getUserInfo(getCurrentUser()))
+                        .status(200)
+                        .message("Get user information successfully!")
+                        .build());
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/change-avatar")
     public ResponseEntity<Response> changeAvatar(@RequestParam("file") MultipartFile file) {
         User user = getCurrentUser();
-        System.out.println(file.getOriginalFilename());
-        return userService.changeAvatar(user, file);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(userService.changeAvatar(user, file))
+                        .status(200)
+                        .message("Upload avatar successfully")
+                        .build());
     }
 
     private User getCurrentUser() {
@@ -98,6 +112,12 @@ public class AuthController {
     @PutMapping(value = "/update-user-info")
     public ResponseEntity<Response> updateUserInfo(@RequestBody UpdateProfileRequest updateProfileRequest) {
         User user = getCurrentUser();
-        return userService.updateUserInfo(user, updateProfileRequest);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(userService.updateUserInfo(user, updateProfileRequest))
+                        .status(200)
+                        .message("Update user information successfully")
+                        .build()
+        );
     }
 }

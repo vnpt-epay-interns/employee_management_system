@@ -9,10 +9,12 @@ import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.enums.RegistrationMethod;
 import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.exception.RegisterException;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.GoogleUserInfo;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.repository.UserRepository;
@@ -23,7 +25,9 @@ import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -32,6 +36,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -46,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeService employeeService;
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -155,7 +161,8 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    public ResponseEntity<Response> selectRoleEmployee(User user, String referenceCode) {
+    @Override
+    public EmployeeInformation selectRoleEmployee(User user, String referenceCode) {
         if (user.getRole() != null) {
             throw new RegisterException("Account already has a role");
         }
@@ -171,7 +178,6 @@ public class AuthServiceImpl implements AuthService {
 
         user.setRole("EMPLOYEE");
         user.setLocked(false);
-
         // save user to user table
         userRepository.update(user);
 
@@ -180,17 +186,18 @@ public class AuthServiceImpl implements AuthService {
                 .id(user.getId())
                 .managerId(manager.getId())
                 .build();
-
         // save employee to employee table
         employeeService.save(employee);
-        return ResponseEntity.ok(
-                Response
-                        .builder()
-                        .status(200)
-                        .message("Register employee successfully!")
-                        .data(null)
-                        .build()
-        );
+
+        EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
+
+        List<EmployeeInformation> employees = (List<EmployeeInformation>) redisTemplate.opsForValue().get("employees::" + manager.getId());
+        if (employees != null) {
+            employees.add(employeeInfo);
+            redisTemplate.opsForValue().set("employees::" + manager.getId(), employees);
+        }
+
+        return employeeInfo;
     }
 
     private UUID generateReferenceCode() {

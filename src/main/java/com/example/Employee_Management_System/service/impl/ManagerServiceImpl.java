@@ -22,6 +22,7 @@ import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -209,14 +210,11 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
-    public ResponseEntity<Response> getEmployeeBelongToManager(User manager) {
+    @Override
+    @Cacheable(value = "employees", key = "#manager.id")
+    public List<EmployeeInformation> getEmployeeBelongToManager(User manager) {
         List<EmployeeInformation> employees = userRepository.getEmployeeBelongToManager(manager.getId());
-        return ResponseEntity.ok(Response.builder()
-                .status(200)
-                .message("Get all employees successfully!")
-                .data(employees)
-                .build()
-        );
+        return employees;
     }
 
     @Override
