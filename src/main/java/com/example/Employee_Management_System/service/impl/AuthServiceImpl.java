@@ -58,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees";
+    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -201,10 +201,10 @@ public class AuthServiceImpl implements AuthService {
 
         Gson gson = new Gson();
         EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE);
+        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId());
         if (employeesInRedis != null || !employeesInRedis.isEmpty()) {
             Map<Long, String> map = Stream.of(employeeInfo).collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
-            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE, map);
+            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId(), map);
         }
 
         return employeeInfo;

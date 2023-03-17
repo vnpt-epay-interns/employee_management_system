@@ -44,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final ReportService reportService;
     private final TaskService taskService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees";
+    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     @Override
     public ResponseEntity<Response> getTaskById(Long id, User user) {
@@ -292,11 +292,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<EmployeeInformation> employees;
         Gson gson = new Gson();
 
-        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE);
+        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE + id);
         if (employeesInRedis == null || employeesInRedis.isEmpty()) {
             employees = managerRepository.getAllEmployees(id);
             Map<Long, String> map = employees.stream().collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
-            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE, map);
+            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + id, map);
             return employees;
         }
 
