@@ -27,7 +27,7 @@ public interface TaskMapper {
 
     User getEmployeeOfTask(Long taskId);
 
-    List<TaskDetailedInfo> getSubTasks(long taskId);
+    List<TaskDetailedInfo> getSubTasks(long parentId);
 
     List<TaskDetailedInfo> getTasksByManagerId(Long managerId);
 }

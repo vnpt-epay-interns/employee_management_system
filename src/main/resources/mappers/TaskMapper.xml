@@ -72,6 +72,46 @@
         group by t.id
     </select>
 
+    <select id="getSubTasks" resultMap="taskDetailedInfo">
+        SELECT t.id,
+               t.title,
+               t.description,
+               t.status,
+               t.completion,
+               t.start_date,
+               t.end_date,
+               t.estimate_hours,
+               t.parent_id,
+               t.priority,
+               t.manager_id,
+               t.project_id,
+               t.project_name,
+               t.employee_id,
+               t.employee_name,
+               count(r.id) as number_reports
+        FROM (SELECT t.id,
+                     t.title,
+                     t.description,
+                     t.status,
+                     t.completion,
+                     t.start_date,
+                     t.end_date,
+                     t.estimate_hours,
+                     e.manager_id                           as manager_id,
+                     t.parent_id,
+                     t.priority,
+                     t.project_id,
+                     p.name                                 as project_name,
+                     t.employee_id,
+                     CONCAT(u.first_name, ' ', u.last_name) AS employee_name
+              FROM employees e
+                       JOIN users u on u.id = e.id
+                       JOIN tasks t on t.employee_id = e.id
+                       join projects p on p.id = t.project_id
+              WHERE t.parent_id = #{parentId}) t
+                 left join reports r on r.task_id = t.id
+        group by t.id
+    </select>
     <select id="getTasksByEmployeeId" resultMap="taskDetailedInfo">
         SELECT t.id,
                t.title,

@@ -185,8 +185,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskDetailedInfo> getSubTasks(long taskId) {
-        return taskRepository.getSubTasks(taskId);
+    public List<TaskDetailedInfo> getSubTasks(long parentId) {
+        List<TaskDetailedInfo> allTasksInRedis = getAllTasksInRedis();
+        // if the subtasks of  are in the cache, return them
+        if (allTasksInRedis != null && !allTasksInRedis.isEmpty()) {
+            List<TaskDetailedInfo> subTasks = allTasksInRedis.stream()
+                    .filter(task -> task.getParentId().equals(parentId))
+                    .collect(Collectors.toList());
+
+            return subTasks;
+        } else {
+            // otherwise, get the tasks from the database
+            return taskRepository.getSubTasks(parentId);
+        }
 
     }
 }
