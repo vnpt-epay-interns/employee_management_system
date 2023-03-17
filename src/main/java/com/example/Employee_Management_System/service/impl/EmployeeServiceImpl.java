@@ -268,7 +268,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return ResponseEntity.ok(
                 Response.builder()
                         .status(200)
-                        .data(reportService.getReportsByTaskId(taskId))
+                        .data(reportService.getAllReportsByTaskId(taskId))
                         .build()
         );
     }

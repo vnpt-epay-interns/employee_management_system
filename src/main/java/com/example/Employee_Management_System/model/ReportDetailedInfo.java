@@ -1,5 +1,6 @@
 package com.example.Employee_Management_System.model;
 
+import com.example.Employee_Management_System.domain.Report;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,4 +16,5 @@ public class ReportDetailedInfo {
     private Date createdAt;
     private Long taskId;
     private boolean isRead;
+
 }

@@ -5,15 +5,23 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.repository.ReportRepository;
 import com.example.Employee_Management_System.service.ReportService;
+import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final String REDIS_REPORTS_KEY = "report";
     private final ReportRepository reportRepository;
 
     @Override
@@ -23,7 +31,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ReportDetailedInfo> getAllReports(User manager) {
-        return reportRepository.getAllReports(manager);
+        return getAllProjectsInRedis();
     }
 
     @Override
@@ -40,7 +48,15 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ReportDetailedInfo> getAllReportsByTaskId(long taskId) {
-        return reportRepository.findReportsByTaskId(taskId);
+        List<ReportDetailedInfo> reports = getReportByTaskIdFromRedis(taskId);
+
+        if (reports == null && !reports.isEmpty()) {
+            return reports;
+        } else {
+            List<ReportDetailedInfo> reportsFromDB = reportRepository.getReportsByTaskId(taskId);
+            cacheReportsToRedis(reportsFromDB);
+            return reportsFromDB;
+        }
     }
 
     @Override
@@ -50,12 +66,62 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ReportDetailedInfo> getReportsByEmployeeId(Long id) {
-        return reportRepository.getReportsByEmployeeId(id);
+        return getReportsByEmployeeIdFromRedis(id);
     }
 
-    @Override
-    public List<ReportDetailedInfo> getReportsByTaskId(long taskId) {
-        return reportRepository.getReportsByTaskId(taskId);
+    private List<ReportDetailedInfo> getReportsByEmployeeIdFromRedis(Long id) {
+        Gson gson = new Gson();
+
+        List<Object> reportsInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_KEY);
+        if (reportsInRedis == null || reportsInRedis.isEmpty()) {
+            return null;
+        }
+        else {
+            return reportsInRedis.stream()
+                    .map(report -> gson.fromJson(report.toString(), ReportDetailedInfo.class))
+                    .filter(report -> Objects.equals(reportRepository.findReportsByEmployeeId(id), id))
+                    .toList();
+        }
+
     }
 
+    private void cacheReportsToRedis(List<ReportDetailedInfo> reportsFromDB) {
+        Gson gson = new Gson();
+        Map<String, String> map = reportsFromDB.stream()
+                .collect(Collectors.toMap(report -> report.getEmployeeName(), report -> gson.toJson(report)));
+        redisTemplate.opsForHash().putAll(REDIS_REPORTS_KEY, map);
+    }
+
+
+
+
+
+    public List<ReportDetailedInfo> getAllProjectsInRedis() {
+        List<ReportDetailedInfo> reports;
+        Gson gson = new Gson();
+
+        List<Object> reportsInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_KEY);
+        if (reportsInRedis == null || reportsInRedis.isEmpty()) {
+            return null;
+        }
+        else {
+            return reportsInRedis.stream()
+                    .map(report -> gson.fromJson(report.toString(), ReportDetailedInfo.class))
+                    .toList();
+        }
+    }
+
+
+    private List<ReportDetailedInfo> getReportByTaskIdFromRedis(Long id) {
+        List<ReportDetailedInfo> allReports = getAllProjectsInRedis();
+        if (allReports != null || allReports.isEmpty()) {
+            List<ReportDetailedInfo> reportsFromDB = allReports.stream()
+                    .filter(report -> report.getTaskId().equals(id))
+                    .toList();
+            if (reportsFromDB != null && !reportsFromDB.isEmpty()) {
+                return reportsFromDB;
+            }
+        }
+        return null;
+    }
 }
