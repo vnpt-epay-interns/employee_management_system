@@ -64,7 +64,7 @@ public class TaskServiceImpl implements TaskService {
         List<TaskDetailedInfo> employeeTasksInDB = getTasksByEmployeeIdFromRedis(employeeId);
 
         // if the employee has no task, get all tasks from the database
-        if (employeeTasksInDB == null && !employeeTasksInDB.isEmpty()) {
+        if (employeeTasksInDB != null && !employeeTasksInDB.isEmpty()) {
             return employeeTasksInDB;
         } else {
             // filter the tasks that the employee has
