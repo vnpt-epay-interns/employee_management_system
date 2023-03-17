@@ -44,7 +44,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final TaskService taskService;
 
-    private final TaskRepository taskRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
