@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Value("${amazon.s3.default-bucket}")
     private String bucketName;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -116,4 +116,5 @@ public class UserServiceImpl implements UserService {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata).withCannedAcl(CannedAccessControlList.PublicRead));
         return s3client.getUrl(bucketName, fileName).toString();
     }
+
 }

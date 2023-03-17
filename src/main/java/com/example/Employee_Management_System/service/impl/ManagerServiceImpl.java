@@ -5,7 +5,7 @@ import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
-import com.example.Employee_Management_System.dto.response.TaskDTO;
+import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import com.example.Employee_Management_System.exception.ReportException;
@@ -14,7 +14,7 @@ import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
-import com.example.Employee_Management_System.repository.TaskRepository;
+import com.example.Employee_Management_System.repository.ReportRepository;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
@@ -22,6 +22,7 @@ import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,19 +35,18 @@ import static com.example.Employee_Management_System.dto.response.WorkingSchedul
 @AllArgsConstructor
 public class ManagerServiceImpl implements ManagerService {
     private final ManagerRepository managerRepository;
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
     private final ReportService reportService;
     private final EmployeeService employeeService;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
-    private final TaskService taskService;
+    private final ReportRepository reportRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
         if (request.getParentId() != null) {
-            Task parenTask = managerRepository
-                    .getTaskById(request.getParentId());
+            TaskDetailedInfo parenTask = taskService.getTaskById(request.getParentId());
             if (parenTask == null) {
                 throw new IllegalStateException("Parent task is not exist!");
             }
@@ -66,7 +66,8 @@ public class ManagerServiceImpl implements ManagerService {
                 .priority(request.getPriority())
                 .projectId(request.getProjectId())
                 .build();
-        taskRepository.createTask(task);
+
+        taskService.saveTask(task);
 
         return ResponseEntity.ok(
                 Response
@@ -79,13 +80,12 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> deleteTask(long taskId) {
-        Task task = managerRepository
-                .getTaskById(taskId);
+        TaskDetailedInfo task = taskService.getTaskById(taskId);
         if (task == null) {
             throw new IllegalStateException("Task not found!");
         }
 
-        taskRepository.deleteTask(task);
+        taskService.deleteTaskById(task);
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -98,15 +98,13 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> updateTask(long taskId, UpdateTaskRequest updateTaskRequest) {
         if (updateTaskRequest.getParentId() != null) {
-            Task parentTask = managerRepository
-                    .getTaskById(updateTaskRequest.getParentId());
+            TaskDetailedInfo parentTask = taskService.getTaskById(updateTaskRequest.getParentId());
             if (parentTask == null) {
                 throw new IllegalStateException("Parent task is not exist!");
             }
         }
 
-        Task task = managerRepository
-                .getTaskById(taskId);
+        TaskDetailedInfo task = taskService.getTaskById(taskId);
         task.setTitle(updateTaskRequest.getTitle());
         task.setDescription(updateTaskRequest.getDescription());
         task.setStatus(updateTaskRequest.getStatus());
@@ -119,7 +117,7 @@ public class ManagerServiceImpl implements ManagerService {
         task.setParentId(updateTaskRequest.getParentId());
         task.setProjectId(updateTaskRequest.getProjectId());
 
-        taskRepository.updateTask(task);
+        taskService.updateTask(task);
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -200,7 +198,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getAllTasks(User manager) {
-        List<TaskDTO> tasks = managerRepository.getAllTasks(manager.getId());
+        List<TaskDetailedInfo> tasks = taskService.getAllTasksByMangerId(manager.getId());
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -262,7 +260,7 @@ public class ManagerServiceImpl implements ManagerService {
             throw new ReportException("You are not allowed to view this task");
         }
 
-        List<TaskDTO> subTasks = taskService.getSubTasks(taskId);
+        List<TaskDetailedInfo> subTasks = taskService.getSubTasks(taskId);
         return ResponseEntity.ok(Response.builder()
                 .status(200)
                 .message("Get all sub tasks successfully!")
@@ -273,7 +271,7 @@ public class ManagerServiceImpl implements ManagerService {
 
 
     private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
-        User employeeManager = taskRepository.getManagerOfTask(taskId);
+        User employeeManager = taskService.getManagerOfTask(taskId);
         return employeeManager.getId().equals(manager.getId());
     }
 
@@ -348,5 +346,41 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
 
+    @Cacheable(value = "referenceCode", key = "#empl")
+    public String getReferenceCodeCache(User manager) {
+        Object dataUser = redisTemplate.opsForValue().get("referenceCode: " + manager.getId());
+        if (dataUser != null) {
+            return (String) dataUser;
+        }
+        else {
+            String referenceCode = managerRepository.getReferenceCode(manager.getId());
+            redisTemplate.opsForValue().set("referenceCode: " + manager.getId(), referenceCode);
+            return referenceCode;
+        }
+    }
+
+    @Cacheable(value = "allProject", key = "#manager")
+    public List<Project> getAllProjectCache(User manager) {
+        List<Project> allProjects = projectRepository.getAllProjects();
+        return allProjects;
+    }
+
+    @Cacheable(value = "allReport", key = "#manager")
+    public List<ReportDetailedInfo> getAllReportCache(User manager) {
+        List<ReportDetailedInfo> allReports = reportRepository.getAllReports(manager);
+        return allReports;
+    }
+
+    @Cacheable(value = "reportsByEmployeeID", key = "#manager")
+    public List<ReportDetailedInfo> getReportsByEmployeeId(User manager) {
+        List<ReportDetailedInfo> allReports = reportRepository.getReportsByEmployeeId(manager.getId());
+        return allReports;
+    }
+
+    @Cacheable(value = "project", key = "#manager.id")
+    public Project getProjectByIdCache(Long id) {
+        Project project = projectRepository.getProjectById(id);
+        return project;
+    }
 }
 

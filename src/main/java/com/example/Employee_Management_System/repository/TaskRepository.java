@@ -2,52 +2,60 @@ package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
-import com.example.Employee_Management_System.dto.response.TaskDTO;
+import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.mapper.TaskMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
 public class TaskRepository {
     private final TaskMapper taskMapper;
 
-    public void save(Task task) {
-        taskMapper.save(task);
+    public Long saveTask(Task task) {
+        return taskMapper.save(task);
     }
 
-    public void updateTask(Task task) {
+    public void updateTask(TaskDetailedInfo taskInfo) {
+        Task task = Task.builder()
+                .id(taskInfo.getId())
+                .title(taskInfo.getTitle())
+                .description(taskInfo.getDescription())
+                .endDate(taskInfo.getEndDate())
+                .startDate(taskInfo.getStartDate())
+                .status(taskInfo.getStatus())
+                .priority(taskInfo.getPriority())
+                .completion(taskInfo.getCompletion())
+                .estimateHours(taskInfo.getEstimateHours())
+                .employeeId(taskInfo.getEmployeeId())
+                .projectId(taskInfo.getProjectId())
+                .build();
         taskMapper.update(task);
     }
 
-    public void createTask(Task task) {
-        taskMapper.save(task);
+    public void deleteTaskById(Long id) {
+        taskMapper.delete(id);
     }
 
-    public void deleteTask(Task task) {
-        taskMapper.delete(task);
-    }
-
-    public Task getTask(long taskId) {
+    public TaskDetailedInfo getTaskById(long taskId) {
         return taskMapper.getTaskById(taskId);
-    }
-
-    public User getManagerOfEmployee(Long taskId) {
-        return taskMapper.getManagerOfEmployee(taskId);
     }
 
     public User getManagerOfTask(long taskId) {
         return taskMapper.getManagerOfTask(taskId);
     }
 
-    public User getEmployeeOfTask(Long taskId) {
-        return taskMapper.getEmployeeOfTask(taskId);
+    public List<TaskDetailedInfo> getSubTasks(long taskId) {
+        return taskMapper.getSubTasks(taskId);
     }
 
-    public List<TaskDTO> getSubTasks(long taskId) {
-        return taskMapper.getSubTasks(taskId);
+    public List<TaskDetailedInfo> getTasksByEmployeeId(Long employeeId) {
+        return taskMapper.getTasksByEmployeeId(employeeId);
+    }
+
+    public List<TaskDetailedInfo> getTasksByManagerId(Long managerId) {
+        return taskMapper.getTasksByManagerId(managerId);
     }
 }

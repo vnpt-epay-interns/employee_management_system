@@ -9,10 +9,11 @@ import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.springframework.http.ResponseEntity;
 
-import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
+import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
+import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.MonthInfo;
 
 public interface EmployeeService {
-    ResponseEntity<Response> getTaskById(long id, User employee);
+    ResponseEntity<Response> getTaskById(Long id, User employee);
 
     ResponseEntity<Response> getTasks(User employee);
 

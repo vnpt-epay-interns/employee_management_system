@@ -5,13 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task {
+//TODO: change the mapper
+public class Task implements Serializable {
     private Long id;
     private String title;
     private String description;
@@ -24,4 +26,5 @@ public class Task {
     private Long employeeId;
     private Long parentId;
     private Long projectId;
+
 }

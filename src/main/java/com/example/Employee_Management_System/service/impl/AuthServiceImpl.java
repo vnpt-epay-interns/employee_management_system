@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
@@ -73,7 +74,10 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationCode(code);
 
         userRepository.save(user);
-        sendVerificationEmail(user, code);
+
+        // Send verification email asynchronously using CompletableFuture
+        CompletableFuture.runAsync(() -> sendVerificationEmail(user, code));
+
         return ResponseEntity.ok(
                 Response
                         .builder()
