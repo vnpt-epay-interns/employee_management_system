@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
 public interface EmployeeService {
-    ResponseEntity<Response> getTaskById(long id, User employee);
+    ResponseEntity<Response> getTaskById(Long id, User employee);
     ResponseEntity<Response> getTasks(User employee);
     ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest);
     ResponseEntity<Response> writeReport(User employee, WriteReportRequest request);

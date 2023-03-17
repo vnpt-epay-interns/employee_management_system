@@ -5,10 +5,9 @@ import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequ
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
-import com.example.Employee_Management_System.dto.response.TaskDTO;
+import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
-import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
@@ -20,8 +19,6 @@ import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -49,11 +46,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public ResponseEntity<Response> getTaskById(long id, User user) {
-        Task task = employeeRepository
-                .getTaskByIdAndEmployeeId(id, user.getId())
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-
+    public ResponseEntity<Response> getTaskById(Long id, User user) {
+        TaskDetailedInfo task = taskService.getTaskByIdAndEmployeeId(id, user.getId());
         Response response = Response.builder()
                 .status(200)
                 .data(task)
@@ -62,36 +56,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
-    @Cacheable(value = "taskById", key = "#id")
-    public Task getTaskByIdCaching(long id, User user) {
-        Task task = employeeRepository
-                .getTaskByIdAndEmployeeId(id, user.getId())
-                .orElseThrow(() -> new NotFoundException("Task not found"));
-
-        return task;
-
-    }
+//    @Cacheable(value = "taskById", key = "#id")
+//    public Task getTaskByIdCaching(long id, User user) {
+//        Task task = employeeRepository
+//                .getTaskByIdAndEmployeeId(id, user.getId())
+//                .orElseThrow(() -> new NotFoundException("Task not found"));
+//
+//        return task;
+//
+//    }
 
     @Override
     public ResponseEntity<Response> getTasks(User employee) {
+        List<TaskDetailedInfo> tasks = taskService.getTasksByEmployeeId(employee.getId());
+
         return ResponseEntity.ok(
                 Response.builder()
-                        .message("Get all tasks successfully!")
-                        .status(200)
-                        .data(employeeRepository.getTasksByEmployeeId(employee.getId()))
-                        .build()
+                .status(200)
+                .data(tasks)
+                .build()
         );
     }
 
     @Override
     public ResponseEntity<Response> updateTask(User employee, Long taskId, UpdateTaskEmployeeRequest updateTaskRequest) {
-        Task task = employeeRepository
-                .getTaskByIdAndEmployeeId(taskId, employee.getId())
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+        TaskDetailedInfo task = taskService.getTaskByIdAndEmployeeId(taskId, employee.getId());
 
         task.setStatus(updateTaskRequest.getStatus());
         task.setCompletion(updateTaskRequest.getCompletion());
-        taskRepository.updateTask(task);
+        taskService.updateTask(task);
 
         return ResponseEntity.ok(
                 Response
@@ -124,9 +117,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private boolean checkIfTaskBelongsToEmployee(User employee, Long taskId) {
-        Task task = taskService.getTaskByTaskId(taskId);
-        User assignedEmployee = taskService.getEmployeeOfTask(task.getId());
-        return Objects.equals(assignedEmployee.getId(), employee.getId());
+        TaskDetailedInfo taskDetailedInfo = taskService.getTaskById(taskId);
+        return Objects.equals(taskDetailedInfo.getEmployeeId(), employee.getId());
     }
 
     @Override
@@ -228,7 +220,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request) {
-        Task task = taskService.getTaskByTaskId(taskId);
+        TaskDetailedInfo task = taskService.getTaskById(taskId);
         if (task == null) {
             throw new IllegalStateException("Task not found");
         }
@@ -308,9 +300,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
-    @Cacheable(value = "tasksByEmployee", key = "#employee.id")
-    public List<TaskDTO> getAllTasksCaching(User employee) {
-        //        Object dataInRedis = redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
+//    @Cacheable(value = "tasksByEmployee", key = "#employee.id")
+//    public List<TaskDetailedInfo> getAllTasksCaching(User employee) {
+//                Object dataInRedis = redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
 //        if (dataInRedis != null) {
 //            System.out.println("Getting data from redis");
 //            System.out.println(dataInRedis);
@@ -321,35 +313,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 //            return tasks;
 //
 //        }
-        List<TaskDTO> tasksByEmployeeId = employeeRepository.getTasksByEmployeeId(employee.getId());
-        return tasksByEmployeeId;
-    }
+//        List<TaskDetailedInfo> tasksByEmployeeId = taskService.getTasksByEmployeeId(employee.getId());
+//        return tasksByEmployeeId;
+//    }
 
-    @CachePut(value = "taskById", key = "#taskId")
-    public Task updateTaskCaching(User employee, Long taskId, UpdateTaskEmployeeRequest request) {
-        Task task = employeeRepository
-                .getTaskByIdAndEmployeeId(taskId, employee.getId())
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-
-        task.setStatus(request.getStatus());
-        task.setCompletion(request.getCompletion());
-        taskRepository.updateTask(task);
-
-        List<TaskDTO> old =  (List<TaskDTO>) redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
-//        System.out.println(old);
-        if (old == null) {
-            for (TaskDTO taskDTO : old) {
-                if (taskDTO.getId() == taskId) {
-                    taskDTO.setStatus(request.getStatus());
-                    taskDTO.setCompletion(request.getCompletion());
-                }
-            }
-            redisTemplate.opsForValue().set("tasksByEmployee::" + employee.getId(), old);
-        }
-
-
-        return task;
-
-    }
+//    @CachePut(value = "taskById", key = "#taskId")
+//    public Task updateTaskCaching(User employee, Long taskId, UpdateTaskEmployeeRequest request) {
+//        Task task = taskService.getTaskByIdAndEmployeeId(taskId, employee.getId());
+//
+//        task.setStatus(request.getStatus());
+//        task.setCompletion(request.getCompletion());
+//        taskRepository.updateTask(task);
+//
+//        List<TaskDetailedInfo> old =  (List<TaskDetailedInfo>) redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
+////        System.out.println(old);
+//        if (old == null) {
+//            for (TaskDetailedInfo taskDTO : old) {
+//                if (taskDTO.getId() == taskId) {
+//                    taskDTO.setStatus(request.getStatus());
+//                    taskDTO.setCompletion(request.getCompletion());
+//                }
+//            }
+//            redisTemplate.opsForValue().set("tasksByEmployee::" + employee.getId(), old);
+//        }
+//
+//
+//        return task;
+//
+//    }
 }
 

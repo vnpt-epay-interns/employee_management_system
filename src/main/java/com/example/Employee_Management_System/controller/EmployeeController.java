@@ -31,7 +31,6 @@ public class EmployeeController {
         return employeeService.getTasks(employee);
     }
 
-
     @PutMapping("/update-task/{taskId}")
     public ResponseEntity<Response> updateTask(@PathVariable("taskId") Long taskId, @RequestBody UpdateTaskEmployeeRequest request) {
         User employee = getCurrentEmployee();

@@ -7,6 +7,7 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ProjectService;
+import com.example.Employee_Management_System.service.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,24 +20,29 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class ManagerController {
     private final ManagerService managerService;
+    private final TaskService taskService;
 
     private ProjectService projectService;
 
+    //TODO: caching task for this endpoint
     @PostMapping("/create-task")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
         return managerService.createTask(request);
     }
 
+    //TODO: caching task for this endpoint
     @DeleteMapping("/delete-task/{taskId}")
     public ResponseEntity<Response> deleteTask(@PathVariable long taskId) {
         return managerService.deleteTask(taskId);
     }
 
+    //TODO: caching task for this endpoint
     @PutMapping("/update-task/{taskId}")
     public ResponseEntity<Response> updateTask(@PathVariable long taskId, @RequestBody UpdateTaskRequest updateTaskRequest) {
         return managerService.updateTask(taskId, updateTaskRequest);
     }
 
+    //TODO: caching task for this endpoint
     @GetMapping("/get-all-tasks")
     public ResponseEntity<Response> getAllTasks() {
         User manager = getCurrentManager();
