@@ -12,10 +12,16 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.UpdateProfileRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.UserInformation;
+import com.example.Employee_Management_System.repository.EmployeeRepository;
+import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.UserService;
+import lombok.AllArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,12 +39,17 @@ public class UserServiceImpl implements UserService {
     @Value("${amazon.s3.default-bucket}")
     private String bucketName;
 
+
     @Autowired
     private UserRepository userRepository;
 
+//    @Autowired
+//    private ManagerRepository managerRepository;
+//    @Autowired
+//    private EmployeeRepository employeeRepository;
     @Autowired
     private AmazonS3 s3client;
-
+//    private final RedisTemplate redisTemplate;
     @Override
     public User getUserByEmail(String email) {
         //TODO : custom exception: NOT FOUND EXCPETION
@@ -130,13 +142,39 @@ public class UserServiceImpl implements UserService {
 
 
     public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename();
+        String fileName = UUID.randomUUID().toString();
         InputStream inputStream = file.getInputStream();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
 
+
         s3client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata).withCannedAcl(CannedAccessControlList.PublicRead));
         return s3client.getUrl(bucketName, fileName).toString();
     }
+
+//    @Cacheable(value = "referenceCode", key = "#managerId")
+//    public String getReferenceCodeCache(User manager) {
+//        Object dataUser = redisTemplate.opsForValue().get("referenceCode: " + manager.getId());
+//        if (dataUser != null) {
+//            return (String) dataUser;
+//        }
+//        else {
+//            if (manager.getRole().equals("MANAGER")) {
+//                String referenceCode = managerRepository.getReferenceCode(manager.getId());
+//                redisTemplate.opsForValue().set("referenceCode: " + manager.getId(), referenceCode);
+//                return referenceCode;
+//            }
+//            else {
+//                String referenceCode = employeeRepository.getReferenceCode(manager.getId());
+//                redisTemplate.opsForValue().set("referenceCode: " + manager.getId(), referenceCode);
+//                return referenceCode;
+//            }
+//        }
+//    }
+
+//    public UserInformation getUserInfoCache(User manager) {
+//        return new UserInformation(manager);
+//    }
+
 }

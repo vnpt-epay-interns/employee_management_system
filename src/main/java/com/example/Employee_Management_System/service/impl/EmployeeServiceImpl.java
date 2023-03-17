@@ -13,12 +13,15 @@ import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
+import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,7 +37,7 @@ import static com.example.Employee_Management_System.dto.response.WorkingSchedul
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-
+    private final ManagerRepository managerRepository;
     private final EmployeeMapper employeeMapper;
 
     private final ReportService reportService;
@@ -283,6 +286,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
+
     @Override
     public void save(Employee employee) {
         employeeRepository.save(employee);
@@ -300,46 +304,64 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
-//    @Cacheable(value = "tasksByEmployee", key = "#employee.id")
-//    public List<TaskDetailedInfo> getAllTasksCaching(User employee) {
-//                Object dataInRedis = redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
-//        if (dataInRedis != null) {
-//            System.out.println("Getting data from redis");
-//            System.out.println(dataInRedis);
-//            return (List<TaskDTO>) dataInRedis;
-//        } else {
-//            List<TaskDTO> tasks = employeeRepository.getTasksByEmployeeId(employee.getId());
-//            redisTemplate.opsForValue().set("tasksByEmployee::" + employee.getId(), tasks);
-//            return tasks;
-//
-//        }
-//        List<TaskDetailedInfo> tasksByEmployeeId = taskService.getTasksByEmployeeId(employee.getId());
-//        return tasksByEmployeeId;
-//    }
 
-//    @CachePut(value = "taskById", key = "#taskId")
-//    public Task updateTaskCaching(User employee, Long taskId, UpdateTaskEmployeeRequest request) {
-//        Task task = taskService.getTaskByIdAndEmployeeId(taskId, employee.getId());
-//
-//        task.setStatus(request.getStatus());
-//        task.setCompletion(request.getCompletion());
-//        taskRepository.updateTask(task);
-//
-//        List<TaskDetailedInfo> old =  (List<TaskDetailedInfo>) redisTemplate.opsForValue().get("tasksByEmployee::" + employee.getId());
-////        System.out.println(old);
-//        if (old == null) {
-//            for (TaskDetailedInfo taskDTO : old) {
-//                if (taskDTO.getId() == taskId) {
-//                    taskDTO.setStatus(request.getStatus());
-//                    taskDTO.setCompletion(request.getCompletion());
-//                }
-//            }
-//            redisTemplate.opsForValue().set("tasksByEmployee::" + employee.getId(), old);
-//        }
-//
-//
-//        return task;
-//
-//    }
+    @Cacheable(value = "referenceCode", key = "#manager.id")
+    public String getReferenceCodeCache(User manager) {
+        String referenceCode;
+        if (manager.getRole().equals("MANAGER")) {
+            referenceCode = managerRepository.getReferenceCode(manager.getId());
+        } else {
+            referenceCode = employeeRepository.getReferenceCode(manager.getId());
+        }
+        return referenceCode;
+    }
+
+    @Cacheable(value = "reportsByEmployee", key = "#employee.id")
+    public List<ReportDetailedInfo> getReportsCache(User employee) {
+        List<ReportDetailedInfo> reports = (List<ReportDetailedInfo>) redisTemplate.opsForValue().get("reportsByEmployee::" + employee.getId());
+        if (reports == null) {
+            reports = reportService.getReportsByEmployeeId(employee.getId());
+            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
+        }
+        return reports;
+    }
+
+    public List<ReportDetailedInfo> getReportsByTaskIdCache(User employee) {
+        List<ReportDetailedInfo> reports = (List<ReportDetailedInfo>) redisTemplate.opsForValue().get("reportsByEmployee::" + employee.getId());
+        if (reports == null) {
+            reports = reportService.getReportsByEmployeeId(employee.getId());
+            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
+        }
+        return reports;
+    }
+
+    @Cacheable(value = "reportsByEmployee", key = "#employee.id")
+    public void writeReportCache(User employee, WriteReportRequest request) {
+        Report report = Report.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .createdAt(Date.valueOf(LocalDate.now()))
+                .createdBy(employee.getId())
+                .isRead(false)
+                .build();
+
+        reportService.save(report);
+        List<ReportDetailedInfo> reports = (List<ReportDetailedInfo>) redisTemplate.opsForValue().get("reportsByEmployee::" + employee.getId());
+        if (reports == null) {
+            reports = reportService.getReportsByEmployeeId(employee.getId());
+            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
+        } else {
+            reports.add(ReportDetailedInfo.builder()
+                    .id(report.getId())
+                    .title(report.getTitle())
+                    .content(report.getContent())
+                    .taskId(report.getTaskId())
+                    .createdAt(report.getCreatedAt())
+                    .build());
+            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
+        }
+    }
+
 }
+
 

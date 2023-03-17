@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.mapper.UserMapper;
 import com.example.Employee_Management_System.model.EmployeeInformation;
+import lombok.AllArgsConstructor;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@AllArgsConstructor
 public class UserRepository {
     @Autowired
     private UserMapper userMapper;
