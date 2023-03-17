@@ -107,7 +107,7 @@ public class TaskServiceImpl implements TaskService {
     private void cacheTasksToRedis(List<TaskDetailedInfo> allTasks) {
         // caching using redisTemplate
         Gson gson = new Gson();
-        Map<Long, String> map = allTasks.stream().collect(Collectors.toMap(TaskDetailedInfo::getId, task -> gson.toJson(task)));
+        Map<Long, String> map = allTasks.stream().collect(Collectors.toMap(TaskDetailedInfo::getId, gson::toJson));
         redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_TASK, map);
     }
 

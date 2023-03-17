@@ -9,6 +9,8 @@ import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.MonthInfo;
 
@@ -42,4 +44,6 @@ public interface EmployeeService {
     ResponseEntity<Response> getReferenceCode(User employee);
 
     ResponseEntity<Response> getSubTasks(User employee, long taskId);
+
+    List<EmployeeInformation> getEmployeesBelongToManager(Long id);
 }

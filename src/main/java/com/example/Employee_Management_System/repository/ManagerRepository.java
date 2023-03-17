@@ -6,6 +6,7 @@ import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.mapper.ManagerMapper;
 import com.example.Employee_Management_System.mapper.TaskMapper;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ public class ManagerRepository {
         return managerMapper.findByReferenceCode(referenceCode);
     }
 
-
     public TaskDetailedInfo getTaskById(long taskId) {
         return taskService.getTaskById(taskId);
     }
@@ -52,5 +52,7 @@ public class ManagerRepository {
         return taskService.getAllTasksByMangerId(managerId);
     }
 
-
+    public List<EmployeeInformation> getAllEmployees(Long id) {
+        return managerMapper.getAllEmployees(id);
+    }
 }

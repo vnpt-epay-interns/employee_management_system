@@ -9,6 +9,7 @@ import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.enums.RegistrationMethod;
 import com.example.Employee_Management_System.exception.LoginFailedException;
@@ -22,6 +23,7 @@ import com.example.Employee_Management_System.service.*;
 import com.example.Employee_Management_System.utils.AvatarLinkCreator;
 import com.example.Employee_Management_System.utils.GoogleAPIHelper;
 import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
+import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
@@ -36,10 +38,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -53,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -193,12 +199,12 @@ public class AuthServiceImpl implements AuthService {
         // save employee to employee table
         employeeService.save(employee);
 
+        Gson gson = new Gson();
         EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-
-        List<EmployeeInformation> employees = (List<EmployeeInformation>) redisTemplate.opsForValue().get("employees::" + manager.getId());
-        if (employees != null) {
-            employees.add(employeeInfo);
-            redisTemplate.opsForValue().set("employees::" + manager.getId(), employees);
+        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE);
+        if (employeesInRedis != null || !employeesInRedis.isEmpty()) {
+            Map<Long, String> map = Stream.of(employeeInfo).collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
+            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE, map);
         }
 
         return employeeInfo;

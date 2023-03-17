@@ -211,10 +211,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<EmployeeInformation> getEmployeeBelongToManager(User manager) {
-        List<EmployeeInformation> employees = userRepository.getEmployeeBelongToManager(manager.getId());
-
-//        List<EmployeeInformation> employees = redisTemplate.opsForHash().values("employees");
-
+        List<EmployeeInformation> employees = employeeService.getEmployeesBelongToManager(manager.getId());
         return employees;
     }
 
@@ -298,7 +295,6 @@ public class ManagerServiceImpl implements ManagerService {
         User employeeManager = employeeService.getManagerOfEmployee(employeeId);
         return employeeManager.getId().equals(manager.getId());
     }
-
 
     @Override
     public ResponseEntity<Response> getEmployeeWorkingSchedules(User manager, int year,  int month) {

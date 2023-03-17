@@ -17,8 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 public class EmployeeRepository {
     private final EmployeeMapper employeeMapper;
-    private final TaskMapper taskMapper;
-
 
     public void save(Employee employee) {
         employeeMapper.save(employee);
@@ -31,7 +29,6 @@ public class EmployeeRepository {
     public void scheduleWorkingDays(List<WorkingSchedule> workingSchedules) {
         employeeMapper.saveWorkingSchedules(workingSchedules);
     }
-
 
     public String getReferenceCode(Long id) {
         return employeeMapper.getReferenceCode(id);

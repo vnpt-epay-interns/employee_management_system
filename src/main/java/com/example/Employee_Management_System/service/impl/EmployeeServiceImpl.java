@@ -19,6 +19,7 @@ import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
+import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
 
@@ -39,13 +41,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final ManagerRepository managerRepository;
     private final EmployeeMapper employeeMapper;
-
     private final ReportService reportService;
-
     private final TaskService taskService;
-
-
     private final RedisTemplate<String, Object> redisTemplate;
+    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees";
 
     @Override
     public ResponseEntity<Response> getTaskById(Long id, User user) {
@@ -57,16 +56,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return ResponseEntity.ok(response);
 
     }
-
-//    @Cacheable(value = "taskById", key = "#id")
-//    public Task getTaskByIdCaching(long id, User user) {
-//        Task task = employeeRepository
-//                .getTaskByIdAndEmployeeId(id, user.getId())
-//                .orElseThrow(() -> new NotFoundException("Task not found"));
-//
-//        return task;
-//
-//    }
 
     @Override
     public ResponseEntity<Response> getTasks(User employee) {
@@ -285,7 +274,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
-
     @Override
     public ResponseEntity<Response> getSubTasks(User employee, long taskId) {
         if (!checkIfTaskBelongsToEmployee(employee, taskId)) {
@@ -297,6 +285,22 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .data(taskService.getSubTasks(taskId))
                         .build()
         );
+    }
+
+    @Override
+    public List<EmployeeInformation> getEmployeesBelongToManager(Long id) {
+        List<EmployeeInformation> employees;
+        Gson gson = new Gson();
+
+        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE);
+        if (employeesInRedis == null || employeesInRedis.isEmpty()) {
+            employees = managerRepository.getAllEmployees(id);
+            Map<Long, String> map = employees.stream().collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
+            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE, map);
+            return employees;
+        }
+
+        return employeesInRedis.stream().map(e -> gson.fromJson((String) e, EmployeeInformation.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -315,7 +319,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.getEmployeeByEmployeeId(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
-
 
     @Cacheable(value = "referenceCode", key = "#manager.id")
     public String getReferenceCodeCache(User manager) {
@@ -373,7 +376,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
         }
     }
-
 }
 
 
