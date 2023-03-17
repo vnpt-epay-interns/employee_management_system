@@ -26,4 +26,5 @@ public interface ReportMapper {
 
     List<ReportDetailedInfo> getReportsByEmployeeId(Long id);
 
+    String getNameFromReportByEmployeeId(Long id);
 }
