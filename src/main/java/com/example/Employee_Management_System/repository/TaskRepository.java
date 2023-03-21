@@ -30,8 +30,10 @@ public class TaskRepository {
                 .completion(taskInfo.getCompletion())
                 .estimateHours(taskInfo.getEstimateHours())
                 .employeeId(taskInfo.getEmployeeId())
+                .parentId(taskInfo.getParentId())
                 .projectId(taskInfo.getProjectId())
                 .build();
+
         taskMapper.update(task);
     }
 

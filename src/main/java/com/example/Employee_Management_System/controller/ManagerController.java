@@ -39,6 +39,11 @@ public class ManagerController {
         return managerService.getAllTasks(manager);
     }
 
+    @GetMapping("/get-task/{taskId}")
+    public ResponseEntity<Response> getTaskById(@PathVariable long taskId) {
+        User manager = getCurrentManager();
+        return managerService.getTaskById(manager, taskId);
+    }
     @GetMapping("/get-all-subtasks/{taskId}")
     public ResponseEntity<Response> getAllSubTasks(@PathVariable long taskId) {
         User manager = getCurrentManager();

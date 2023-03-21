@@ -267,6 +267,20 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
+    @Override
+    public ResponseEntity<Response> getTaskById(User manager, long taskId) {
+        TaskDetailedInfo task = taskService.getTaskById(taskId);
+        if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
+            throw new ReportException("You are not allowed to view this task");
+        }
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get task successfully!")
+                .data(task)
+                .build()
+        );
+    }
+
 
     private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
         User employeeManager = taskService.getManagerOfTask(taskId);
