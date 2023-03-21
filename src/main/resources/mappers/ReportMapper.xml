@@ -125,7 +125,7 @@
             r.task_id AS task_id,
             CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             r.created_at AS created_at,
-            r.is_read AS is_read
+            r.is_read AS is_read[]
         FROM reports r
                  JOIN users u ON r.created_by = u.id
         WHERE  r.task_id = #{taskId} AND u.task_id = #{employeeId}
