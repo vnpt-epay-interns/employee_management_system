@@ -105,6 +105,7 @@ public class ManagerServiceImpl implements ManagerService {
         }
 
         TaskDetailedInfo task = taskService.getTaskById(taskId);
+        task.setId(taskId);
         task.setTitle(updateTaskRequest.getTitle());
         task.setDescription(updateTaskRequest.getDescription());
         task.setStatus(updateTaskRequest.getStatus());
@@ -262,6 +263,20 @@ public class ManagerServiceImpl implements ManagerService {
                 .status(200)
                 .message("Get all sub tasks successfully!")
                 .data(subTasks)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getTaskById(User manager, long taskId) {
+        TaskDetailedInfo task = taskService.getTaskById(taskId);
+        if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
+            throw new ReportException("You are not allowed to view this task");
+        }
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get task successfully!")
+                .data(task)
                 .build()
         );
     }

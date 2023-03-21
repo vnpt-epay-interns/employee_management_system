@@ -1,16 +1,19 @@
 package com.example.Employee_Management_System.service;
 
+import com.example.Employee_Management_System.domain.Project;
 import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 public interface ProjectService {
 
-//    ResponseEntity<Response> createProject(CreateProjectRequest createProjectRequest);
-//    ResponseEntity<Response> getProjectById(Long id);
-//    ResponseEntity<Response> getAllProjects();
-//    ResponseEntity<Response> updateProject(Long id, String name, Long managerId);
-//    ResponseEntity<Response> deleteProjectById(Long id);
+    void createProject(CreateProjectRequest createProjectRequest, Long managerId);
+    Project getProjectById(Long id);
+    List<Project> getAllProjects();
+    Project updateProject(Long id, String name, Long managerId);
+    void deleteProjectById(Long id);
 
 
 }

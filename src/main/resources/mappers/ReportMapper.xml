@@ -130,4 +130,7 @@
                  JOIN users u ON r.created_by = u.id
         WHERE  r.task_id = #{taskId} AND u.task_id = #{employeeId}
     </select>
+    <select id="getNameFromReportByEmployeeId" resultType="java.lang.String">
+        SELECT CONCAT(u.first_name, ' ', u.last_name) AS employee_name from reports r JOIN users u on r.created_by = u.id where r.created_by = #{id};
+    </select>
 </mapper>
