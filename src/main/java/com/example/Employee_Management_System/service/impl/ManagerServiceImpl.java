@@ -105,6 +105,7 @@ public class ManagerServiceImpl implements ManagerService {
         }
 
         TaskDetailedInfo task = taskService.getTaskById(taskId);
+        task.setId(taskId);
         task.setTitle(updateTaskRequest.getTitle());
         task.setDescription(updateTaskRequest.getDescription());
         task.setStatus(updateTaskRequest.getStatus());

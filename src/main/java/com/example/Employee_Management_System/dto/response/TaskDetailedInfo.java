@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 @Data
@@ -14,7 +15,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 //TODO: change the mapper
-public class TaskDetailedInfo {
+public class TaskDetailedInfo implements Serializable {
     private Long id;
     private String title;
     private String description;

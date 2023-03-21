@@ -18,7 +18,6 @@ public interface TaskMapper {
 
     List<TaskDetailedInfo> getTasksByEmployeeId(Long employeeId);
 
-    List<TaskDetailedInfo> getTasksByParentTaskId(Long parentId);
 
     @Update("UPDATE tasks SET title = #{title}, description = #{description}, start_date = #{startDate}, end_date = #{endDate}, status = #{status}, priority = #{priority}, completion = #{completion}, estimate_hours = #{estimateHours}, employee_id = #{employeeId}, parent_id = #{parentId}, project_id= #{projectId} WHERE id = #{id}")
     void update(Task task);
