@@ -96,6 +96,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CachePut(value = "user", key = "#currentUser.id")
     public UserInformation changeAvatar(User currentUser, MultipartFile file) {
         try {
             String link = uploadFile(file);
@@ -103,10 +104,6 @@ public class UserServiceImpl implements UserService {
             userRepository.update(currentUser);
 
             UserInformation userInformationUpdated = new UserInformation(currentUser);
-            UserInformation userInRedis = (UserInformation) redisTemplate.opsForValue().get("user::" + currentUser.getId());
-            if (userInRedis != null) {
-                redisTemplate.opsForValue().set("user::" + currentUser.getId(), userInformationUpdated);
-            }
             return userInformationUpdated;
         } catch (IOException e) {
             throw new IllegalStateException(e);
