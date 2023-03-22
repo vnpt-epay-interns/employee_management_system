@@ -22,8 +22,8 @@ public class ProjectRepository {
         return projectMapper.getProjectById(id);
     }
 
-    public List<Project> getAllProjects() {
-        return projectMapper.getAllProjects();
+    public List<Project> getAllProjectsByManagerId(Long managerId) {
+        return projectMapper.getAllProjectsByManagerId(managerId);
     }
 
     public void updateProject(Long id, String name, Long managerId) {

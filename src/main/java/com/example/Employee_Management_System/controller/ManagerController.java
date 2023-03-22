@@ -114,7 +114,8 @@ public class ManagerController {
 
     @GetMapping("/get-all-projects")
     public ResponseEntity<Response> getAllProjects() {
-        return managerService.getAllProjects();
+        Long managerId = getCurrentManager().getId();
+        return managerService.getAllProjectsByManagerId(managerId);
     }
 
 

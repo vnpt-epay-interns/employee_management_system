@@ -16,7 +16,7 @@ public interface ProjectMapper {
 
     Project getProjectById(Long id);
 
-    List<Project> getAllProjects();
+    List<Project> getAllProjectsByManagerId(Long managerId);
 
     @Update("UPDATE projects SET name = #{name}, manager_id = #{managerId} WHERE id = #{id}")
     void updateProject(Long id, String name, Long managerId);
