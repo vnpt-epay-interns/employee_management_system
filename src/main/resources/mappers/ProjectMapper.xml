@@ -7,8 +7,9 @@
         <result property="managerId" column="manager_id" />
     </resultMap>
 
-    <select id="getAllProjects" resultMap="project">
-        SELECT * FROM projects;
+    <select id="getAllProjectsByManagerId" resultMap="project">
+        SELECT * FROM projects
+        WHERE manager_id = #{managerId};
     </select>
 
     <select id="getProjectById" resultMap="project">

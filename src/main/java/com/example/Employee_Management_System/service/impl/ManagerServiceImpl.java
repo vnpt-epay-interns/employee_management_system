@@ -242,8 +242,8 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public ResponseEntity<Response> getAllProjects() {
-        List<Project> allProjects = projectRepository.getAllProjects();
+    public ResponseEntity<Response> getAllProjectsByManagerId(Long managerId) {
+        List<Project> allProjects = projectRepository.getAllProjectsByManagerId(managerId);
         return ResponseEntity.ok(Response.builder()
                 .status(200)
                 .message("Get all projects successfully!")
@@ -372,7 +372,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Cacheable(value = "allProject", key = "#manager")
     public List<Project> getAllProjectCache(User manager) {
-        List<Project> allProjects = projectRepository.getAllProjects();
+        List<Project> allProjects = projectRepository.getAllProjectsByManagerId(manager.getId());
         return allProjects;
     }
 
