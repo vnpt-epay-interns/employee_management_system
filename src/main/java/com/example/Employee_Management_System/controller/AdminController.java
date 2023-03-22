@@ -1,6 +1,5 @@
 package com.example.Employee_Management_System.controller;
 
-import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.UserService;
 import lombok.AllArgsConstructor;

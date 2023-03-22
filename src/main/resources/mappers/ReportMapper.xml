@@ -17,10 +17,11 @@
         SELECT
         r.id AS report_id,
         r.title AS report_title,
+        r.content AS content,
+        r.task_id AS task_id,
         CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
         r.created_at AS created_at,
-        r.task_id AS task_id,
-        r.content AS content
+        r.is_read AS is_read
         FROM reports r
              JOIN users u ON r.created_by = u.id
              JOIN employees e ON u.id = e.id
@@ -33,10 +34,11 @@
         SELECT
             r.id AS report_id,
             r.title AS report_title,
+            r.content AS content,
+            r.task_id AS task_id,
             CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             r.created_at AS created_at,
-            r.task_id AS task_id,
-                r.content AS content
+            r.is_read AS is_read
         FROM reports r
                  JOIN users u ON r.created_by = u.id
         WHERE r.id = #{id}
@@ -46,10 +48,11 @@
         SELECT
             r.id AS report_id,
             r.title AS report_title,
+            r.content AS content,
+            r.task_id AS task_id,
             CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             r.created_at AS created_at,
-            r.task_id AS task_id,
-            r.content AS content
+            r.is_read AS is_read
         FROM reports r
                  JOIN users u ON r.created_by = u.id
         WHERE  r.created_by = #{employeeId}
@@ -59,10 +62,11 @@
         SELECT
             r.id AS report_id,
             r.title AS report_title,
+            r.content AS content,
+            r.task_id AS task_id,
             CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             r.created_at AS created_at,
-            r.task_id AS task_id,
-            r.content AS content
+            r.is_read AS is_read
         FROM reports r
                  JOIN users u ON r.created_by = u.id
         WHERE r.task_id = #{taskId}
@@ -103,10 +107,11 @@
         SELECT
             r.id AS report_id,
             r.title AS report_title,
+            r.content AS content,
+            r.task_id AS task_id,
             CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             r.created_at AS created_at,
-            r.task_id AS task_id,
-            r.content AS content
+            r.is_read AS is_read
         FROM reports r
                  JOIN users u ON r.created_by = u.id
         WHERE  r.created_by = #{id}
@@ -116,12 +121,16 @@
         SELECT
             r.id AS report_id,
             r.title AS report_title,
+            r.content AS content,
+            r.task_id AS task_id,
             CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             r.created_at AS created_at,
-            r.task_id AS task_id,
-            r.content AS content
+            r.is_read AS is_read[]
         FROM reports r
                  JOIN users u ON r.created_by = u.id
         WHERE  r.task_id = #{taskId} AND u.task_id = #{employeeId}
+    </select>
+    <select id="getNameFromReportByEmployeeId" resultType="java.lang.String">
+        SELECT CONCAT(u.first_name, ' ', u.last_name) AS employee_name from reports r JOIN users u on r.created_by = u.id where r.created_by = #{id};
     </select>
 </mapper>

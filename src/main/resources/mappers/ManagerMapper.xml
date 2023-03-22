@@ -68,7 +68,7 @@
         WHERE m.referenced_code = #{referencedCode}
     </select>
 
-    <resultMap id="task_user_info" type="com.example.Employee_Management_System.dto.response.TaskDTO">
+    <resultMap id="task_user_info" type="com.example.Employee_Management_System.dto.response.TaskDetailedInfo">
         <result property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="description" column="description"/>

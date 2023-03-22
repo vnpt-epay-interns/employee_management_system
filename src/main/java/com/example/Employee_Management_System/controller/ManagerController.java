@@ -6,12 +6,10 @@ import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.ManagerService;
-import com.example.Employee_Management_System.service.ProjectService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/manager")
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class ManagerController {
     private final ManagerService managerService;
-
-    private ProjectService projectService;
 
     @PostMapping("/create-task")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
@@ -43,6 +39,11 @@ public class ManagerController {
         return managerService.getAllTasks(manager);
     }
 
+    @GetMapping("/get-task/{taskId}")
+    public ResponseEntity<Response> getTaskById(@PathVariable long taskId) {
+        User manager = getCurrentManager();
+        return managerService.getTaskById(manager, taskId);
+    }
     @GetMapping("/get-all-subtasks/{taskId}")
     public ResponseEntity<Response> getAllSubTasks(@PathVariable long taskId) {
         User manager = getCurrentManager();
@@ -79,7 +80,6 @@ public class ManagerController {
         return managerService.getEmployeeWorkingSchedules(manager, year,  monthNumber);
     }
 
-
     @GetMapping("/get-referenced-code")
     public ResponseEntity<Response> getManagerInfo() {
         User manager = getCurrentManager();
@@ -90,11 +90,15 @@ public class ManagerController {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-
     @GetMapping("/get-all-employees")
     public ResponseEntity<Response> getEmployeeBelongToManager() {
         User manager = getCurrentManager();
-        return managerService.getEmployeeBelongToManager(manager);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(managerService.getEmployeeBelongToManager(manager))
+                        .status(200)
+                        .message("Get all employees successfully!")
+                        .build());
     }
 
     @PostMapping("/create-project")

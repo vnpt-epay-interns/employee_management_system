@@ -6,6 +6,7 @@ import com.example.Employee_Management_System.dto.request.GoogleLoginRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.model.EmployeeInformation;
 import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 
@@ -15,16 +16,16 @@ import java.io.UnsupportedEncodingException;
 public interface AuthService {
     ResponseEntity<Response> register(RegisterRequest registerRequest) throws MessagingException, UnsupportedEncodingException;
 
-
     ResponseEntity<Response> formLogin(LoginRequest loginRequest);
 
     ResponseEntity<Response> selectRoleManager(User user);
 
-    ResponseEntity<Response> selectRoleEmployee(User user, String referenceCode);
+    EmployeeInformation selectRoleEmployee(User user, String referenceCode);
 
     ResponseEntity<Response> verify(String code);
 
     ResponseEntity<Response> existsEmail(CheckEmailExistRequest request);
+
     ResponseEntity<Response> getManagerInfo(String referencedCode);
 
     ResponseEntity<Response> googleLogin(GoogleLoginRequest loginRequest);

@@ -20,5 +20,5 @@ public interface ReportService {
 
     List<ReportDetailedInfo> getReportsByEmployeeId(Long id);
 
-    List<ReportDetailedInfo> getReportsByTaskId(long taskId);
+
 }

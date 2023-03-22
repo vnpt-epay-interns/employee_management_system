@@ -47,4 +47,8 @@ public class ReportRepository {
     public List<ReportDetailedInfo> getReportsByTaskId(long taskId) {
         return reportMapper.findAllReportsByTaskId(taskId);
     }
+
+    public String getNameFromReport(Long id) {
+        return reportMapper.getNameFromReportByEmployeeId(id);
+    }
 }
