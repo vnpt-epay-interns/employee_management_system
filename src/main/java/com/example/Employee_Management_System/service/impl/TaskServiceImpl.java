@@ -160,8 +160,6 @@ public class TaskServiceImpl implements TaskService {
             cacheTasksToRedis(subtasksOfParentTaskInRedis, REDIS_KEY_FOR_SUBTASK + "::" + taskDetailedInfo.getParentId());
         }
         // because a task can be stored in 3 keys, "tasks", "tasks::employeeId" and "tasks::managerId"
-
-
         // update the cache for dashboard of Employee who is assigned this task
         // get the task list stored in Redis, add the task to the list and save the list to Redis
         Long employeeId = taskDetailedInfo.getEmployeeId();

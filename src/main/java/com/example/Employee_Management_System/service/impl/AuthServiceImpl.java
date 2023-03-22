@@ -198,13 +198,18 @@ public class AuthServiceImpl implements AuthService {
 
         Gson gson = new Gson();
         EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId());
+        List<EmployeeInformation> employeesInRedis = redisTemplate.opsForHash()
+                .values(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId())
+                .stream()
+                .map(employeeInRedis -> gson.fromJson(employeeInRedis.toString(), EmployeeInformation.class))
+                .collect(Collectors.toList());
+
         if (employeesInRedis != null || !employeesInRedis.isEmpty()) {
             employeesInRedis.add(employeeInfo);
             Map<Long, String> map = employeesInRedis
                     .stream()
-                            .map(employeeInRedis -> gson.fromJson(employeeInRedis.toString(), EmployeeInformation.class))
-                                    .collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
+                    .collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
+
             redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId(), map);
         }
 

@@ -282,9 +282,9 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
 
-    private boolean checkIfTaskBelongsToEmployeeOfManager(User manager, long taskId) {
-        User employeeManager = taskService.getManagerOfTask(taskId);
-        return employeeManager.getId().equals(manager.getId());
+    private boolean checkIfTaskBelongsToEmployeeOfManager(User currentManager, long taskId) {
+        User manager = taskService.getManagerOfTask(taskId);
+        return manager.getId().equals(currentManager.getId());
     }
 
     @Override
