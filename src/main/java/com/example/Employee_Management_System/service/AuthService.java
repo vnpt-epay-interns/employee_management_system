@@ -6,6 +6,7 @@ import com.example.Employee_Management_System.dto.request.GoogleLoginRequest;
 import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public interface AuthService {
 
     EmployeeInformation selectRoleEmployee(User user, String referenceCode);
 
-    ResponseEntity<Response> verify(String code);
+    UserInformation verify(String code);
 
     ResponseEntity<Response> existsEmail(CheckEmailExistRequest request);
 

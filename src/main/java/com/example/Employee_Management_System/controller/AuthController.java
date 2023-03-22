@@ -40,7 +40,12 @@ public class AuthController {
 
     @GetMapping("/verify/{code}")
     public ResponseEntity<Response> verify(@PathVariable String code) {
-        return authService.verify(code);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(authService.verify(code))
+                        .status(200)
+                        .message("Verify successfully!")
+                        .build());
     }
 
 

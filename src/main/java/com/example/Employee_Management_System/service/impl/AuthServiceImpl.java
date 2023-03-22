@@ -9,6 +9,7 @@ import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
+import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.enums.RegistrationMethod;
 import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
@@ -232,27 +233,23 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    public ResponseEntity<Response> verify(String verificationCode) {
+    @Transactional
+    public UserInformation verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
         if (user == null) {
-            return ResponseEntity.ok().body(
-                    Response.builder()
-                            .status(400)
-                            .message("Invalid verification code")
-                            .data(verificationCode)
-                            .build()
-            );
+            throw new RegisterException("Invalid verification code");
         } else {
-
             user.setVerificationCode(null);
             userRepository.updateVerificationCode(user);
             userRepository.update(user);
-            return ResponseEntity.ok().body(
-                    Response.builder()
-                            .status(200)
-                            .message("Verify successfully")
-                            .build()
-            );
+
+            UserInformation userInformationUpdated = new UserInformation(user);
+            UserInformation userInRedis = (UserInformation) redisTemplate.opsForValue().get("user::" + user.getId());
+            if (userInRedis != null) {
+                redisTemplate.opsForValue().set("user::" + user.getId(), userInformationUpdated);
+            }
+
+            return userInformationUpdated;
         }
     }
 

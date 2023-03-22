@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +31,14 @@ public class UserServiceImpl implements UserService {
     @Value("${amazon.s3.default-bucket}")
     private String bucketName;
 
-
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private AmazonS3 s3client;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public User getUserByEmail(String email) {
@@ -92,15 +95,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CachePut(value = "user", key = "#currentUser.id")
+    @Transactional
     public UserInformation changeAvatar(User currentUser, MultipartFile file) {
         try {
             String link = uploadFile(file);
             currentUser.setAvatar(link);
             userRepository.update(currentUser);
 
-            UserInformation userInformation = new UserInformation(currentUser);
-            return userInformation;
+            UserInformation userInformationUpdated = new UserInformation(currentUser);
+            UserInformation userInRedis = (UserInformation) redisTemplate.opsForValue().get("user::" + currentUser.getId());
+            if (userInRedis != null) {
+                redisTemplate.opsForValue().set("user::" + currentUser.getId(), userInformationUpdated);
+            }
+            return userInformationUpdated;
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
