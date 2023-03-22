@@ -19,6 +19,7 @@ import com.example.Employee_Management_System.repository.UserRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.service.ReportService;
+import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class ManagerServiceImpl implements ManagerService {
     private final EmployeeService employeeService;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final TaskService taskService;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
@@ -249,6 +251,21 @@ public class ManagerServiceImpl implements ManagerService {
                 .status(200)
                 .message("Get all projects successfully!")
                 .data(allProjects)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getAllSubTasks(User manager, long taskId) {
+        if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
+            throw new ReportException("You are not allowed to view this task");
+        }
+
+        List<TaskDTO> subTasks = taskService.getSubTasks(taskId);
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get all sub tasks successfully!")
+                .data(subTasks)
                 .build()
         );
     }

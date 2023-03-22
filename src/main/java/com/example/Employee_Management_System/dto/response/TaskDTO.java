@@ -31,4 +31,5 @@ public class TaskDTO {
     private String employeeName;
     private Integer numberReports;
     private String projectName;
+    private Integer numberSubtasks;
 }

@@ -35,4 +35,6 @@ public interface TaskMapper {
     User getEmployeeOfTask(Long taskId);
 
     Task getTaskById(Long taskId);
+
+    List<TaskDTO> getSubTasks(long taskId);
 }

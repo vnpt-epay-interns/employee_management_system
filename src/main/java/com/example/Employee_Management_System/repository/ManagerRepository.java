@@ -53,4 +53,6 @@ public class ManagerRepository {
     public List<TaskDTO> getAllTasks(Long managerId) {
         return managerMapper.getAllTasks(managerId);
     }
+
+
 }

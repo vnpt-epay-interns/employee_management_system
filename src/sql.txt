@@ -57,7 +57,7 @@ create table tasks (
     priority varchar(25),
     completion int,
     estimate_hours float,
-    employee_id int not null,
+    employee_id int,
     parent_id int,
     project_id int,
     foreign key (employee_id) references employees(id) on delete cascade,
