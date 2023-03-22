@@ -9,8 +9,6 @@ import com.example.Employee_Management_System.dto.request.LoginRequest;
 import com.example.Employee_Management_System.dto.request.RegisterRequest;
 import com.example.Employee_Management_System.dto.response.LoginResponse;
 import com.example.Employee_Management_System.dto.response.Response;
-import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
-import com.example.Employee_Management_System.dto.response.UserInformation;
 import com.example.Employee_Management_System.enums.RegistrationMethod;
 import com.example.Employee_Management_System.exception.LoginFailedException;
 import com.example.Employee_Management_System.exception.NotFoundException;
@@ -27,8 +25,6 @@ import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -37,14 +33,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -58,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees";
+    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -172,6 +167,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public EmployeeInformation selectRoleEmployee(User user, String referenceCode) {
         if (user.getRole() != null) {
             throw new RegisterException("Account already has a role");
@@ -201,10 +197,14 @@ public class AuthServiceImpl implements AuthService {
 
         Gson gson = new Gson();
         EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE);
+        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId());
         if (employeesInRedis != null || !employeesInRedis.isEmpty()) {
-            Map<Long, String> map = Stream.of(employeeInfo).collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
-            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE, map);
+            employeesInRedis.add(employeeInfo);
+            Map<Long, String> map = employeesInRedis
+                    .stream()
+                            .map(employeeInRedis -> gson.fromJson(employeeInRedis.toString(), EmployeeInformation.class))
+                                    .collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
+            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId(), map);
         }
 
         return employeeInfo;
@@ -298,7 +298,7 @@ public class AuthServiceImpl implements AuthService {
         GoogleUserInfo googleUserInfo = GoogleAPIHelper.getUserInfo(loginRequest.getAuthorizationCode());
 
         String email = googleUserInfo.getEmail();
-        User user = null;
+        User user;
 
         if (userRepository.existsByEmail(email)) {
             // if the email exists, it means the user has already registered

@@ -221,7 +221,7 @@
                       LEFT JOIN projects p ON p.id = t.project_id
                       LEFT JOIN reports r ON r.task_id = t.id
                       LEFT JOIN employees e ON e.id = t.employee_id
-             WHERE e.manager_id = #{managerId}
+             WHERE e.manager_id = #{managerId} AND t.parent_id IS NULL
              GROUP BY t.id) t
                 left join tasks sub on sub.parent_id = t.id
         group by t.id
