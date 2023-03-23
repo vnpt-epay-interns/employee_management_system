@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -237,6 +238,8 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    //TODO: FIX DE VU
+    @CachePut(value = "user", key = "#{user.id}")
     @Transactional
     public UserInformation verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
@@ -245,7 +248,7 @@ public class AuthServiceImpl implements AuthService {
         } else {
             user.setVerificationCode(null);
             userRepository.updateVerificationCode(user);
-            userRepository.update(user);
+//            userRepository.update(user);
 
             UserInformation userInformationUpdated = new UserInformation(user);
             String key = "user::" + user.getId();

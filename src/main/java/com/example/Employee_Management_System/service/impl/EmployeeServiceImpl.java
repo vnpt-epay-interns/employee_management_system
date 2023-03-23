@@ -293,16 +293,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public List<EmployeeInformation> getEmployeesBelongToManager(Long id) {
-        List<EmployeeInformation> employees;
         String key = REDIS_KEY_FOR_EMPLOYEE + id;
 
         List<EmployeeInformation> employeesInRedis = convertToListOfEmployeeInformation(redisService.getHash(key));
-        if (employeesInRedis.isEmpty()) {
-            employees = managerRepository.getAllEmployees(id);
+        if (!employeesInRedis.isEmpty()) {
+            return employeesInRedis;
+        } else {
+            List<EmployeeInformation> employees = managerRepository.getAllEmployees(id);
             redisService.cacheEmployeeList(employees, key);
             return employees;
-        } else {
-            return employeesInRedis;
         }
 
     }
