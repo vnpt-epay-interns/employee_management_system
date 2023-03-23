@@ -16,6 +16,7 @@ import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.EmployeeService;
+import com.example.Employee_Management_System.service.RedisService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
@@ -44,7 +45,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final ReportService reportService;
     private final TaskService taskService;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisService redisService;
+    private final RedisTemplate redisTemplate;
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     @Override
@@ -292,17 +294,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public List<EmployeeInformation> getEmployeesBelongToManager(Long id) {
         List<EmployeeInformation> employees;
-        Gson gson = new Gson();
+        String key = REDIS_KEY_FOR_EMPLOYEE + id;
 
-        List<Object> employeesInRedis = redisTemplate.opsForHash().values(REDIS_KEY_FOR_EMPLOYEE + id);
-        if (employeesInRedis == null || employeesInRedis.isEmpty()) {
+        List<EmployeeInformation> employeesInRedis = convertToListOfEmployeeInformation(redisService.getHash(key));
+        if (employeesInRedis.isEmpty()) {
             employees = managerRepository.getAllEmployees(id);
-            Map<Long, String> map = employees.stream().collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
-            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + id, map);
+            redisService.cacheEmployeeList(employees, key);
             return employees;
+        } else {
+            return employeesInRedis;
         }
 
-        return employeesInRedis.stream().map(e -> gson.fromJson((String) e, EmployeeInformation.class)).collect(Collectors.toList());
+    }
+
+    private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {
+        Gson gson = new Gson();
+
+        return employeesInRedis.stream().map(e -> gson.fromJson(e.toString(), EmployeeInformation.class))
+                .collect(Collectors.toList());
     }
 
     @Override

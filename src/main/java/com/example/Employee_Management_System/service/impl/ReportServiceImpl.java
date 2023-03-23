@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,7 +30,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ReportDetailedInfo> getAllReports(User manager) {
-        return getAllProjectsInRedis();
+        return getAllReportsFromRedis();
     }
 
     @Override
@@ -50,7 +49,7 @@ public class ReportServiceImpl implements ReportService {
     public List<ReportDetailedInfo> getAllReportsByTaskId(long taskId) {
         List<ReportDetailedInfo> reports = getReportByTaskIdFromRedis(taskId);
 
-        if (reports == null && !reports.isEmpty()) {
+        if (reports != null && !reports.isEmpty()) {
             return reports;
         } else {
             List<ReportDetailedInfo> reportsFromDB = reportRepository.getReportsByTaskId(taskId);
@@ -73,10 +72,9 @@ public class ReportServiceImpl implements ReportService {
         Gson gson = new Gson();
 
         List<Object> reportsInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_KEY);
-        if (reportsInRedis == null || reportsInRedis.isEmpty()) {
+        if (reportsInRedis.isEmpty()) {
             return null;
-        }
-        else {
+        } else {
             return reportsInRedis.stream()
                     .map(report -> gson.fromJson(report.toString(), ReportDetailedInfo.class))
                     .filter(report -> Objects.equals(reportRepository.findReportsByEmployeeId(id), id))
@@ -93,18 +91,14 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-
-
-
-    public List<ReportDetailedInfo> getAllProjectsInRedis() {
+    public List<ReportDetailedInfo> getAllReportsFromRedis() {
         List<ReportDetailedInfo> reports;
         Gson gson = new Gson();
 
         List<Object> reportsInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_KEY);
-        if (reportsInRedis == null || reportsInRedis.isEmpty()) {
+        if (reportsInRedis.isEmpty()) {
             return null;
-        }
-        else {
+        } else {
             return reportsInRedis.stream()
                     .map(report -> gson.fromJson(report.toString(), ReportDetailedInfo.class))
                     .toList();
@@ -113,8 +107,8 @@ public class ReportServiceImpl implements ReportService {
 
 
     private List<ReportDetailedInfo> getReportByTaskIdFromRedis(Long id) {
-        List<ReportDetailedInfo> allReports = getAllProjectsInRedis();
-        if (allReports != null || allReports.isEmpty()) {
+        List<ReportDetailedInfo> allReports = getAllReportsFromRedis();
+        if (allReports == null || allReports.isEmpty()) {
             List<ReportDetailedInfo> reportsFromDB = allReports.stream()
                     .filter(report -> report.getTaskId().equals(id))
                     .toList();

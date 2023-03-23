@@ -53,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeService employeeService;
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
+    private final RedisService redisService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
@@ -198,24 +199,22 @@ public class AuthServiceImpl implements AuthService {
 
         Gson gson = new Gson();
         EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-        List<EmployeeInformation> employeesInRedis = redisTemplate.opsForHash()
-                .values(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId())
-                .stream()
-                .map(employeeInRedis -> gson.fromJson(employeeInRedis.toString(), EmployeeInformation.class))
-                .collect(Collectors.toList());
+        String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
+        List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
 
-        if (employeesInRedis != null || !employeesInRedis.isEmpty()) {
-            employeesInRedis.add(employeeInfo);
-            Map<Long, String> map = employeesInRedis
-                    .stream()
-                    .collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
-
-            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId(), map);
+        if (employeeInformationList != null || !employeeInformationList.isEmpty()) {
+            employeeInformationList.add(employeeInfo);
+            redisService.cacheEmployeeList(employeeInformationList, key);
         }
 
         return employeeInfo;
     }
+    private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {
+        Gson gson = new Gson();
 
+        return employeesInRedis.stream().map(e -> gson.fromJson(e.toString(), EmployeeInformation.class))
+                .collect(Collectors.toList());
+    }
     private UUID generateReferenceCode() {
         return UUID.randomUUID();
     }
@@ -249,9 +248,10 @@ public class AuthServiceImpl implements AuthService {
             userRepository.update(user);
 
             UserInformation userInformationUpdated = new UserInformation(user);
-            UserInformation userInRedis = (UserInformation) redisTemplate.opsForValue().get("user::" + user.getId());
+            String key = "user::" + user.getId();
+            UserInformation userInRedis = (UserInformation) redisTemplate.opsForValue().get(key);
             if (userInRedis != null) {
-                redisTemplate.opsForValue().set("user::" + user.getId(), userInformationUpdated);
+                redisTemplate.opsForValue().set(key, userInformationUpdated);
             }
 
             return userInformationUpdated;
