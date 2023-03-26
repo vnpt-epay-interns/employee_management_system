@@ -21,7 +21,7 @@ public interface AuthService {
 
     ResponseEntity<Response> selectRoleManager(User user);
 
-    EmployeeInformation selectRoleEmployee(User user, String referenceCode);
+    UserInformation selectRoleEmployee(User user, String referenceCode);
 
     UserInformation verify(String code);
 

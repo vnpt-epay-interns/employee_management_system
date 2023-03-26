@@ -26,7 +26,9 @@ import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -36,6 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeService employeeService;
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
+    private final RedisService redisService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
@@ -112,8 +116,6 @@ public class AuthServiceImpl implements AuthService {
             throw new LoginFailedException("Wrong password!");
         }
 
-
-
         LoginResponse response = generateAccessTokenAndCreateLoginResponse(user);
 
         return ResponseEntity.ok(
@@ -169,7 +171,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public EmployeeInformation selectRoleEmployee(User user, String referenceCode) {
+    // update user in redis
+    @CachePut(value = "user", key = "#result.id")
+    public UserInformation selectRoleEmployee(User user, String referenceCode) {
         if (user.getRole() != null) {
             throw new RegisterException("Account already has a role");
         }
@@ -196,24 +200,23 @@ public class AuthServiceImpl implements AuthService {
         // save employee to employee table
         employeeService.save(employee);
 
-        Gson gson = new Gson();
+        // add employee to employee list in redis
         EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-        List<EmployeeInformation> employeesInRedis = redisTemplate.opsForHash()
-                .values(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId())
-                .stream()
-                .map(employeeInRedis -> gson.fromJson(employeeInRedis.toString(), EmployeeInformation.class))
-                .collect(Collectors.toList());
-
-        if (employeesInRedis != null || !employeesInRedis.isEmpty()) {
-            employeesInRedis.add(employeeInfo);
-            Map<Long, String> map = employeesInRedis
-                    .stream()
-                    .collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
-
-            redisTemplate.opsForHash().putAll(REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId(), map);
+        String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
+        List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
+        if (employeeInformationList != null || !employeeInformationList.isEmpty()) {
+            employeeInformationList.add(employeeInfo);
+            redisService.cacheEmployeeList(employeeInformationList, key);
         }
 
-        return employeeInfo;
+        return new UserInformation(user);
+    }
+
+    private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {
+        Gson gson = new Gson();
+
+        return employeesInRedis.stream().map(e -> gson.fromJson(e.toString(), EmployeeInformation.class))
+                .collect(Collectors.toList());
     }
 
     private UUID generateReferenceCode() {
@@ -239,23 +242,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Transactional
+    @CachePut(value = "user", key = "#result.id")
     public UserInformation verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
         if (user == null) {
             throw new RegisterException("Invalid verification code");
-        } else {
-            user.setVerificationCode(null);
-            userRepository.updateVerificationCode(user);
-            userRepository.update(user);
-
-            UserInformation userInformationUpdated = new UserInformation(user);
-            UserInformation userInRedis = (UserInformation) redisTemplate.opsForValue().get("user::" + user.getId());
-            if (userInRedis != null) {
-                redisTemplate.opsForValue().set("user::" + user.getId(), userInformationUpdated);
-            }
-
-            return userInformationUpdated;
         }
+        user.setVerificationCode(null);
+        userRepository.updateVerificationCode(user);
+//            userRepository.update(user);
+
+        UserInformation userInformationUpdated = new UserInformation(user);
+
+        return userInformationUpdated;
     }
 
     @Override
