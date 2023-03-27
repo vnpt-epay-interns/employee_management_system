@@ -144,7 +144,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getReportById(User manager, long reportId) {
-        Report report = reportService.getReportById(reportId);
+        ReportDetailedInfo report = reportService.getReportById(reportId);
         // check if report belongs to one of the employees of the manager
         if (!checkIfReportBelongsToEmployeeOfManager(report, manager)) {
             throw new ReportException("You are not allowed to access this report!");
@@ -159,7 +159,7 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
-    private boolean checkIfReportBelongsToEmployeeOfManager(Report report, User manager) {
+    private boolean checkIfReportBelongsToEmployeeOfManager(ReportDetailedInfo report, User manager) {
         User employeeManager = reportService.getManagerOfEmployeeReport(report.getId());
         return employeeManager.getId().equals(manager.getId());
     }
@@ -169,7 +169,7 @@ public class ManagerServiceImpl implements ManagerService {
         if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
             throw new ReportException("You are not allowed to view this report");
         }
-        List<ReportDetailedInfo> unreadReportsByTaskId = reportService.getAllReportsByTaskId(taskId);
+        List<ReportDetailedInfo> unreadReportsByTaskId = reportService.getAllReportsByTaskId(manager, taskId);
 
         return ResponseEntity.ok(Response.builder()
                 .status(200)

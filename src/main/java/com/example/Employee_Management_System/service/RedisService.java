@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.service;
 
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.model.EmployeeInformation;
+import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,6 +47,15 @@ public class RedisService {
     }
     public List<Object> getHash(String key) {
         return redisTemplate.opsForHash().values(key);
+    }
+
+    public void cacheReportsToRedis(List<ReportDetailedInfo> reportsFromDB, Long id, String key) {
+        Gson gson = new Gson();
+        Map<Long, String> map = reportsFromDB.stream()
+                .collect(Collectors.toMap(ReportDetailedInfo::getId, gson::toJson));
+        redisTemplate.delete(key + id);
+        redisTemplate.opsForHash().putAll(key + id, map);
+        redisTemplate.expire(key + id, Duration.ofMinutes(EXPIRE_INTERVAL));
     }
 
 

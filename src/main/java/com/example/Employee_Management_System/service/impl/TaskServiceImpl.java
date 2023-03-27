@@ -51,9 +51,6 @@ public class TaskServiceImpl implements TaskService {
         if (task == null) {
             throw new NotFoundException("Task not found");
         }
-        if (!task.getEmployeeId().equals(employeeId)) {
-            throw new IllegalStateException("The task is not assigned to the employee");
-        }
         return task;
     }
 
@@ -165,8 +162,9 @@ public class TaskServiceImpl implements TaskService {
         List<TaskDetailedInfo> employeeTasksInRedis = getTasksByEmployeeId(employeeId);
         addTaskToTaskList(employeeTasksInRedis, taskDetailedInfo);
         String employeeKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
-        redisService.cacheTasksToRedis(employeeTasksInRedis, employeeKey);
         System.out.println("Line 168");
+        redisService.cacheTasksToRedis(employeeTasksInRedis, employeeKey);
+        System.out.println("Line 170");
         // update the cache for dashboard of Manager if the task is a parent task
         // the dashboard of manager doesn't show the subtas
         // if it not the subtask, change the cache so that can be shown in the dashboard
