@@ -23,9 +23,9 @@ public class ManagerController {
         return managerService.createTask(request);
     }
 
-    @DeleteMapping("/delete-task/{taskId}")
-    public ResponseEntity<Response> deleteTask(@PathVariable long taskId) {
-        return managerService.deleteTask(taskId);
+    @DeleteMapping("/hide-task/{taskId}")
+    public ResponseEntity<Response> hideTaskById(@PathVariable long taskId) {
+        return managerService.hideTaskById(taskId);
     }
 
     @PutMapping("/update-task/{taskId}")

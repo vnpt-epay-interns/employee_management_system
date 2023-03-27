@@ -13,7 +13,7 @@ public interface TaskService {
 
     List<TaskDetailedInfo> getTasksByEmployeeId(Long employeeId);
 
-    void deleteTaskById(TaskDetailedInfo task);
+    void hideTaskById(TaskDetailedInfo task);
 
     TaskDetailedInfo saveTask(Task task);
 

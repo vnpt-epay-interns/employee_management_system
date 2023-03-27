@@ -11,7 +11,7 @@ import java.util.List;
 public interface TaskMapper {
     Long save(Task task);
 
-    @Delete("DELETE FROM tasks WHERE id = #{id}")
+    // delete task and its subtasks (hide them)
     void delete(Long id);
 
     TaskDetailedInfo getTaskById(Long taskId);

@@ -19,7 +19,7 @@ public interface ManagerService {
 
     ResponseEntity<Response> createTask(CreateTaskRequest request);
 
-    ResponseEntity<Response> deleteTask(long taskId);
+    ResponseEntity<Response> hideTaskById(long taskId);
 
     ResponseEntity<Response> updateTask(long taskId, UpdateTaskRequest updateTaskRequest);
 

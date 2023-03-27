@@ -104,12 +104,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-
-
     @Transactional
     @CacheEvict(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
-    public void deleteTaskById(TaskDetailedInfo task) {
+    public void hideTaskById(TaskDetailedInfo task) {
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
         Long employeeId = task.getEmployeeId();
         Long managerId = task.getManagerId();
@@ -131,22 +129,25 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void removeTaskFromList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo task) {
+        // remove the task and its subtasks from the list
         if (taskListInRedis != null && !taskListInRedis.isEmpty()) {
-            taskListInRedis.removeIf(taskInRedis -> taskInRedis.getId().equals(task.getId()));
+            taskListInRedis.removeIf(taskInRedis -> taskInRedis.getId().equals(task.getId()) || task.getId().equals(taskInRedis.getParentId()));
         }
+
     }
 
-    @Transactional()
+    @Transactional
     @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
     public TaskDetailedInfo saveTask(Task task) {
+        // i added some sout to prevent the error, i don't why, if i remove them, i got the duplicate key when i save a task to databse
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
-
+        System.out.println("Saving a new task begins");
+        System.out.println("Line 144");
         // save the task to the database first so that the task object has the id
-        System.out.println("TRYING TO SAVE");
         taskRepository.saveTask(task);
         TaskDetailedInfo taskDetailedInfo = getTaskById(task.getId());// after saving the task to the database, the task object has the id
-
+        System.out.println("Line 148");
         // if the task has a parent task, update the subtask cache of parent task
         if (task.getParentId() != null) {
             // save this task as the subtask for its parent task in Redis
@@ -157,7 +158,7 @@ public class TaskServiceImpl implements TaskService {
             addTaskToTaskList(subtasksOfParentTaskInRedis, taskDetailedInfo);
             redisService.cacheTasksToRedis(subtasksOfParentTaskInRedis, key);
         }
-
+        System.out.println("Line 159");
         // update the cache for dashboard of Employee who is assigned this task
         // get the task list stored in Redis, add the task to the list and save the list to Redis
         Long employeeId = taskDetailedInfo.getEmployeeId();
@@ -165,23 +166,21 @@ public class TaskServiceImpl implements TaskService {
         addTaskToTaskList(employeeTasksInRedis, taskDetailedInfo);
         String employeeKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
         redisService.cacheTasksToRedis(employeeTasksInRedis, employeeKey);
-
+        System.out.println("Line 168");
         // update the cache for dashboard of Manager if the task is a parent task
         // the dashboard of manager doesn't show the subtas
         // if it not the subtask, change the cache so that can be shown in the dashboard
         Long managerId = taskDetailedInfo.getManagerId();
         List<TaskDetailedInfo> managerTasksInRedis = getAllTasksByMangerId(managerId);
         String managerKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString();
-
         if (taskDetailedInfo.getParentId() == null) {
             // get the task list stored in Redis, add the task to the list and save the list to Redis
             addTaskToTaskList(managerTasksInRedis, taskDetailedInfo);
             redisService.cacheTasksToRedis(managerTasksInRedis, managerKey);
+            System.out.println("Line 178");
         } else {
             // if it is the subtask, change the cache for the parent so that can be shown accurately in the dashboard of both manager and employee
-            TaskDetailedInfo parentTask = managerTasksInRedis.stream()
-                    .filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId()))
-                    .findFirst().orElse(null);
+            TaskDetailedInfo parentTask = managerTasksInRedis.stream().filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId())).findFirst().orElse(null);
 
 
             parentTask.setNumberSubtasks(parentTask.getNumberSubtasks() + 1);
@@ -189,22 +188,22 @@ public class TaskServiceImpl implements TaskService {
             // update the number of subtasks of the parent task of the manager dashboard in the Redis
             updateTaskToTaskList(managerTasksInRedis, parentTask);
             redisService.cacheTasksToRedis(managerTasksInRedis, managerKey);
-
+            System.out.println("Line 189");
 
             // udpate the number of subtasks of the parent task of the employee dashboard in the Redis
             Long employeeIdOfParentTask = parentTask.getEmployeeId();
             List<TaskDetailedInfo> employeeTasksInRedisOfParentTask = getTasksByEmployeeId(employeeIdOfParentTask);
             // TODO: when the duplicated key error happens? where the task is cached on client side in the store
-            TaskDetailedInfo parentTaskOfEmployee = employeeTasksInRedisOfParentTask.stream()
-                    .filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId()))
-                    .findFirst().orElse(null);
+            TaskDetailedInfo parentTaskOfEmployee = employeeTasksInRedisOfParentTask.stream().filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId())).findFirst().orElse(null);
             parentTaskOfEmployee.setNumberSubtasks(parentTaskOfEmployee.getNumberSubtasks() + 1);
             updateTaskToTaskList(employeeTasksInRedisOfParentTask, parentTaskOfEmployee);
             String employeeOfParentTaskKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeIdOfParentTask.toString();
             redisService.cacheTasksToRedis(employeeTasksInRedisOfParentTask, employeeOfParentTaskKey);
+            System.out.println("Line 200");
         }
 
-            return taskDetailedInfo;
+        System.out.println("Done");
+        return taskDetailedInfo;
     }
 
     private void addTaskToTaskList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo taskDetailedInfo) {
@@ -256,15 +255,13 @@ public class TaskServiceImpl implements TaskService {
 
     private List<TaskDetailedInfo> convertToListOfTaskDetailedInfo(List<Object> subtasksOfParentTask) {
         Gson gson = new Gson();
-        List<TaskDetailedInfo> subtasksOfParentTaskInRedis = subtasksOfParentTask.stream()
-                .map(value -> gson.fromJson(value.toString(), TaskDetailedInfo.class))
-                .collect(Collectors.toList());
+        List<TaskDetailedInfo> subtasksOfParentTaskInRedis = subtasksOfParentTask.stream().map(value -> gson.fromJson(value.toString(), TaskDetailedInfo.class)).collect(Collectors.toList());
 
         return subtasksOfParentTaskInRedis;
     }
 
     private void updateTaskToTaskList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo taskDetailedInfo) {
-        for (TaskDetailedInfo task : taskListInRedis )  {
+        for (TaskDetailedInfo task : taskListInRedis) {
             if (task.getId().equals(taskDetailedInfo.getId())) {
                 task.update(taskDetailedInfo);
                 break;
@@ -278,8 +275,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-
-//    @Cacheable(value = REDIS_KEY_FOR_SUBTASK, key = "#parentId")
+    //    @Cacheable(value = REDIS_KEY_FOR_SUBTASK, key = "#parentId")
     @Override
     public List<TaskDetailedInfo> getSubTasks(long parentId) {
         String subtaskKey = REDIS_KEY_FOR_SUBTASK + "::" + parentId;

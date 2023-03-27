@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.List;
@@ -32,11 +33,17 @@ public class RedisService {
         cacheHash(key, map);
 
     }
+
     private void cacheHash(String key, Map<Long, String> map) {
+        redisTemplate.delete(key); // delete old cache if exists
         redisTemplate.opsForHash().putAll(key, map);
         redisTemplate.expire(key, Duration.ofMinutes(EXPIRE_INTERVAL));
     }
 
+    public void cacheObjectToRedis(Object object, String key) {
+        redisTemplate.opsForValue().set(key, object);
+        redisTemplate.expire(key, Duration.ofMinutes(EXPIRE_INTERVAL));
+    }
     public List<Object> getHash(String key) {
         return redisTemplate.opsForHash().values(key);
     }

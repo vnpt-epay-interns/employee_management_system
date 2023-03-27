@@ -45,6 +45,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
+
         if (request.getParentId() != null) {
             TaskDetailedInfo parenTask = taskService.getTaskById(request.getParentId());
             if (parenTask == null) {
@@ -79,13 +80,13 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public ResponseEntity<Response> deleteTask(long taskId) {
+    public ResponseEntity<Response> hideTaskById(long taskId) {
         TaskDetailedInfo task = taskService.getTaskById(taskId);
         if (task == null) {
             throw new IllegalStateException("Task not found!");
         }
 
-        taskService.deleteTaskById(task);
+        taskService.hideTaskById(task);
         return ResponseEntity.ok(
                 Response
                         .builder()
