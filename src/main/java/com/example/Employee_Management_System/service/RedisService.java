@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -22,17 +24,58 @@ public class RedisService {
     private final static int EXPIRE_INTERVAL = 5;
 
     public void cacheTasksToRedis(List<TaskDetailedInfo> allTasks, String key) {
-        // convert list to map
         Gson gson = new Gson();
-        Map<Long, String> map = allTasks.stream().collect(Collectors.toMap(TaskDetailedInfo::getId, gson::toJson));
+
+        // remove duplicate element
+        List<TaskDetailedInfo> distinct = new ArrayList<>();
+        for (TaskDetailedInfo taskDetailedInfo : allTasks) {
+            boolean isExist = distinct.stream().anyMatch(task -> task.getId().equals(taskDetailedInfo.getId()));
+            if (!isExist) {
+                distinct.add(taskDetailedInfo);
+            }
+        }
+
+        // convert list to map
+        Map<Long, String> map = distinct.stream()
+                .collect(Collectors.toMap(TaskDetailedInfo::getId, gson::toJson));
         cacheHash(key, map);
     }
     public void cacheEmployeeList(List<EmployeeInformation> list, String key) {
-        // convert list to map
         Gson gson = new Gson();
-        Map<Long, String> map = list.stream().collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
+        // remove duplicate element
+        List<EmployeeInformation> distinct = new ArrayList<>();
+        for (EmployeeInformation employeeInformation : list) {
+            boolean isExist = distinct.stream().anyMatch(employee -> employee.getId().equals(employeeInformation.getId()));
+            if (!isExist) {
+                distinct.add(employeeInformation);
+            }
+        }
+
+        // convert list to map
+
+        Map<Long, String> map = distinct.stream()
+                .collect(Collectors.toMap(EmployeeInformation::getId, gson::toJson));
         cacheHash(key, map);
 
+    }
+    public void cacheReportsToRedis(List<ReportDetailedInfo> reportsFromDB, Long id, String key) {
+        Gson gson = new Gson();
+
+        // remove duplicate elements
+        List<ReportDetailedInfo> distinct = new ArrayList<>();
+        for (ReportDetailedInfo reportDetailedInfo : reportsFromDB) {
+            boolean isExist = distinct.stream().anyMatch(task -> task.getId().equals(reportDetailedInfo.getId()));
+            if (!isExist) {
+                distinct.add(reportDetailedInfo);
+            }
+        }
+
+        // convert list to map
+        Map<Long, String> map = distinct.stream()
+                .collect(Collectors.toMap(ReportDetailedInfo::getId, gson::toJson));
+        redisTemplate.delete(key + id);
+        redisTemplate.opsForHash().putAll(key + id, map);
+        redisTemplate.expire(key + id, Duration.ofMinutes(EXPIRE_INTERVAL));
     }
 
     private void cacheHash(String key, Map<Long, String> map) {
@@ -49,14 +92,6 @@ public class RedisService {
         return redisTemplate.opsForHash().values(key);
     }
 
-    public void cacheReportsToRedis(List<ReportDetailedInfo> reportsFromDB, Long id, String key) {
-        Gson gson = new Gson();
-        Map<Long, String> map = reportsFromDB.stream()
-                .collect(Collectors.toMap(ReportDetailedInfo::getId, gson::toJson));
-        redisTemplate.delete(key + id);
-        redisTemplate.opsForHash().putAll(key + id, map);
-        redisTemplate.expire(key + id, Duration.ofMinutes(EXPIRE_INTERVAL));
-    }
 
 
 }

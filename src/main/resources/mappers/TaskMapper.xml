@@ -12,15 +12,8 @@
         SET t1.hidden = TRUE
     </update>
 
-    <insert id="save">
-        REPLACE  INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours,
-            employee_id, parent_id, project_id)
-            VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion},
-            #{estimateHours}, #{employeeId}, #{parentId}, #{projectId})
-            <selectKey keyProperty="id" resultType="long" order="AFTER">
-                SELECT LAST_INSERT_ID()
-            </selectKey>
-    </insert>
+
+
     <resultMap id="taskDetailedInfo" type="com.example.Employee_Management_System.dto.response.TaskDetailedInfo">
         <result property="id" column="id"/>
         <result property="title" column="title"/>

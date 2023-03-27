@@ -137,14 +137,11 @@ public class TaskServiceImpl implements TaskService {
     @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
     public TaskDetailedInfo saveTask(Task task) {
-        // i added some sout to prevent the error, i don't why, if i remove them, i got the duplicate key when i save a task to databse
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
-        System.out.println("Saving a new task begins");
-        System.out.println("Line 144");
         // save the task to the database first so that the task object has the id
         taskRepository.saveTask(task);
         TaskDetailedInfo taskDetailedInfo = getTaskById(task.getId());// after saving the task to the database, the task object has the id
-        System.out.println("Line 148");
+
         // if the task has a parent task, update the subtask cache of parent task
         if (task.getParentId() != null) {
             // save this task as the subtask for its parent task in Redis
@@ -155,27 +152,26 @@ public class TaskServiceImpl implements TaskService {
             addTaskToTaskList(subtasksOfParentTaskInRedis, taskDetailedInfo);
             redisService.cacheTasksToRedis(subtasksOfParentTaskInRedis, key);
         }
-        System.out.println("Line 159");
+
         // update the cache for dashboard of Employee who is assigned this task
         // get the task list stored in Redis, add the task to the list and save the list to Redis
         Long employeeId = taskDetailedInfo.getEmployeeId();
         List<TaskDetailedInfo> employeeTasksInRedis = getTasksByEmployeeId(employeeId);
         addTaskToTaskList(employeeTasksInRedis, taskDetailedInfo);
         String employeeKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
-        System.out.println("Line 168");
         redisService.cacheTasksToRedis(employeeTasksInRedis, employeeKey);
-        System.out.println("Line 170");
+
         // update the cache for dashboard of Manager if the task is a parent task
         // the dashboard of manager doesn't show the subtas
         // if it not the subtask, change the cache so that can be shown in the dashboard
         Long managerId = taskDetailedInfo.getManagerId();
         List<TaskDetailedInfo> managerTasksInRedis = getAllTasksByMangerId(managerId);
         String managerKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString();
+
         if (taskDetailedInfo.getParentId() == null) {
             // get the task list stored in Redis, add the task to the list and save the list to Redis
             addTaskToTaskList(managerTasksInRedis, taskDetailedInfo);
             redisService.cacheTasksToRedis(managerTasksInRedis, managerKey);
-            System.out.println("Line 178");
         } else {
             // if it is the subtask, change the cache for the parent so that can be shown accurately in the dashboard of both manager and employee
             TaskDetailedInfo parentTask = managerTasksInRedis.stream().filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId())).findFirst().orElse(null);
@@ -186,7 +182,6 @@ public class TaskServiceImpl implements TaskService {
             // update the number of subtasks of the parent task of the manager dashboard in the Redis
             updateTaskToTaskList(managerTasksInRedis, parentTask);
             redisService.cacheTasksToRedis(managerTasksInRedis, managerKey);
-            System.out.println("Line 189");
 
             // udpate the number of subtasks of the parent task of the employee dashboard in the Redis
             Long employeeIdOfParentTask = parentTask.getEmployeeId();
@@ -197,10 +192,8 @@ public class TaskServiceImpl implements TaskService {
             updateTaskToTaskList(employeeTasksInRedisOfParentTask, parentTaskOfEmployee);
             String employeeOfParentTaskKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeIdOfParentTask.toString();
             redisService.cacheTasksToRedis(employeeTasksInRedisOfParentTask, employeeOfParentTaskKey);
-            System.out.println("Line 200");
         }
 
-        System.out.println("Done");
         return taskDetailedInfo;
     }
 

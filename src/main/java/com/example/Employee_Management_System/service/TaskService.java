@@ -15,6 +15,7 @@ public interface TaskService {
 
     void hideTaskById(TaskDetailedInfo task);
 
+
     TaskDetailedInfo saveTask(Task task);
 
     TaskDetailedInfo updateTask(TaskDetailedInfo task);
