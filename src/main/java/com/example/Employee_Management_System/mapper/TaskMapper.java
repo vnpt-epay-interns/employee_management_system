@@ -9,9 +9,11 @@ import java.util.List;
 
 @Mapper
 public interface TaskMapper {
-    Long save(Task task);
+    @Insert("INSERT INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours, employee_id, parent_id, project_id) VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion}, #{estimateHours}, #{employeeId}, #{parentId}, #{projectId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void save(Task task);
 
-    @Delete("DELETE FROM tasks WHERE id = #{id}")
+    // delete task and its subtasks (hide them)
     void delete(Long id);
 
     TaskDetailedInfo getTaskById(Long taskId);

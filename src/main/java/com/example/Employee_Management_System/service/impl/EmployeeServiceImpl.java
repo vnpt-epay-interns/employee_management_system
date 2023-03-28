@@ -20,6 +20,7 @@ import com.example.Employee_Management_System.service.RedisService;
 import com.example.Employee_Management_System.service.ReportService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
@@ -48,10 +49,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final RedisService redisService;
     private final RedisTemplate redisTemplate;
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
+    private final String REDIS_REPORTS_BY_TASK_KEY = "reports_by_task::";
+    private final String REDIS_REPORTS_BY_MANAGER_KEY = "reports_by_manager::";
 
     @Override
-    public ResponseEntity<Response> getTaskById(Long id, User user) {
-        TaskDetailedInfo task = taskService.getTaskByIdAndEmployeeId(id, user.getId());
+    public ResponseEntity<Response> getTaskById(Long taskId, User user) {
+        TaskDetailedInfo task = taskService.getTaskById(taskId);
         Response response = Response.builder()
                 .status(200)
                 .data(task)
@@ -100,6 +103,19 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
 
         reportService.save(report);
+
+        Gson gson = new Gson();
+        Employee employeeInformation = employeeRepository.getEmployeeByEmployeeId(employee.getId());
+        ReportDetailedInfo reportDetailedInfo = reportService.getReportById(report.getId());
+        List<Object> reportsByTaskInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_BY_MANAGER_KEY + employeeInformation.getManagerId());
+        List<ReportDetailedInfo> reportsByTask = new ArrayList<>(reportsByTaskInRedis.stream()
+                .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
+                .toList());
+
+        if (reportsByTask != null || !reportsByTask.isEmpty()) {
+            reportsByTask.add(reportDetailedInfo);
+            redisService.cacheReportsToRedis(reportsByTask, employeeInformation.getManagerId(), REDIS_REPORTS_BY_MANAGER_KEY);
+        }
 
         return ResponseEntity.ok(
                 Response.builder()
@@ -230,8 +246,32 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .createdBy(employee.getId())
                 .isRead(false)
                 .build();
-
         reportService.save(report);
+
+        Gson gson = new Gson();
+
+        ReportDetailedInfo reportDetailedInfo = reportService.getReportById(report.getId());
+
+        List<Object> reportsByTaskInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_BY_TASK_KEY + taskId);
+        // update the reports by task in redis
+        List<ReportDetailedInfo> reportsByTask = new ArrayList<>(reportsByTaskInRedis.stream()
+                .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
+                .toList());
+        if (reportsByTask != null || !reportsByTask.isEmpty()) {
+            reportsByTask.add(reportDetailedInfo);
+            redisService.cacheReportsToRedis(reportsByTask, taskId, REDIS_REPORTS_BY_TASK_KEY);
+        }
+
+        // update the reports by manager in redis
+        Employee employeeInformation = employeeRepository.getEmployeeByEmployeeId(employee.getId());
+        List<Object> reportsByManagerInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_BY_MANAGER_KEY + employeeInformation.getManagerId());
+        List<ReportDetailedInfo> reportsByManager = new ArrayList<>(reportsByManagerInRedis.stream()
+                .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
+                .toList());
+        if (reportsByManager != null || !reportsByManager.isEmpty()) {
+            reportsByManager.add(reportDetailedInfo);
+            redisService.cacheReportsToRedis(reportsByManager, employeeInformation.getManagerId(), REDIS_REPORTS_BY_MANAGER_KEY);
+        }
 
         return ResponseEntity.ok(
                 Response.builder()
@@ -259,7 +299,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return ResponseEntity.ok(
                 Response.builder()
                         .status(200)
-                        .data(reportService.getAllReportsByTaskId(taskId))
+                        .data(reportService.getAllReportsByTaskId(employee, taskId))
                         .build()
         );
     }

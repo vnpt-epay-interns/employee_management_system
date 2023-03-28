@@ -14,8 +14,8 @@ import java.util.List;
 public class TaskRepository {
     private final TaskMapper taskMapper;
 
-    public Long saveTask(Task task) {
-        return taskMapper.save(task);
+    public void saveTask(Task task) {
+         taskMapper.save(task);
     }
 
     public void updateTask(TaskDetailedInfo taskInfo) {

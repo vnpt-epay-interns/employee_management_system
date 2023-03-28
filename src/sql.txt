@@ -60,8 +60,9 @@ create table tasks (
     employee_id int,
     parent_id int,
     project_id int,
+    hidden boolean default false,
     foreign key (employee_id) references employees(id) on delete cascade,
-    foreign key (parent_id) references tasks(id),
+    foreign key (parent_id) references tasks(id) on delete cascade
     foreign key (project_id) references projects(id) on delete cascade
     );
 

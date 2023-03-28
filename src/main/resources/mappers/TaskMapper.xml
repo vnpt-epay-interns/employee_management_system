@@ -2,15 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.Employee_Management_System.mapper.TaskMapper">
 
-    <insert id="save" >
-        INSERT INTO tasks (title, description, start_date, end_date, status, priority, completion, estimate_hours,
-                           employee_id, parent_id, project_id)
-        VALUES (#{title}, #{description}, #{startDate}, #{endDate}, #{status}, #{priority}, #{completion},
-                #{estimateHours}, #{employeeId}, #{parentId}, #{projectId})
-        <selectKey keyProperty="id" resultType="long" order="AFTER">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
-    </insert>
+    <update id="delete">
+        UPDATE tasks t1
+            INNER JOIN (
+            SELECT id
+            FROM tasks
+            WHERE id = #{id} OR parent_id = #{id}
+            ) t2 ON t1.id = t2.id
+        SET t1.hidden = TRUE
+    </update>
+
+
+
     <resultMap id="taskDetailedInfo" type="com.example.Employee_Management_System.dto.response.TaskDetailedInfo">
         <result property="id" column="id"/>
         <result property="title" column="title"/>
@@ -75,7 +78,7 @@
                       LEFT JOIN projects p ON p.id = t.project_id
                       LEFT JOIN reports r ON r.task_id = t.id
                       LEFT JOIN employees e ON e.id = t.employee_id
-             WHERE t.id = #{taskId}
+             WHERE t.id = #{taskId} AND t.hidden = FALSE
              GROUP BY t.id) t
                 left join tasks sub on sub.parent_id = t.id
         group by t.id
@@ -124,7 +127,7 @@
                       LEFT JOIN projects p ON p.id = t.project_id
                       LEFT JOIN reports r ON r.task_id = t.id
                       LEFT JOIN employees e ON e.id = t.employee_id
-             WHERE t.parent_id = #{parentId}
+             WHERE t.parent_id = #{parentId} AND t.hidden = FALSE
              GROUP BY t.id) t
                 left join tasks sub on sub.parent_id = t.id
         group by t.id
@@ -172,13 +175,11 @@
                       LEFT JOIN projects p ON p.id = t.project_id
                       LEFT JOIN reports r ON r.task_id = t.id
                       LEFT JOIN employees e ON e.id = t.employee_id
-             WHERE e.id = #{employeeId}
+             WHERE e.id = #{employeeId} AND t.hidden = FALSE
              GROUP BY t.id) t
                 left join tasks sub on sub.parent_id = t.id
         group by t.id
     </select>
-
-
 
     <select id="getTasksByManagerId" resultMap="taskDetailedInfo">
         select
@@ -221,7 +222,7 @@
                       LEFT JOIN projects p ON p.id = t.project_id
                       LEFT JOIN reports r ON r.task_id = t.id
                       LEFT JOIN employees e ON e.id = t.employee_id
-             WHERE e.manager_id = #{managerId} AND t.parent_id IS NULL
+             WHERE e.manager_id = #{managerId} AND t.parent_id IS NULL AND t.hidden = FALSE
              GROUP BY t.id) t
                 left join tasks sub on sub.parent_id = t.id
         group by t.id

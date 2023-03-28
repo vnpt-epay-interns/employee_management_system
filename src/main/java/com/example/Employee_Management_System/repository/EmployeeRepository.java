@@ -3,9 +3,7 @@ package com.example.Employee_Management_System.repository;
 import com.example.Employee_Management_System.domain.Employee;
 
 import com.example.Employee_Management_System.domain.WorkingSchedule;
-import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.mapper.EmployeeMapper;
-import com.example.Employee_Management_System.mapper.TaskMapper;
 import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -20,6 +18,10 @@ public class EmployeeRepository {
 
     public void save(Employee employee) {
         employeeMapper.save(employee);
+    }
+
+    public Employee getEmployeeByEmployeeId(long employeeId) {
+        return employeeMapper.getEmployeeByEmployeeId(employeeId).get();
     }
 
     public List<WorkingScheduleDetailedInfo> getWorkingSchedule(long employeeId, int year, int month) {

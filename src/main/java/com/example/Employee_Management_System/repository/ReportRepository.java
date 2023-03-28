@@ -20,7 +20,7 @@ public class ReportRepository {
         return reportMapper.getAllReports(manager.getId());
     }
 
-    public Optional<Report> findById(long reportId) {
+    public Optional<ReportDetailedInfo> findById(long reportId) {
         return reportMapper.findById(reportId);
     }
 

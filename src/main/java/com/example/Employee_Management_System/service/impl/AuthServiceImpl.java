@@ -57,7 +57,6 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {

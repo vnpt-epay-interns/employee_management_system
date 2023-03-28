@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +14,14 @@ import java.util.Optional;
 public interface ReportMapper {
     List<ReportDetailedInfo> getAllReports(long managerId);
 
-    Optional<Report> findById(long reportId);
+    Optional<ReportDetailedInfo> findById(long reportId);
 
     List<ReportDetailedInfo> findReportsByEmployeeId(long employeeId);
 
     List<ReportDetailedInfo> findAllReportsByTaskId(long taskId);
 
     @Insert("INSERT INTO reports (title, content, task_id, created_by, created_at, is_read) VALUES (#{title}, #{content}, #{taskId}, #{createdBy}, #{createdAt}, #{isRead})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     void save(Report report);
 
     User getManagerOfEmployeeReport(long reportId);

@@ -51,9 +51,6 @@ public class TaskServiceImpl implements TaskService {
         if (task == null) {
             throw new NotFoundException("Task not found");
         }
-        if (!task.getEmployeeId().equals(employeeId)) {
-            throw new IllegalStateException("The task is not assigned to the employee");
-        }
         return task;
     }
 
@@ -104,12 +101,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-
-
     @Transactional
     @CacheEvict(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
-    public void deleteTaskById(TaskDetailedInfo task) {
+    public void hideTaskById(TaskDetailedInfo task) {
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
         Long employeeId = task.getEmployeeId();
         Long managerId = task.getManagerId();
@@ -131,19 +126,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void removeTaskFromList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo task) {
+        // remove the task and its subtasks from the list
         if (taskListInRedis != null && !taskListInRedis.isEmpty()) {
-            taskListInRedis.removeIf(taskInRedis -> taskInRedis.getId().equals(task.getId()));
+            taskListInRedis.removeIf(taskInRedis -> taskInRedis.getId().equals(task.getId()) || task.getId().equals(taskInRedis.getParentId()));
         }
+
     }
 
-    @Transactional()
+    @Transactional
     @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
     public TaskDetailedInfo saveTask(Task task) {
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
-
         // save the task to the database first so that the task object has the id
-        System.out.println("TRYING TO SAVE");
         taskRepository.saveTask(task);
         TaskDetailedInfo taskDetailedInfo = getTaskById(task.getId());// after saving the task to the database, the task object has the id
 
@@ -179,9 +174,7 @@ public class TaskServiceImpl implements TaskService {
             redisService.cacheTasksToRedis(managerTasksInRedis, managerKey);
         } else {
             // if it is the subtask, change the cache for the parent so that can be shown accurately in the dashboard of both manager and employee
-            TaskDetailedInfo parentTask = managerTasksInRedis.stream()
-                    .filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId()))
-                    .findFirst().orElse(null);
+            TaskDetailedInfo parentTask = managerTasksInRedis.stream().filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId())).findFirst().orElse(null);
 
 
             parentTask.setNumberSubtasks(parentTask.getNumberSubtasks() + 1);
@@ -190,21 +183,18 @@ public class TaskServiceImpl implements TaskService {
             updateTaskToTaskList(managerTasksInRedis, parentTask);
             redisService.cacheTasksToRedis(managerTasksInRedis, managerKey);
 
-
             // udpate the number of subtasks of the parent task of the employee dashboard in the Redis
             Long employeeIdOfParentTask = parentTask.getEmployeeId();
             List<TaskDetailedInfo> employeeTasksInRedisOfParentTask = getTasksByEmployeeId(employeeIdOfParentTask);
             // TODO: when the duplicated key error happens? where the task is cached on client side in the store
-            TaskDetailedInfo parentTaskOfEmployee = employeeTasksInRedisOfParentTask.stream()
-                    .filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId()))
-                    .findFirst().orElse(null);
+            TaskDetailedInfo parentTaskOfEmployee = employeeTasksInRedisOfParentTask.stream().filter(taskInRedis -> taskInRedis.getId().equals(taskDetailedInfo.getParentId())).findFirst().orElse(null);
             parentTaskOfEmployee.setNumberSubtasks(parentTaskOfEmployee.getNumberSubtasks() + 1);
             updateTaskToTaskList(employeeTasksInRedisOfParentTask, parentTaskOfEmployee);
             String employeeOfParentTaskKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeIdOfParentTask.toString();
             redisService.cacheTasksToRedis(employeeTasksInRedisOfParentTask, employeeOfParentTaskKey);
         }
 
-            return taskDetailedInfo;
+        return taskDetailedInfo;
     }
 
     private void addTaskToTaskList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo taskDetailedInfo) {
@@ -256,15 +246,13 @@ public class TaskServiceImpl implements TaskService {
 
     private List<TaskDetailedInfo> convertToListOfTaskDetailedInfo(List<Object> subtasksOfParentTask) {
         Gson gson = new Gson();
-        List<TaskDetailedInfo> subtasksOfParentTaskInRedis = subtasksOfParentTask.stream()
-                .map(value -> gson.fromJson(value.toString(), TaskDetailedInfo.class))
-                .collect(Collectors.toList());
+        List<TaskDetailedInfo> subtasksOfParentTaskInRedis = subtasksOfParentTask.stream().map(value -> gson.fromJson(value.toString(), TaskDetailedInfo.class)).collect(Collectors.toList());
 
         return subtasksOfParentTaskInRedis;
     }
 
     private void updateTaskToTaskList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo taskDetailedInfo) {
-        for (TaskDetailedInfo task : taskListInRedis )  {
+        for (TaskDetailedInfo task : taskListInRedis) {
             if (task.getId().equals(taskDetailedInfo.getId())) {
                 task.update(taskDetailedInfo);
                 break;
@@ -278,8 +266,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-
-//    @Cacheable(value = REDIS_KEY_FOR_SUBTASK, key = "#parentId")
+    //    @Cacheable(value = REDIS_KEY_FOR_SUBTASK, key = "#parentId")
     @Override
     public List<TaskDetailedInfo> getSubTasks(long parentId) {
         String subtaskKey = REDIS_KEY_FOR_SUBTASK + "::" + parentId;
