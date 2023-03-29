@@ -14,11 +14,11 @@ import java.util.Map;
 
 public class GoogleAPIHelper {
 
+//AIzaSyAUEil0wIJaQzlXknco3JcR7teDlAJruFM
 
-
-        private static final String CLIENT_ID = "828625326282-k8fksboqf7e2q62j8i4s3o0kne477ovi.apps.googleusercontent.com";
-        private static final String CLIENT_SECRET = "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";
-        private static final String REDIRECT_URI = "http://127.0.0.1:5173";
+        private static final String CLIENT_ID = "462456379026-lqaidolcunt933qhms2v2ir1ak26ts0t.apps.googleusercontent.com";
+        private static final String CLIENT_SECRET = "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";
+        private static final String REDIRECT_URI = "https://ems-frontend-ems.web.app";
         private static final String TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
         private static final String PEOPLE_API_BASE_URL = "https://people.googleapis.com/v1/people/me";
         private static final String PROFILE_FIELDS = "names,emailAddresses,photos";
