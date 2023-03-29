@@ -2,7 +2,7 @@ package com.example.Employee_Management_System.utils;
 
 public class HtmlMailVerifiedCreator {
 
-    private static final String FRONT_END_VERIFY_EMAIL_URL = "http://127.0.0.1:5173/verify-email";
+    private static final String FRONT_END_VERIFY_EMAIL_URL = "https://ems-frontend-ems.web.app/verify-email";
     public static String generateHTML(String fullname, String code) {
         String link = FRONT_END_VERIFY_EMAIL_URL + "/" + code;
         String html =
