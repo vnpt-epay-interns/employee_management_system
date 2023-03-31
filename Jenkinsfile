@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'sudo docker build -S ems-be:lts3 .'
+                sh 'sudo docker build -t ems-be:lts3 .'
                 sh 'sudo docker run -d -p 8080:8080 ems-be:lts3'
             }
         }
