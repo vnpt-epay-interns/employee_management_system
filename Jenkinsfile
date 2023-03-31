@@ -24,7 +24,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'docker build -t ems-be:lts3 .'
-                sh 'docker run -d -p 8080:8080 ems-be:lts3'
+                sh 'docker run -d -p 8081:8080 ems-be:lts3'
             }
         }
 
