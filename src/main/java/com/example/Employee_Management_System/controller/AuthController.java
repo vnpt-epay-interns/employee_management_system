@@ -11,15 +11,18 @@ import com.example.Employee_Management_System.service.AuthService;
 import com.example.Employee_Management_System.service.UserService;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -28,9 +31,10 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
-
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @PostMapping("/register-account")
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) throws UnsupportedEncodingException, MessagingException {
+        logger.info("AHIHI");
         return authService.register(registerRequest);
     }
 
@@ -52,6 +56,7 @@ public class AuthController {
 
     @PostMapping( "/login")
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
+        logger.info("logging in");
         return authService.formLogin(loginRequest);
     }
 

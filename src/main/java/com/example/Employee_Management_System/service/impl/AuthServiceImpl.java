@@ -26,6 +26,9 @@ import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -47,6 +50,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final JavaMailSender mailSender;
@@ -57,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
+    private final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
@@ -223,6 +228,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void sendVerificationEmail(User user, String code) {
+        logger.info("Sending verification email to {}", user.getEmail());
         String toAddress = user.getEmail();
         String subject = "Please verify your registration";
         String content;
@@ -236,8 +242,10 @@ public class AuthServiceImpl implements AuthService {
             helper.setText(content, true);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
+            logger.error("Exception: ", e);
             throw new RuntimeException(e);
         }
+        logger.info("Verification email sent to {}", user.getEmail());
     }
 
     @Transactional
@@ -258,7 +266,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<Response> existsEmail(CheckEmailExistRequest request) {
+        logger.info("Check email exists");
+        Gson gson = new Gson();
+        logger.info(gson.toJson(request));
         if (userRepository.existsByEmail(request.getEmail())) {
+            logger.info("Email already exists");
             return ResponseEntity.ok(
                     Response
                             .builder()
@@ -267,6 +279,7 @@ public class AuthServiceImpl implements AuthService {
                             .build()
             );
         } else {
+            logger.info("Email not exists");
             return ResponseEntity.ok(
                     Response
                             .builder()
