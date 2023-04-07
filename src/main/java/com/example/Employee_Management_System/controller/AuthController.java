@@ -34,7 +34,6 @@ public class AuthController {
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @PostMapping("/register-account")
     public ResponseEntity<Response> register(@RequestBody RegisterRequest registerRequest) throws UnsupportedEncodingException, MessagingException {
-        logger.info("AHIHI");
         return authService.register(registerRequest);
     }
 

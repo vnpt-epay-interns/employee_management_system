@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class HtmlMailVerifiedCreator {
 
     private static Logger logger = LoggerFactory.getLogger(HtmlMailVerifiedCreator.class);
-    private static final String FRONT_END_VERIFY_EMAIL_URL = "http://localhost:8081/api/auth/verify";
+    private static final String FRONT_END_VERIFY_EMAIL_URL = "http://103.23.146.173:8080/api/auth/verify";
     public static String generateHTML(String fullname, String code) {
         logger.info("generateHTML");
         String link = FRONT_END_VERIFY_EMAIL_URL + "/" + code;
