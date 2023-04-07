@@ -15,6 +15,7 @@ import com.example.Employee_Management_System.service.EmployeeService;
 import com.example.Employee_Management_System.service.RedisService;
 import com.example.Employee_Management_System.service.UserService;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
@@ -32,6 +33,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -103,18 +105,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<Response> unlockUser(Long id) {
+    @Transactional
+    @CachePut(value = "user", key = "#id")
+    public UserInformation unlockUser(Long id) {
         User user = userRepository.findUserById(id);
         if (!user.isLocked) {
             throw new IllegalStateException("Manager already approved");
         }
         userRepository.unlockUser(id);
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .message("Unlock user successfully")
-                        .build()
-        );
+        user.setLocked(false);
+        log.atInfo().log("Unlock user successfully");
+        return new UserInformation(user);
     }
 
     @Override

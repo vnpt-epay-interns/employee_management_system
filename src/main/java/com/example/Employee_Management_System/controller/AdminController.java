@@ -17,7 +17,12 @@ public class AdminController {
 
     @PutMapping("/verify/{id}")
     public ResponseEntity<Response> unlockUser(@PathVariable Long id) {
-        return userService.unlockUser(id);
+        return ResponseEntity.ok(
+                Response.builder()
+                        .data(userService.unlockUser(id))
+                        .status(200)
+                        .message("Verify successfully!")
+                        .build());
     }
 
     @GetMapping("/get-all-manager-unverified")

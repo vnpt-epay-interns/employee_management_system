@@ -1,9 +1,16 @@
 package com.example.Employee_Management_System.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Slf4j
 public class HtmlMailVerifiedCreator {
 
-    private static final String FRONT_END_VERIFY_EMAIL_URL = "https://ems-frontend-ems.web.app/verify-email";
+    private static Logger logger = LoggerFactory.getLogger(HtmlMailVerifiedCreator.class);
+    private static final String FRONT_END_VERIFY_EMAIL_URL = "http://localhost:8081/api/auth/verify";
     public static String generateHTML(String fullname, String code) {
+        logger.info("generateHTML");
         String link = FRONT_END_VERIFY_EMAIL_URL + "/" + code;
         String html =
                 "<!DOCTYPE html>" +
@@ -335,6 +342,7 @@ public class HtmlMailVerifiedCreator {
                         "  </body>" +
                         "</html>" +
                         "";
+        logger.info("html: " + html);
         return html;
     }
 }

@@ -45,6 +45,7 @@ public class AuthController {
 
     @GetMapping("/verify/{code}")
     public ResponseEntity<Response> verify(@PathVariable String code) {
+        logger.info("verify");
         return ResponseEntity.ok(
                 Response.builder()
                         .data(authService.verify(code))
@@ -54,7 +55,7 @@ public class AuthController {
     }
 
 
-    @PostMapping( "/login")
+    @PostMapping("/login")
     public ResponseEntity<Response> login(@RequestBody LoginRequest loginRequest) {
         logger.info("logging in");
         return authService.formLogin(loginRequest);

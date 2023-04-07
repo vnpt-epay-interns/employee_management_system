@@ -98,16 +98,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> formLogin(LoginRequest loginRequest) {
+        logger.info("Login request: {}", loginRequest);
         if (!userRepository.existsByEmail(loginRequest.getEmail())) {
             throw new LoginFailedException("Email is not registered!");
         }
-
+        logger.info("Email is registered");
         // when user try to login by form for the email that was registered by other method
         User user = getUserByEmail(loginRequest.getEmail());
         if (!user.getRegistrationMethod().equals(RegistrationMethod.FORM.toString())) {
             throw new LoginFailedException("Email was registered by other method");
         }
-
+        logger.info("Email is registered by form");
         // wrong password
         try {
             authenticationManager.authenticate(
@@ -119,9 +120,9 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new LoginFailedException("Wrong password!");
         }
-
+        logger.info("Password is correct");
         LoginResponse response = generateAccessTokenAndCreateLoginResponse(user);
-
+        logger.info("Login successfully");
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -133,6 +134,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private LoginResponse generateAccessTokenAndCreateLoginResponse(User user) {
+        logger.info("Generate access token");
         String jwtToken = jwtService.generateToken(user);
         LoginResponse token = LoginResponse
                 .builder()
@@ -251,17 +253,18 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @CachePut(value = "user", key = "#result.id")
     public UserInformation verify(String verificationCode) {
+        logger.info("Verifying user with verification code: {}", verificationCode);
         User user = userRepository.findByVerificationCode(verificationCode);
+        logger.info("User: {}", user);
         if (user == null) {
+            logger.info("Invalid verification code");
             throw new RegisterException("Invalid verification code");
         }
         user.setVerificationCode(null);
         userRepository.updateVerificationCode(user);
-//            userRepository.update(user);
+//        userRepository.update(user);
 
-        UserInformation userInformationUpdated = new UserInformation(user);
-
-        return userInformationUpdated;
+        return new UserInformation(user);
     }
 
     @Override
