@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class HtmlMailVerifiedCreator {
 
     private static Logger logger = LoggerFactory.getLogger(HtmlMailVerifiedCreator.class);
-    private static final String FRONT_END_VERIFY_EMAIL_URL = "http://103.23.146.173:8080/api/auth/verify";
+    private static final String FRONT_END_VERIFY_EMAIL_URL = "http://103.23.146.173:5173/verify-email";
     public static String generateHTML(String fullname, String code) {
         logger.info("generateHTML");
         String link = FRONT_END_VERIFY_EMAIL_URL + "/" + code;
@@ -235,7 +235,7 @@ public class HtmlMailVerifiedCreator {
                         "                <p style=\"margin: 0\">" +
                         "                  Hi "+ fullname + ", thanks for signing up to EMS. Please tap the button below to confirm your email address. If you" +
                         "                  didn't create an account with" +
-                        "                  <a href=\"http://127.0.0.1:8080/home\">EMS</a>, you can safely" +
+                        "                  <a href=\"http://103.23.146.173:5173/home\">EMS</a>, you can safely" +
                         "                  delete this email." +
                         "                </p>" +
                         "              </td>" +
