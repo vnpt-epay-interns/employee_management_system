@@ -45,5 +45,12 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/ems-be:latest
+          cache-from: type=registry,ref=your-image-name:cache
+          cache-to: type=registry,ref=ems-be:cache,mode=max
+          build-args: |
+            ARG1=value1
+            ARG2=value2
+          no-cache: true
