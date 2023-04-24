@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.repository.TaskRepository;
@@ -123,6 +124,34 @@ public class TaskServiceImpl implements TaskService {
 
         // delete the task from the database
         taskRepository.deleteTaskById(task.getId());
+    }
+
+    @Override
+    public TaskDetailedInfo createTask(CreateTaskRequest request) {
+
+        if (request.getParentId() != null) {
+            TaskDetailedInfo parenTask = getTaskById(request.getParentId());
+            if (parenTask == null) {
+                throw new IllegalStateException("Parent task is not exist!");
+            }
+        }
+
+        Task task = Task
+                .builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .status(request.getStatus())
+                .completion(request.getCompletion())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .employeeId(request.getEmployeeId())
+                .estimateHours(request.getEstimateHours())
+                .parentId(request.getParentId())
+                .priority(request.getPriority())
+                .projectId(request.getProjectId())
+                .build();
+
+        return saveTask(task);
     }
 
     private void removeTaskFromList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo task) {

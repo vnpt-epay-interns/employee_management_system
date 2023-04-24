@@ -85,6 +85,11 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteProjectById(id);
     }
 
+    @Override
+    public List<Project> getAllProjectsByManagerId(Long id) {
+        return projectRepository.getAllProjectsByManagerId(id);
+    }
+
     private List<Project> getAllProjectsInRedis() {
         List<Project> projects;
         Gson gson = new Gson();

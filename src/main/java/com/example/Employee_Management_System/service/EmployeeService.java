@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.service;
 
 import com.example.Employee_Management_System.domain.Employee;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -46,4 +47,8 @@ public interface EmployeeService {
     ResponseEntity<Response> getSubTasks(User employee, long taskId);
 
     List<EmployeeInformation> getEmployeesBelongToManager(Long id);
+
+    ResponseEntity<Response> createTask(User employee, CreateTaskRequest request);
+
+    ResponseEntity<Response> getAllProjectsByManagerId(User employee);
 }

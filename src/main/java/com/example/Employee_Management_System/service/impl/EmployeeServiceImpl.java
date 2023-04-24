@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.*;
+import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -15,10 +16,7 @@ import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.TaskRepository;
-import com.example.Employee_Management_System.service.EmployeeService;
-import com.example.Employee_Management_System.service.RedisService;
-import com.example.Employee_Management_System.service.ReportService;
-import com.example.Employee_Management_System.service.TaskService;
+import com.example.Employee_Management_System.service.*;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
@@ -47,7 +45,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final ReportService reportService;
     private final TaskService taskService;
     private final RedisService redisService;
+    private final ProjectService projectService;
     private final RedisTemplate redisTemplate;
+    private final String REDIS_KEY_FOR_TASK_BY_USER = "tasks_by_user";
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
     private final String REDIS_REPORTS_BY_TASK_KEY = "reports_by_task::";
     private final String REDIS_REPORTS_BY_MANAGER_KEY = "reports_by_manager::";
@@ -257,7 +257,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<ReportDetailedInfo> reportsByTask = new ArrayList<>(reportsByTaskInRedis.stream()
                 .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
                 .toList());
-        if (reportsByTask != null || !reportsByTask.isEmpty()) {
+        if (!reportsByTask.isEmpty()) {
             reportsByTask.add(reportDetailedInfo);
             redisService.cacheReportsToRedis(reportsByTask, taskId, REDIS_REPORTS_BY_TASK_KEY);
         }
@@ -268,10 +268,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<ReportDetailedInfo> reportsByManager = new ArrayList<>(reportsByManagerInRedis.stream()
                 .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
                 .toList());
-        if (reportsByManager != null || !reportsByManager.isEmpty()) {
+        if (reportsByManager.isEmpty()) {
             reportsByManager.add(reportDetailedInfo);
             redisService.cacheReportsToRedis(reportsByManager, employeeInformation.getManagerId(), REDIS_REPORTS_BY_MANAGER_KEY);
         }
+
+
+        // update the dashboard of employee and manager in redis
+        Long employeeId = task.getEmployeeId();
+        Long managerId = task.getManagerId();
+
+        // get the tasks of the employee and manager from the cache
+        List<TaskDetailedInfo> employeeTasksInRedis = taskService.getTasksByEmployeeId(employeeId);
+        List<TaskDetailedInfo> managerTasksInRedis = taskService.getAllTasksByMangerId(managerId);
+        // delete the task from the task list stored in Redis
+        redisService.cacheTasksToRedis(employeeTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString());
+        redisService.cacheTasksToRedis(managerTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString());
 
         return ResponseEntity.ok(
                 Response.builder()
@@ -344,6 +356,37 @@ public class EmployeeServiceImpl implements EmployeeService {
             return employees;
         }
 
+    }
+
+    @Override
+    public ResponseEntity<Response> createTask(User employee, CreateTaskRequest request) {
+
+       if (!employee.getId().equals(request.getEmployeeId())) {
+            throw new IllegalStateException("You can onl assign a task to yourself");
+        }
+
+        taskService.createTask(request);
+
+        return ResponseEntity.ok(
+                Response
+                        .builder()
+                        .status(200)
+                        .message("Create task successfully!")
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getAllProjectsByManagerId(User employee) {
+        Employee employeeInformation = employeeRepository.getEmployeeByEmployeeId(employee.getId());
+        List<Project> projects = projectService.getAllProjectsByManagerId(employeeInformation.getManagerId());
+        return ResponseEntity.ok(
+                Response
+                        .builder()
+                        .status(200)
+                        .data(projects)
+                        .build()
+        );
     }
 
     private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {

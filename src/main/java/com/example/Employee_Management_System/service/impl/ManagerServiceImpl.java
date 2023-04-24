@@ -46,30 +46,7 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
 
-        if (request.getParentId() != null) {
-            TaskDetailedInfo parenTask = taskService.getTaskById(request.getParentId());
-            if (parenTask == null) {
-                throw new IllegalStateException("Parent task is not exist!");
-            }
-        }
-
-        Task task = Task
-                .builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .status(request.getStatus())
-                .completion(request.getCompletion())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .employeeId(request.getEmployeeId())
-                .estimateHours(request.getEstimateHours())
-                .parentId(request.getParentId())
-                .priority(request.getPriority())
-                .projectId(request.getProjectId())
-                .build();
-
-        taskService.saveTask(task);
-
+        taskService.createTask(request);
         return ResponseEntity.ok(
                 Response
                         .builder()

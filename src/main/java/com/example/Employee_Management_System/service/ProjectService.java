@@ -16,4 +16,6 @@ public interface ProjectService {
     void deleteProjectById(Long id);
 
 
+    List<Project> getAllProjectsByManagerId(Long id);
+
 }

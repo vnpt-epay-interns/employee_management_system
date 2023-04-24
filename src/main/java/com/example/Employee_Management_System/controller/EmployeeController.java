@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.controller;
 
 import  com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.ScheduleWorkingDayRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequest;
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
@@ -37,6 +38,18 @@ public class EmployeeController {
     public ResponseEntity<Response> viewSubTasks(@PathVariable long taskId) {
         User employee = getCurrentEmployee();
         return employeeService.getSubTasks(employee, taskId);
+    }
+
+    @GetMapping("/create-task")
+    public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
+        User employee = getCurrentEmployee();
+        return employeeService.createTask(employee, request);
+    }
+
+    @GetMapping("/get-all-projects")
+    public ResponseEntity<Response> getAllProjects() {
+        User employee = getCurrentEmployee();
+        return employeeService.getAllProjectsByManagerId(employee);
     }
 
     @PutMapping("/update-task/{taskId}")

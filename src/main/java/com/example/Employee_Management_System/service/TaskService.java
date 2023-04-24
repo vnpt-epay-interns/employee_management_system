@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.service;
 
 import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
+import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public interface TaskService {
 
     void hideTaskById(TaskDetailedInfo task);
 
+    TaskDetailedInfo createTask( CreateTaskRequest request);
 
     TaskDetailedInfo saveTask(Task task);
 
