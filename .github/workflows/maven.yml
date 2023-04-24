@@ -45,7 +45,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/ems-be:latest
-          cache-from: type=registry,ref=your-image-name:cache
+          cache-from: type=registry,ref=ems-be:cache
           cache-to: type=registry,ref=ems-be:cache,mode=max
           build-args: |
             ARG1=value1
