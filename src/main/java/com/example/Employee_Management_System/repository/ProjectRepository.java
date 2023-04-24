@@ -2,6 +2,7 @@ package com.example.Employee_Management_System.repository;
 
 import com.example.Employee_Management_System.domain.Project;
 import com.example.Employee_Management_System.mapper.ProjectMapper;
+import com.example.Employee_Management_System.model.ProjectBriefInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -22,7 +23,7 @@ public class ProjectRepository {
         return projectMapper.getProjectById(id);
     }
 
-    public List<Project> getAllProjectsByManagerId(Long managerId) {
+    public List<Project> getAllProjectNamesByManagerId(Long managerId) {
         return projectMapper.getAllProjectsByManagerId(managerId);
     }
 
@@ -35,4 +36,7 @@ public class ProjectRepository {
     }
 
 
+    public List<ProjectBriefInformation> getAllProjectInformationByManagerId(Long managerId) {
+        return projectMapper.getAllProjectInformationByManagerId(managerId);
+    }
 }

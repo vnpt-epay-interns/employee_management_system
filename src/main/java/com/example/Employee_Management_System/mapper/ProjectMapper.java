@@ -1,6 +1,7 @@
 package com.example.Employee_Management_System.mapper;
 
 import com.example.Employee_Management_System.domain.Project;
+import com.example.Employee_Management_System.model.ProjectBriefInformation;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,4 +26,5 @@ public interface ProjectMapper {
     void deleteProjectById(Long id);
 
 
+    List<ProjectBriefInformation> getAllProjectInformationByManagerId(Long managerId);
 }

@@ -11,6 +11,7 @@ import com.example.Employee_Management_System.dto.response.WorkingScheduleRespon
 import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.ManagerInformation;
+import com.example.Employee_Management_System.model.ProjectBriefInformation;
 import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
@@ -220,8 +221,8 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public ResponseEntity<Response> getAllProjectsByManagerId(Long managerId) {
-        List<Project> allProjects = projectRepository.getAllProjectsByManagerId(managerId);
+    public ResponseEntity<Response> getAllProjectNamesByManagerId(Long managerId) {
+        List<Project> allProjects = projectRepository.getAllProjectNamesByManagerId(managerId);
         return ResponseEntity.ok(Response.builder()
                 .status(200)
                 .message("Get all projects successfully!")
@@ -255,6 +256,17 @@ public class ManagerServiceImpl implements ManagerService {
                 .status(200)
                 .message("Get task successfully!")
                 .data(task)
+                .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<Response> getAllProjectInformationByManagerId(Long managerId) {
+        List<ProjectBriefInformation> allProjects = projectRepository.getAllProjectInformationByManagerId(managerId);
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get all projects successfully!")
+                .data(allProjects)
                 .build()
         );
     }
@@ -350,7 +362,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Cacheable(value = "allProject", key = "#manager")
     public List<Project> getAllProjectCache(User manager) {
-        List<Project> allProjects = projectRepository.getAllProjectsByManagerId(manager.getId());
+        List<Project> allProjects = projectRepository.getAllProjectNamesByManagerId(manager.getId());
         return allProjects;
     }
 

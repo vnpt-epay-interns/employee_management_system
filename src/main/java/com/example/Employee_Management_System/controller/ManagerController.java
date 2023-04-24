@@ -112,10 +112,16 @@ public class ManagerController {
         return managerService.getProjectById(id);
     }
 
-    @GetMapping("/get-all-projects")
-    public ResponseEntity<Response> getAllProjects() {
+    @GetMapping("/get-all-project-names")
+    public ResponseEntity<Response> getAllProjectNames() {
         Long managerId = getCurrentManager().getId();
-        return managerService.getAllProjectsByManagerId(managerId);
+        return managerService.getAllProjectNamesByManagerId(managerId);
+    }
+
+    @GetMapping("/get-all-project-information")
+    public ResponseEntity<Response> getAllProjectInformation() {
+        Long managerId = getCurrentManager().getId();
+        return managerService.getAllProjectInformationByManagerId(managerId);
     }
 
 

@@ -47,9 +47,12 @@ public interface ManagerService {
 
     ResponseEntity<Response> getProjectById(Long id);
 
-    ResponseEntity<Response> getAllProjectsByManagerId(Long managerId);
+    ResponseEntity<Response> getAllProjectNamesByManagerId(Long managerId);
 
     ResponseEntity<Response> getAllSubTasks(User manager, long taskId);
 
     ResponseEntity<Response> getTaskById(User manager, long taskId);
+
+    ResponseEntity<Response> getAllProjectInformationByManagerId(Long managerId);
+
 }

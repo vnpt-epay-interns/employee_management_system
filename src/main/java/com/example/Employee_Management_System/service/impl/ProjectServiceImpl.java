@@ -2,7 +2,6 @@ package com.example.Employee_Management_System.service.impl;
 
 import com.example.Employee_Management_System.domain.Project;
 import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
-import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.service.ProjectService;
@@ -10,7 +9,6 @@ import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -87,7 +85,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getAllProjectsByManagerId(Long id) {
-        return projectRepository.getAllProjectsByManagerId(id);
+        return projectRepository.getAllProjectNamesByManagerId(id);
     }
 
     private List<Project> getAllProjectsInRedis() {
