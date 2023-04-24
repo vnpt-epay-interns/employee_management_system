@@ -16,7 +16,7 @@ public interface UserService {
 
     UserInformation updateUserInfo(User user, UpdateProfileRequest updateProfileRequest);
 
-    ResponseEntity<Response> unlockUser(Long id);
+    UserInformation unlockUser(Long id);
 
     ResponseEntity<Response> getAllManagerUnverified();
 

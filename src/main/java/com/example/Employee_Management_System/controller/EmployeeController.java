@@ -6,6 +6,7 @@ import com.example.Employee_Management_System.dto.request.UpdateTaskEmployeeRequ
 import com.example.Employee_Management_System.dto.request.WriteReportRequest;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/employee")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@Slf4j
 public class EmployeeController {
 
     @Autowired

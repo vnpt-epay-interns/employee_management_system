@@ -26,6 +26,9 @@ import com.google.gson.Gson;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -47,6 +50,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final JavaMailSender mailSender;
@@ -57,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
     private final RedisService redisService;
+    private final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
@@ -93,16 +98,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public ResponseEntity<Response> formLogin(LoginRequest loginRequest) {
+        logger.info("Login request: {}", loginRequest);
         if (!userRepository.existsByEmail(loginRequest.getEmail())) {
             throw new LoginFailedException("Email is not registered!");
         }
-
+        logger.info("Email is registered");
         // when user try to login by form for the email that was registered by other method
         User user = getUserByEmail(loginRequest.getEmail());
         if (!user.getRegistrationMethod().equals(RegistrationMethod.FORM.toString())) {
             throw new LoginFailedException("Email was registered by other method");
         }
-
+        logger.info("Email is registered by form");
         // wrong password
         try {
             authenticationManager.authenticate(
@@ -114,9 +120,9 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new LoginFailedException("Wrong password!");
         }
-
+        logger.info("Password is correct");
         LoginResponse response = generateAccessTokenAndCreateLoginResponse(user);
-
+        logger.info("Login successfully");
         return ResponseEntity.ok(
                 Response
                         .builder()
@@ -128,6 +134,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private LoginResponse generateAccessTokenAndCreateLoginResponse(User user) {
+        logger.info("Generate access token");
         String jwtToken = jwtService.generateToken(user);
         LoginResponse token = LoginResponse
                 .builder()
@@ -223,6 +230,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void sendVerificationEmail(User user, String code) {
+        logger.info("Sending verification email to {}", user.getEmail());
         String toAddress = user.getEmail();
         String subject = "Please verify your registration";
         String content;
@@ -236,29 +244,36 @@ public class AuthServiceImpl implements AuthService {
             helper.setText(content, true);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
+            logger.error("Exception: ", e);
             throw new RuntimeException(e);
         }
+        logger.info("Verification email sent to {}", user.getEmail());
     }
 
     @Transactional
     @CachePut(value = "user", key = "#result.id")
     public UserInformation verify(String verificationCode) {
+        logger.info("Verifying user with verification code: {}", verificationCode);
         User user = userRepository.findByVerificationCode(verificationCode);
+        logger.info("User: {}", user);
         if (user == null) {
+            logger.info("Invalid verification code");
             throw new RegisterException("Invalid verification code");
         }
         user.setVerificationCode(null);
         userRepository.updateVerificationCode(user);
-//            userRepository.update(user);
+//        userRepository.update(user);
 
-        UserInformation userInformationUpdated = new UserInformation(user);
-
-        return userInformationUpdated;
+        return new UserInformation(user);
     }
 
     @Override
     public ResponseEntity<Response> existsEmail(CheckEmailExistRequest request) {
+        logger.info("Check email exists");
+        Gson gson = new Gson();
+        logger.info(gson.toJson(request));
         if (userRepository.existsByEmail(request.getEmail())) {
+            logger.info("Email already exists");
             return ResponseEntity.ok(
                     Response
                             .builder()
@@ -267,6 +282,7 @@ public class AuthServiceImpl implements AuthService {
                             .build()
             );
         } else {
+            logger.info("Email not exists");
             return ResponseEntity.ok(
                     Response
                             .builder()
