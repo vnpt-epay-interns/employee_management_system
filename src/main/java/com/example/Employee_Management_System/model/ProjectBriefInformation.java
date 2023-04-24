@@ -8,8 +8,11 @@ import java.sql.Date;
 public class ProjectBriefInformation {
     private Long id;
     private String name;
-    private Date createdAt;
     private Integer employeeNum;
     private Integer taskNum;
-    private Object taskNumByStatus;
+    private Integer newTaskNum;
+    private Integer inProgressTaskNum;
+    private Integer readyForReviewTaskNum;
+    private Integer doneTaskNum;
+
 }

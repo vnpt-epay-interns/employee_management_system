@@ -7,9 +7,8 @@
         <result property="managerId" column="manager_id" />
     </resultMap>
 
-    <resultMap id="projectBriefInfo" type="com.example.Employee_Management_System.model.ProjectBriefInformation">
 
-    </resultMap>
+
     <select id="getAllProjectsByManagerId" resultMap="project">
         SELECT * FROM projects
         WHERE manager_id = #{managerId};
@@ -23,7 +22,26 @@
 <!--        SELECT * FROM projects WHERE name = #{name};-->
 <!--    </select>-->
 
-    <select id="getAllProjectInformationByManagerId" >
+    <resultMap id="projectBriefInfo" type="com.example.Employee_Management_System.model.ProjectBriefInformation">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="employeeNum" column="employee_num" />
+        <result property="newTaskNum" column="new_task" />
+        <result property="inProgressTaskNum" column="in_progress_task" />
+        <result property="readyForReviewTaskNum" column="ready_for_review_task" />
+        <result property="doneTaskNum" column="done_task" />
+    </resultMap>
+    <select id="getAllProjectInformationByManagerId" resultMap="projectBriefInfo">
+        SELECT p.id AS id,
+               p.name AS name,
+               (SELECT COUNT( DISTINCT employee_id) FROM tasks t WHERE t.project_id = p.id) AS employee_num,
+               (SELECT COUNT(t.id) FROM tasks t WHERE t.project_id = p.id AND t.status = "NEW") AS new_task,
+               (SELECT COUNT(t.id) FROM tasks t WHERE t.project_id = p.id AND t.status = "IN_PROGRESS") AS in_progress_task,
+               (SELECT COUNT(t.id) FROM tasks t WHERE t.project_id = p.id AND t.status = "READY_FOR_REVIEW") AS ready_for_review_task,
+               (SELECT COUNT(t.id) FROM tasks t WHERE t.project_id = p.id AND t.status = "DONE") AS done_task
+        FROM projects p
+        WHERE p.manager_id = #{mangerdId}
+
 
     </select>
 </mapper>

@@ -40,13 +40,13 @@ public class EmployeeController {
         return employeeService.getSubTasks(employee, taskId);
     }
 
-    @GetMapping("/create-task")
+    @PostMapping("/create-task")
     public ResponseEntity<Response> createTask(@RequestBody CreateTaskRequest request) {
         User employee = getCurrentEmployee();
         return employeeService.createTask(employee, request);
     }
 
-    @GetMapping("/get-all-projects")
+    @GetMapping("/get-all-project-names")
     public ResponseEntity<Response> getAllProjects() {
         User employee = getCurrentEmployee();
         return employeeService.getAllProjectsByManagerId(employee);

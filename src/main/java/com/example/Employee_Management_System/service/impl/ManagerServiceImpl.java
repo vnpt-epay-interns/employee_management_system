@@ -4,6 +4,7 @@ import com.example.Employee_Management_System.domain.*;
 import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
+import com.example.Employee_Management_System.dto.response.ProjectInformationDTO;
 import com.example.Employee_Management_System.dto.response.Response;
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
@@ -263,10 +264,12 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ResponseEntity<Response> getAllProjectInformationByManagerId(Long managerId) {
         List<ProjectBriefInformation> allProjects = projectRepository.getAllProjectInformationByManagerId(managerId);
+        List<ProjectInformationDTO> projectInformationDTOS = allProjects.stream().map(ProjectInformationDTO::new).toList();
+
         return ResponseEntity.ok(Response.builder()
                 .status(200)
                 .message("Get all projects successfully!")
-                .data(allProjects)
+                .data(projectInformationDTOS)
                 .build()
         );
     }
