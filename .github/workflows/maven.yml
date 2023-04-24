@@ -51,3 +51,7 @@ jobs:
             ARG1=value1
             ARG2=value2
           no-cache: true
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
