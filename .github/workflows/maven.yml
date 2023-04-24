@@ -39,8 +39,8 @@ jobs:
       - name: remove previous Docker image
         run: |
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-          docker pull $DOCKER_IMAGE_NAME:latest
-          docker rmi -f $DOCKER_IMAGE_NAME:latest
+          docker pull 5n0wb0ard/ems-be:latest
+          docker rmi -f 5n0wb0ard/ems-be:latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
