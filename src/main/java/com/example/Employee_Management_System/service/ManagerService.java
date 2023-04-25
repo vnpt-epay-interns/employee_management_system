@@ -55,4 +55,5 @@ public interface ManagerService {
 
     ResponseEntity<Response> getAllProjectInformationByManagerId(Long managerId);
 
+    ResponseEntity<Response> getProjectDetailsById(Long id, Long managerId);
 }

@@ -274,6 +274,12 @@ public class ManagerServiceImpl implements ManagerService {
         );
     }
 
+    @Override
+    public ResponseEntity<Response> getProjectDetailsById(Long id, Long managerId) {
+        Project project = projectRepository.getProjectDetailsById(id, managerId);
+        return null;
+    }
+
 
     private boolean checkIfTaskBelongsToEmployeeOfManager(User currentManager, long taskId) {
         User manager = taskService.getManagerOfTask(taskId);
