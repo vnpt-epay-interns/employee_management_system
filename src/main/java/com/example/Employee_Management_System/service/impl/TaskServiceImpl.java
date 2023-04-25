@@ -5,6 +5,7 @@ import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.exception.NotFoundException;
+import com.example.Employee_Management_System.model.TaskDetailsForProject;
 import com.example.Employee_Management_System.repository.TaskRepository;
 import com.example.Employee_Management_System.service.RedisService;
 import com.example.Employee_Management_System.service.TaskService;
@@ -67,6 +68,11 @@ public class TaskServiceImpl implements TaskService {
             redisService.cacheTasksToRedis(tasksInDB, key);
             return tasksInDB;
         }
+    }
+
+    @Override
+    public List<TaskDetailsForProject> getAllProjectDetailsById(Long id) {
+        return taskRepository.getAllProjectDetailsById(id);
     }
 
     @Override

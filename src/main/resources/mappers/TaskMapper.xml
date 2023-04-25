@@ -202,4 +202,34 @@
 
     </select>
 
+
+    <resultMap id="taskDetailsForProject" type="com.example.Employee_Management_System.model.TaskDetailsForProject">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="completion" column="completion"/>
+        <result property="estimateHours" column="estimate_hours"/>
+        <result property="assigneeName" column="assigned_to"/>
+        <result property="managerReview" column="manager_review"/>
+        <result property="employeeReview" column="employee_review"/>
+    </resultMap>
+    <select id="getAllProjectDetailsById" resultMap="taskDetailsForProject">
+        select
+            t.id,
+            t.title,
+            t.description,
+            t.start_date,
+            t.end_date,
+            t.completion,
+            t.estimate_hours,
+            CONCAT(u.first_name, ' ', u.last_name) AS assigned_to,
+            t.manager_review,
+            t.employee_review
+        from tasks t
+                 join users u on t.employee_id = u.id
+        where t.project_id = #{id} and t.hidden = FALSE
+    </select>
+
 </mapper>

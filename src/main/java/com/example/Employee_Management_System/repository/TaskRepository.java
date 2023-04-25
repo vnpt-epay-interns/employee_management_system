@@ -4,6 +4,7 @@ import com.example.Employee_Management_System.domain.Task;
 import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.mapper.TaskMapper;
+import com.example.Employee_Management_System.model.TaskDetailsForProject;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -61,5 +62,9 @@ public class TaskRepository {
 
     public List<TaskDetailedInfo> getTasksByManagerId(Long managerId) {
         return taskMapper.getTasksByManagerId(managerId);
+    }
+
+    public List<TaskDetailsForProject> getAllProjectDetailsById(Long id) {
+        return taskMapper.getAllProjectDetailsById(id);
     }
 }
