@@ -13,6 +13,7 @@ public class CreateTaskRequest {
     private Status status;
     private Integer completion;
     private Priority priority;
+    private String review;
     private Date startDate;
     private Date endDate;
     private Long employeeId;

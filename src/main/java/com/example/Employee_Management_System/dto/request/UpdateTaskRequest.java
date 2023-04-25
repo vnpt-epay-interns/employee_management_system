@@ -14,6 +14,7 @@ public class UpdateTaskRequest {
     private Integer completion;
     private Priority priority;
     private Date startDate;
+    private String review;
     private Date endDate;
     private Long employeeId;
     private double estimateHours;

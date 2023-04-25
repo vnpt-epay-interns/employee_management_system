@@ -98,6 +98,8 @@ public class ManagerServiceImpl implements ManagerService {
         task.setParentId(updateTaskRequest.getParentId());
         task.setProjectId(updateTaskRequest.getProjectId());
 
+
+
         taskService.updateTask(task);
         return ResponseEntity.ok(
                 Response
