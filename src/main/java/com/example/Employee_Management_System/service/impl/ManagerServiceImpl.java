@@ -10,18 +10,12 @@ import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse;
 import com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.EmployeeSchedule;
 import com.example.Employee_Management_System.exception.ReportException;
-import com.example.Employee_Management_System.model.EmployeeInformation;
-import com.example.Employee_Management_System.model.ManagerInformation;
-import com.example.Employee_Management_System.model.ProjectBriefInformation;
-import com.example.Employee_Management_System.model.ReportDetailedInfo;
+import com.example.Employee_Management_System.model.*;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.repository.ReportRepository;
 import com.example.Employee_Management_System.repository.UserRepository;
-import com.example.Employee_Management_System.service.EmployeeService;
-import com.example.Employee_Management_System.service.ManagerService;
-import com.example.Employee_Management_System.service.ReportService;
-import com.example.Employee_Management_System.service.TaskService;
+import com.example.Employee_Management_System.service.*;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +31,7 @@ import static com.example.Employee_Management_System.dto.response.WorkingSchedul
 @AllArgsConstructor
 public class ManagerServiceImpl implements ManagerService {
     private final ManagerRepository managerRepository;
+    private final ProjectService projectService;
     private final TaskService taskService;
     private final ReportService reportService;
     private final EmployeeService employeeService;
@@ -264,8 +259,25 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ResponseEntity<Response> getProjectDetailsById(Long id, Long managerId) {
-        Project project = projectRepository.getProjectDetailsById(id, managerId);
-        return null;
+        List<TaskDetailsForProject> taskDetailsForProjectsList = taskService.getAllProjectDetailsById(id);
+        Project project = projectRepository.getProjectById(id);
+
+        if (!project.getManagerId().equals(managerId)) {
+            throw new ReportException("You are not allowed to view this project");
+        }
+
+        ProjectDetails projectDetails = ProjectDetails.builder()
+                .id(project.getId())
+                .name(project.getName())
+                .tasks(taskDetailsForProjectsList)
+                .build();
+
+        return ResponseEntity.ok(Response.builder()
+                .status(200)
+                .message("Get project details successfully!")
+                .data(projectDetails)
+                .build()
+        );
     }
 
 

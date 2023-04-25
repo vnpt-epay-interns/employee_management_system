@@ -3,6 +3,7 @@ package com.example.Employee_Management_System.service.impl;
 import com.example.Employee_Management_System.domain.Project;
 import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.exception.NotFoundException;
+import com.example.Employee_Management_System.model.TaskDetailsForProject;
 import com.example.Employee_Management_System.repository.ProjectRepository;
 import com.example.Employee_Management_System.service.ProjectService;
 import com.google.gson.Gson;
