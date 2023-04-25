@@ -124,5 +124,9 @@ public class ManagerController {
         return managerService.getAllProjectInformationByManagerId(managerId);
     }
 
-
+    @GetMapping("/project-details/{id}")
+    public ResponseEntity<Response> getProjectDetailsById(@PathVariable Long id) {
+        Long managerId = getCurrentManager().getId();
+        return managerService.getProjectDetailsById(id, managerId);
+    }
 }

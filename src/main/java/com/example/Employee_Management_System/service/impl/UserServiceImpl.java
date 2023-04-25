@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
 
             String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
             List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
-            if (employeeInformationList != null || employeeInformationList.size() != 0) {
+            if (employeeInformationList.size() != 0) {
                 employeeInformationList
                         .stream()
                         .filter(e -> e.getId().equals(user.getId()))
