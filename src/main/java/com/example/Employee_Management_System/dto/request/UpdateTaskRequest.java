@@ -20,4 +20,6 @@ public class UpdateTaskRequest {
     private double estimateHours;
     private Long parentId;
     private Long projectId;
+    private String employeeReview;
+    private String managerReview;
 }

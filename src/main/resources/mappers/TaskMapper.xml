@@ -22,7 +22,6 @@
         <result property="completion" column="completion"/>
         <result property="startDate" column="start_date"/>
         <result property="endDate" column="end_date"/>
-        <result property="employeeId" column="employee_id"/>
         <result property="estimateHours" column="estimate_hours"/>
         <result property="parentId" column="parent_id"/>
         <result property="priority" column="priority"/>
@@ -51,13 +50,15 @@
             p.name AS project_name,
             COUNT(sub.id) AS number_subtasks,
             t.employee_id,
-            CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+            CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             t.completion,
             t.employee_review,
-            t.manager_review
+            t.manager_review,
+            e.manager_id
         from tasks t
                  LEFT JOIN projects p ON t.project_id = p.id
-                 LEFT JOIN users e ON t.employee_id = e.id
+                 LEFT JOIN users u ON t.employee_id = u.id
+                 LEFT JOIN employees e ON t.employee_id = e.id
                  LEFT JOIN tasks sub ON sub.parent_id = t.id
         WHERE t.parent_id = #{parentId} AND t.hidden = FALSE
         GROUP BY t.id
@@ -78,14 +79,17 @@
             p.name AS project_name,
             COUNT(sub.id) AS number_subtasks,
             t.employee_id,
-            CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+            CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             t.completion,
             t.employee_review,
-            t.manager_review
+            t.manager_review,
+            e.manager_id
         from tasks t
                  LEFT JOIN projects p ON t.project_id = p.id
-                 LEFT JOIN users e ON t.employee_id = e.id
+                 LEFT JOIN users u ON t.employee_id = u.id
+                 LEFT JOIN employees e ON t.employee_id = e.id
                  LEFT JOIN tasks sub ON sub.parent_id = t.id
+
         WHERE t.id = #{taskId} AND t.hidden = FALSE
         GROUP BY t.id
     </select>
@@ -105,45 +109,52 @@
             p.name AS project_name,
             COUNT(sub.id) AS number_subtasks,
             t.employee_id,
-            CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+            CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
             t.completion,
             t.employee_review,
-            t.manager_review
+            t.manager_review,
+            e.manager_id
         from tasks t
                  LEFT JOIN projects p ON t.project_id = p.id
-                 LEFT JOIN users e ON t.employee_id = e.id
+                 LEFT JOIN users u ON t.employee_id = u.id
+                 LEFT JOIN employees e ON t.employee_id = e.id
                  LEFT JOIN tasks sub ON sub.parent_id = t.id
+
         WHERE t.employee_id = #{employeeId} AND t.hidden = FALSE
         GROUP BY t.id
     </select>
 
     <select id="getTasksByManagerId" resultMap="taskDetailedInfo">
-        SELECT t.id,
-               t.title,
-               t.description,
-               t.start_date,
-               t.end_date,
-               t.status,
-               t.priority,
-               t.estimate_hours,
-               t.parent_id,
-               t.project_id,
-               p.name AS project_name,
-               COUNT(sub.id) AS number_subtasks,
-               t.employee_id,
-               CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-               t.completion,
-               t.employee_review,
-               t.manager_review
+        select
+            t.id,
+            t.title,
+            t.description,
+            t.start_date,
+            t.end_date,
+            t.status,
+            t.priority,
+            t.estimate_hours,
+            t.parent_id,
+            t.project_id,
+            p.name AS project_name,
+            COUNT(sub.id) AS number_subtasks,
+            t.employee_id,
+            CONCAT(u.first_name, ' ', u.last_name) AS employee_name,
+            t.completion,
+            t.employee_review,
+            t.manager_review,
+            e.manager_id
         from tasks t
                  LEFT JOIN projects p ON t.project_id = p.id
-                 LEFT JOIN users e ON t.employee_id = e.id
+                 LEFT JOIN users u ON t.employee_id = u.id
+                 LEFT JOIN employees e ON t.employee_id = e.id
                  LEFT JOIN tasks sub ON sub.parent_id = t.id
+
         WHERE t.employee_id IN (
             SELECT id
             FROM employees emp
             WHERE emp.manager_id = #{managerId}
-        ) AND t.hidden = FALSE
+        ) AND t.hidden = FALSE AND t.parent_id IS NULL
         GROUP BY t.id
     </select>
     <resultMap id="user" type="com.example.Employee_Management_System.domain.User">

@@ -7,4 +7,5 @@ import lombok.Data;
 public class UpdateTaskEmployeeRequest {
     private Status status;
     private int completion;
+    private String employeeReview;
 }

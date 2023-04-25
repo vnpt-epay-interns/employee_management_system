@@ -97,8 +97,9 @@ public class ManagerServiceImpl implements ManagerService {
         task.setEstimateHours(updateTaskRequest.getEstimateHours());
         task.setParentId(updateTaskRequest.getParentId());
         task.setProjectId(updateTaskRequest.getProjectId());
-
-
+        task.setEmployeeReview(updateTaskRequest.getEmployeeReview());
+        task.setManagerReview(updateTaskRequest.getManagerReview());
+        task.setManagerId(task.getManagerId());
 
         taskService.updateTask(task);
         return ResponseEntity.ok(

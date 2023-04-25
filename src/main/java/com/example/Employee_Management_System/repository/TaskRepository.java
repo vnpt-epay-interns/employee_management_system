@@ -32,6 +32,8 @@ public class TaskRepository {
                 .employeeId(taskInfo.getEmployeeId())
                 .parentId(taskInfo.getParentId())
                 .projectId(taskInfo.getProjectId())
+                .managerReview(taskInfo.getManagerReview())
+                .employeeReview(taskInfo.getEmployeeReview())
                 .build();
 
         taskMapper.update(task);

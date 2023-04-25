@@ -81,6 +81,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         task.setStatus(updateTaskRequest.getStatus());
         task.setCompletion(updateTaskRequest.getCompletion());
+        task.setEmployeeReview(updateTaskRequest.getEmployeeReview());
         taskService.updateTask(task);
 
         return ResponseEntity.ok(
