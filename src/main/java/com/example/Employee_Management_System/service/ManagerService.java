@@ -33,8 +33,6 @@ public interface ManagerService {
 
     void save(Manager manager);
 
-    ResponseEntity<Response> getReportsByTaskId(User manager, long taskId);
-
     ResponseEntity<Response> getReferenceCode(User manager);
 
     Optional<ManagerInformation> getManagerInfo(String referencedCode);

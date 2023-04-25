@@ -62,12 +62,6 @@ public class ManagerController {
         return managerService.getReportById(manager, reportId);
     }
 
-    @GetMapping("/reports/task/{taskId}")
-    public ResponseEntity<Response> viewReportsByTaskId(@PathVariable long taskId) {
-        User manager = getCurrentManager();
-        return managerService.getReportsByTaskId(manager, taskId);
-    }
-
     @GetMapping("/reports/employee/{employeeId}")
     public ResponseEntity<Response> getReportsByEmployeeId(@PathVariable long employeeId) {
         User manager = getCurrentManager();

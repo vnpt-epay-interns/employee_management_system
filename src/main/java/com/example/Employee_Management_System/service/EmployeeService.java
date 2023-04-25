@@ -34,13 +34,11 @@ public interface EmployeeService {
 
     Employee getEmployeeByEmployeeId(long employeeId);
 
-    ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request);
 
     EmployeeSchedule getEmployeeSchedule(EmployeeInformation employeeInfo, int year, int monthNumber, MonthInfo monthInfo);
 
     ResponseEntity<Response> getReports(User employee);
 
-    ResponseEntity<Response> getReportsByTaskId(User employee, long taskId);
 
     ResponseEntity<Response> getReferenceCode(User employee);
 

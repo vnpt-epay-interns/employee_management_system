@@ -60,6 +60,8 @@ create table tasks (
     employee_id int,
     parent_id int,
     project_id int,
+    employee_review longtext,
+    manager_review longtext,
     hidden boolean default false,
     foreign key (employee_id) references employees(id) on delete cascade,
     foreign key (parent_id) references tasks(id) on delete cascade
@@ -72,17 +74,6 @@ create table reports (
     content longtext,
     created_at date,
     created_by int not null,
-    task_id int,
     is_read boolean default false,
     foreign key (created_by) references users(id) on delete cascade,
-    foreign key (task_id) references tasks(id) on delete cascade
 );
-
-create table reviews (
-	id int primary key auto_increment,
-    content longtext,
-    created_by int not null,
-    task_id int,
-    foreign key (created_by) references users(id) on delete cascade,
-    foreign key (task_id) references tasks(id) on delete cascade
-)

@@ -26,5 +26,7 @@ public class Task implements Serializable {
     private Long employeeId;
     private Long parentId;
     private Long projectId;
+    private String employeeReview;
+    private String managerReview;
 
 }

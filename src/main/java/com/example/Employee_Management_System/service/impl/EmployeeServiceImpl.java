@@ -228,71 +228,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeSchedule;
     }
 
-    @Override
-    public ResponseEntity<Response> writeReportForTask(User employee, Long taskId, WriteReportRequest request) {
-        TaskDetailedInfo task = taskService.getTaskById(taskId);
-        if (task == null) {
-            throw new IllegalStateException("Task not found");
-        }
-        if (!checkIfTaskBelongsToEmployee(employee, taskId)) {
-            throw new IllegalStateException("The task is not assigned to the you");
-        }
-
-        Report report = Report.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .taskId(taskId)
-                .createdAt(Date.valueOf(LocalDate.now()))
-                .createdBy(employee.getId())
-                .isRead(false)
-                .build();
-        reportService.save(report);
-
-        Gson gson = new Gson();
-
-        ReportDetailedInfo reportDetailedInfo = reportService.getReportById(report.getId());
-
-        List<Object> reportsByTaskInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_BY_TASK_KEY + taskId);
-        // update the reports by task in redis
-        List<ReportDetailedInfo> reportsByTask = new ArrayList<>(reportsByTaskInRedis.stream()
-                .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
-                .toList());
-        if (!reportsByTask.isEmpty()) {
-            reportsByTask.add(reportDetailedInfo);
-            redisService.cacheReportsToRedis(reportsByTask, taskId, REDIS_REPORTS_BY_TASK_KEY);
-        }
-
-        // update the reports by manager in redis
-        Employee employeeInformation = employeeRepository.getEmployeeByEmployeeId(employee.getId());
-        List<Object> reportsByManagerInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_BY_MANAGER_KEY + employeeInformation.getManagerId());
-        List<ReportDetailedInfo> reportsByManager = new ArrayList<>(reportsByManagerInRedis.stream()
-                .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
-                .toList());
-        if (reportsByManager.isEmpty()) {
-            reportsByManager.add(reportDetailedInfo);
-            redisService.cacheReportsToRedis(reportsByManager, employeeInformation.getManagerId(), REDIS_REPORTS_BY_MANAGER_KEY);
-        }
-
-
-        // update the dashboard of employee and manager in redis
-        Long employeeId = task.getEmployeeId();
-        Long managerId = task.getManagerId();
-
-        // get the tasks of the employee and manager from the cache
-        List<TaskDetailedInfo> employeeTasksInRedis = taskService.getTasksByEmployeeId(employeeId);
-        List<TaskDetailedInfo> managerTasksInRedis = taskService.getAllTasksByMangerId(managerId);
-        // delete the task from the task list stored in Redis
-        redisService.cacheTasksToRedis(employeeTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString());
-        redisService.cacheTasksToRedis(managerTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString());
-
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .message("Report has been saved successfully")
-                        .data(null)
-                        .build());
-    }
-
     public ResponseEntity<Response> getReports(User employee) {
         List<ReportDetailedInfo> reports = reportService.getReportsByEmployeeId(employee.getId());
         return ResponseEntity.ok(
@@ -303,18 +238,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
-    @Override
-    public ResponseEntity<Response> getReportsByTaskId(User employee, long taskId) {
-        if (!checkIfTaskBelongsToEmployee(employee, taskId)) {
-            throw new IllegalStateException("The task is not assigned to the you");
-        }
-        return ResponseEntity.ok(
-                Response.builder()
-                        .status(200)
-                        .data(reportService.getAllReportsByTaskId(employee, taskId))
-                        .build()
-        );
-    }
 
     @Override
     public ResponseEntity<Response> getReferenceCode(User employee) {
@@ -434,14 +357,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return reports;
     }
 
-    public List<ReportDetailedInfo> getReportsByTaskIdCache(User employee) {
-        List<ReportDetailedInfo> reports = (List<ReportDetailedInfo>) redisTemplate.opsForValue().get("reportsByEmployee::" + employee.getId());
-        if (reports == null) {
-            reports = reportService.getReportsByEmployeeId(employee.getId());
-            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
-        }
-        return reports;
-    }
+
 
     @Cacheable(value = "reportsByEmployee", key = "#employee.id")
     public void writeReportCache(User employee, WriteReportRequest request) {
@@ -463,7 +379,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                     .id(report.getId())
                     .title(report.getTitle())
                     .content(report.getContent())
-                    .taskId(report.getTaskId())
                     .createdAt(report.getCreatedAt())
                     .build());
             redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);

@@ -145,20 +145,6 @@ public class ManagerServiceImpl implements ManagerService {
         return employeeManager.getId().equals(manager.getId());
     }
 
-    public ResponseEntity<Response> getReportsByTaskId(User manager, long taskId) {
-
-        if (!checkIfTaskBelongsToEmployeeOfManager(manager, taskId)) {
-            throw new ReportException("You are not allowed to view this report");
-        }
-        List<ReportDetailedInfo> unreadReportsByTaskId = reportService.getAllReportsByTaskId(manager, taskId);
-
-        return ResponseEntity.ok(Response.builder()
-                .status(200)
-                .message("Get all reports ts successfully!")
-                .data(unreadReportsByTaskId)
-                .build()
-        );
-    }
 
     @Override
     public ResponseEntity<Response> getReferenceCode(User manager) {

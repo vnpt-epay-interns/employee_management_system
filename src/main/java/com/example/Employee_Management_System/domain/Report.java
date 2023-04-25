@@ -14,6 +14,5 @@ public class Report {
     private String content;
     private Date createdAt;
     private Long createdBy;
-    private Long taskId;
     private boolean isRead;
 }
