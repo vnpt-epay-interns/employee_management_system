@@ -36,16 +36,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private EmployeeService employeeService;
 
     @Autowired
     private AmazonS3 s3client;
-
-//    @Autowired
-//    private RedisService redisService;
-
-    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     @Override
     public User getUserByEmail(String email) {
@@ -69,30 +62,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(updateProfileRequest.getLastName());
         userRepository.updateName(user);
 
-        // update employee list in redis
-//        if (Objects.equals(user.getRole(), "EMPLOYEE")) {
-//            Employee employee = employeeService.getEmployeeByEmployeeId(user.getId());
-//
-////            String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
-////            List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
-////            if (employeeInformationList.size() != 0) {
-////                employeeInformationList
-////                        .stream()
-////                        .filter(e -> e.getId().equals(user.getId()))
-////                        .findFirst()
-////                        .get()
-////                        .setFirstName(updateProfileRequest.getFirstName());
-////                employeeInformationList
-////                        .stream()
-////                        .filter(e -> e.getId().equals(user.getId()))
-////                        .findFirst()
-////                        .get()
-////                        .setLastName(updateProfileRequest.getLastName());
-////
-////                redisService.cacheEmployeeList(employeeInformationList, key);
-////            }
-////        }
-//        }
+
 
         UserInformation userInformation = new UserInformation(user);
         return userInformation;
@@ -100,7 +70,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-//    @CachePut(value = "user", key = "#id")
     public UserInformation unlockUser(Long id) {
         User user = userRepository.findUserById(id);
         if (!user.isLocked) {
@@ -127,7 +96,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @CachePut(value = "user", key = "#currentUser.id")
     public UserInformation changeAvatar(User currentUser, MultipartFile file) {
         try {
             String link = uploadFile(file);
@@ -136,16 +104,6 @@ public class UserServiceImpl implements UserService {
 
             UserInformation userInformationUpdated = new UserInformation(currentUser);
 
-//            if (Objects.equals(currentUser.getRole(), "EMPLOYEE")) {
-//                Employee employee = employeeService.getEmployeeByEmployeeId(currentUser.getId());
-//
-//                String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
-//                List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
-//                if (employeeInformationList != null || employeeInformationList.size() != 0) {
-//                    employeeInformationList.stream().filter(e -> e.getId().equals(userInformationUpdated.getId())).findFirst().get().setAvatar(link);
-//                    redisService.cacheEmployeeList(employeeInformationList, key);
-//                }
-//            }
 
             return userInformationUpdated;
         } catch (IOException e) {
@@ -153,13 +111,7 @@ public class UserServiceImpl implements UserService {
         }
 
     }
-//
-//    private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {
-//        Gson gson = new Gson();
-//
-//        return employeesInRedis.stream().map(e -> gson.fromJson(e.toString(), EmployeeInformation.class))
-//                .collect(Collectors.toList());
-//    }
+
 
     private String uploadFile(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID().toString();

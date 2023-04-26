@@ -15,15 +15,13 @@ import com.example.Employee_Management_System.model.ReportDetailedInfo;
 import com.example.Employee_Management_System.model.WorkingScheduleDetailedInfo;
 import com.example.Employee_Management_System.repository.EmployeeRepository;
 import com.example.Employee_Management_System.repository.ManagerRepository;
-import com.example.Employee_Management_System.repository.TaskRepository;
-import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.service.EmployeeService;
+import com.example.Employee_Management_System.service.ProjectService;
+import com.example.Employee_Management_System.service.ReportService;
+import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +31,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.*;
+import static com.example.Employee_Management_System.dto.response.WorkingScheduleResponse.MonthInfo;
 
 @Service
 @AllArgsConstructor
@@ -44,13 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeMapper employeeMapper;
     private final ReportService reportService;
     private final TaskService taskService;
-//    private final RedisService redisService;
     private final ProjectService projectService;
-//    private final RedisTemplate redisTemplate;
-//    private final String REDIS_KEY_FOR_TASK_BY_USER = "tasks_by_user";
-//    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
-//    private final String REDIS_REPORTS_BY_TASK_KEY = "reports_by_task::";
-//    private final String REDIS_REPORTS_BY_MANAGER_KEY = "reports_by_manager::";
 
     @Override
     public ResponseEntity<Response> getTaskById(Long taskId, User user) {
@@ -104,19 +96,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
 
         reportService.save(report);
-//
-//        Gson gson = new Gson();
-//        Employee employeeInformation = employeeRepository.getEmployeeByEmployeeId(employee.getId());
-//        ReportDetailedInfo reportDetailedInfo = reportService.getReportById(report.getId());
-//        List<Object> reportsByTaskInRedis = redisTemplate.opsForHash().values(REDIS_REPORTS_BY_MANAGER_KEY + employeeInformation.getManagerId());
-//        List<ReportDetailedInfo> reportsByTask = new ArrayList<>(reportsByTaskInRedis.stream()
-//                .map(reportJson -> gson.fromJson(reportJson.toString(), ReportDetailedInfo.class))
-//                .toList());
-//
-//        if (reportsByTask != null || !reportsByTask.isEmpty()) {
-//            reportsByTask.add(reportDetailedInfo);
-//            redisService.cacheReportsToRedis(reportsByTask, employeeInformation.getManagerId(), REDIS_REPORTS_BY_MANAGER_KEY);
-//        }
+
 
         return ResponseEntity.ok(
                 Response.builder()
@@ -269,16 +249,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public List<EmployeeInformation> getEmployeesBelongToManager(Long id) {
-//        String key = REDIS_KEY_FOR_EMPLOYEE + id;
-//
-//        List<EmployeeInformation> employeesInRedis = convertToListOfEmployeeInformation(redisService.getHash(key));
-//        if (!employeesInRedis.isEmpty()) {
-//            return employeesInRedis;
-//        } else {
-//            List<EmployeeInformation> employees = managerRepository.getAllEmployees(id);
-//            redisService.cacheEmployeeList(employees, key);
-//            return employees;
-//        }
 
         List<EmployeeInformation> employees = managerRepository.getAllEmployees(id);
         return employees;
@@ -317,12 +287,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
     }
 
-    private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {
-        Gson gson = new Gson();
-
-        return employeesInRedis.stream().map(e -> gson.fromJson(e.toString(), EmployeeInformation.class))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public void save(Employee employee) {
@@ -341,54 +305,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
-//    @Cacheable(value = "referenceCode", key = "#manager.id")
-//    public String getReferenceCodeCache(User manager) {
-//        String referenceCode;
-//        if (manager.getRole().equals("MANAGER")) {
-//            referenceCode = managerRepository.getReferenceCode(manager.getId());
-//        } else {
-//            referenceCode = employeeRepository.getReferenceCode(manager.getId());
-//        }
-//        return referenceCode;
-//    }
-//
-////    @Cacheable(value = "reportsByEmployee", key = "#employee.id")
-//    public List<ReportDetailedInfo> getReportsCache(User employee) {
-//        List<ReportDetailedInfo> reports = (List<ReportDetailedInfo>) redisTemplate.opsForValue().get("reportsByEmployee::" + employee.getId());
-//        if (reports == null) {
-//            reports = reportService.getReportsByEmployeeId(employee.getId());
-//            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
-//        }
-//        return reports;
-//    }
-//
-//
-//
-////    @Cacheable(value = "reportsByEmployee", key = "#employee.id")
-//    public void writeReportCache(User employee, WriteReportRequest request) {
-//        Report report = Report.builder()
-//                .title(request.getTitle())
-//                .content(request.getContent())
-//                .createdAt(Date.valueOf(LocalDate.now()))
-//                .createdBy(employee.getId())
-//                .isRead(false)
-//                .build();
-//
-//        reportService.save(report);
-//        List<ReportDetailedInfo> reports = (List<ReportDetailedInfo>) redisTemplate.opsForValue().get("reportsByEmployee::" + employee.getId());
-//        if (reports == null) {
-//            reports = reportService.getReportsByEmployeeId(employee.getId());
-//            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
-//        } else {
-//            reports.add(ReportDetailedInfo.builder()
-//                    .id(report.getId())
-//                    .title(report.getTitle())
-//                    .content(report.getContent())
-//                    .createdAt(report.getCreatedAt())
-//                    .build());
-//            redisTemplate.opsForValue().set("reportsByEmployee::" + employee.getId(), reports);
-//        }
-//    }
 }
 
 

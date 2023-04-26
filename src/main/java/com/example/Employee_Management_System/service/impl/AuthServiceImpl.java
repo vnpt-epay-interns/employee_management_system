@@ -18,7 +18,10 @@ import com.example.Employee_Management_System.model.EmployeeInformation;
 import com.example.Employee_Management_System.model.GoogleUserInfo;
 import com.example.Employee_Management_System.model.ManagerInformation;
 import com.example.Employee_Management_System.repository.UserRepository;
-import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.service.AuthService;
+import com.example.Employee_Management_System.service.EmployeeService;
+import com.example.Employee_Management_System.service.JwtService;
+import com.example.Employee_Management_System.service.ManagerService;
 import com.example.Employee_Management_System.utils.AvatarLinkCreator;
 import com.example.Employee_Management_System.utils.GoogleAPIHelper;
 import com.example.Employee_Management_System.utils.HtmlMailVerifiedCreator;
@@ -30,8 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -41,9 +42,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -60,9 +59,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeService employeeService;
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
-//    private final RedisService redisService;
     private final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
-    private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
     public ResponseEntity<Response> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -206,23 +203,8 @@ public class AuthServiceImpl implements AuthService {
         // save employee to employee table
         employeeService.save(employee);
 
-        // add employee to employee list in redis
-//        EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-//        String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
-//        List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
-//        if (employeeInformationList != null || !employeeInformationList.isEmpty()) {
-//            employeeInformationList.add(employeeInfo);
-//            redisService.cacheEmployeeList(employeeInformationList, key);
-//        }
 
         return new UserInformation(user);
-    }
-
-    private List<EmployeeInformation> convertToListOfEmployeeInformation(List<Object> employeesInRedis) {
-        Gson gson = new Gson();
-
-        return employeesInRedis.stream().map(e -> gson.fromJson(e.toString(), EmployeeInformation.class))
-                .collect(Collectors.toList());
     }
 
     private UUID generateReferenceCode() {

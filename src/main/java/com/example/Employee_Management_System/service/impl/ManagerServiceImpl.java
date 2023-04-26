@@ -1,6 +1,9 @@
 package com.example.Employee_Management_System.service.impl;
 
-import com.example.Employee_Management_System.domain.*;
+import com.example.Employee_Management_System.domain.Employee;
+import com.example.Employee_Management_System.domain.Manager;
+import com.example.Employee_Management_System.domain.Project;
+import com.example.Employee_Management_System.domain.User;
 import com.example.Employee_Management_System.dto.request.CreateProjectRequest;
 import com.example.Employee_Management_System.dto.request.CreateTaskRequest;
 import com.example.Employee_Management_System.dto.request.UpdateTaskRequest;
@@ -13,13 +16,13 @@ import com.example.Employee_Management_System.exception.ReportException;
 import com.example.Employee_Management_System.model.*;
 import com.example.Employee_Management_System.repository.ManagerRepository;
 import com.example.Employee_Management_System.repository.ProjectRepository;
-import com.example.Employee_Management_System.repository.ReportRepository;
 import com.example.Employee_Management_System.repository.UserRepository;
-import com.example.Employee_Management_System.service.*;
+import com.example.Employee_Management_System.service.EmployeeService;
+import com.example.Employee_Management_System.service.ManagerService;
+import com.example.Employee_Management_System.service.ReportService;
+import com.example.Employee_Management_System.service.TaskService;
 import com.example.Employee_Management_System.utils.CalendarHelper;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -31,14 +34,14 @@ import static com.example.Employee_Management_System.dto.response.WorkingSchedul
 @AllArgsConstructor
 public class ManagerServiceImpl implements ManagerService {
     private final ManagerRepository managerRepository;
-    private final ProjectService projectService;
+//    private final ProjectService projectService;
     private final TaskService taskService;
     private final ReportService reportService;
     private final EmployeeService employeeService;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
-    private final ReportRepository reportRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+//    private final ReportRepository reportRepository;
+//    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public ResponseEntity<Response> createTask(CreateTaskRequest request) {
@@ -356,42 +359,5 @@ public class ManagerServiceImpl implements ManagerService {
         managerRepository.save(manager);
     }
 
-
-    @Cacheable(value = "referenceCode", key = "#empl")
-    public String getReferenceCodeCache(User manager) {
-        Object dataUser = redisTemplate.opsForValue().get("referenceCode: " + manager.getId());
-        if (dataUser != null) {
-            return (String) dataUser;
-        }
-        else {
-            String referenceCode = managerRepository.getReferenceCode(manager.getId());
-            redisTemplate.opsForValue().set("referenceCode: " + manager.getId(), referenceCode);
-            return referenceCode;
-        }
-    }
-
-    @Cacheable(value = "allProject", key = "#manager")
-    public List<Project> getAllProjectCache(User manager) {
-        List<Project> allProjects = projectRepository.getAllProjectNamesByManagerId(manager.getId());
-        return allProjects;
-    }
-
-    @Cacheable(value = "allReport", key = "#manager")
-    public List<ReportDetailedInfo> getAllReportCache(User manager) {
-        List<ReportDetailedInfo> allReports = reportRepository.getAllReports(manager);
-        return allReports;
-    }
-
-    @Cacheable(value = "reportsByEmployeeID", key = "#manager")
-    public List<ReportDetailedInfo> getReportsByEmployeeId(User manager) {
-        List<ReportDetailedInfo> allReports = reportRepository.getReportsByEmployeeId(manager.getId());
-        return allReports;
-    }
-
-    @Cacheable(value = "project", key = "#manager.id")
-    public Project getProjectByIdCache(Long id) {
-        Project project = projectRepository.getProjectById(id);
-        return project;
-    }
 }
 

@@ -12,7 +12,7 @@ public interface ProjectService {
 
     void createProject(CreateProjectRequest createProjectRequest, Long managerId);
     Project getProjectById(Long id);
-    List<Project> getAllProjects();
+//    List<Project> getAllProjects();
     Project updateProject(Long id, String name, Long managerId);
     void deleteProjectById(Long id);
 

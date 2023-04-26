@@ -22,6 +22,7 @@ public class MyBatisConfig {
 
     @Value("${spring.datasource.password}")
     private String password;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
