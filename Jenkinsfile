@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'ems-be'
+        DOCKER_TAG = 'latest'
+    }
+
     triggers {
         pollSCM '* * * * *'
     }
@@ -12,19 +17,21 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean install'
-                sh 'mvn clean package'
+                sh 'docker rmi -f $DOCKER_IMAGE || true'
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
         stage('Test') {
             steps {
-                echo 'mvn test'
+                sh 'docker rm -f $DOCKER_IMAGE || true'
+                sh 'docker run -d -p 8080:8080 --name $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_TAG'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'docker build -t myapp .'
-                sh 'docker run -d -p 8080:8080 myapp'
+                sh 'docker stop $DOCKER_IMAGE || true'
+                sh 'docker rm -f $DOCKER_IMAGE || true'
+                sh 'docker run -d -p 8080:8080 --name $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_TAG'
             }
         }
     }
