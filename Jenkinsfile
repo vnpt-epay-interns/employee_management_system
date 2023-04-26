@@ -17,6 +17,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                sh 'mvn clean package'
                 sh 'docker rmi -f $DOCKER_IMAGE || true'
                 sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }

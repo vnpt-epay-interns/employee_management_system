@@ -5,7 +5,6 @@ FROM openjdk:19-jdk-alpine
 ##command line to run jar
 #ENTRYPOINT ["java", "-jar", "/Employee_Management_System-0.0.1-SNAPSHOT.jar"]
 WORKDIR /app
-RUN mvn clean package
-COPY . /app ""
+COPY . /app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "target/Employee_Management_System-0.0.1-SNAPSHOT.jar"]
