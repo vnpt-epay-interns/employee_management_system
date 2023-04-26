@@ -230,6 +230,7 @@
         from tasks t
                  join users u on t.employee_id = u.id
         where t.project_id = #{id} and t.hidden = FALSE
+        order by u.first_name, u.last_name
     </select>
 
 </mapper>
