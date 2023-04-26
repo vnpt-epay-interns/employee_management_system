@@ -44,9 +44,4 @@
 
 
     </select>
-
-
-    <select id="getProjectDetailsById" resultType="com.example.Employee_Management_System.domain.Project">
-
-    </select>
 </mapper>

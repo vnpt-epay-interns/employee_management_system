@@ -7,21 +7,13 @@ import com.example.Employee_Management_System.dto.response.TaskDetailedInfo;
 import com.example.Employee_Management_System.exception.NotFoundException;
 import com.example.Employee_Management_System.model.TaskDetailsForProject;
 import com.example.Employee_Management_System.repository.TaskRepository;
-import com.example.Employee_Management_System.service.RedisService;
 import com.example.Employee_Management_System.service.TaskService;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,15 +21,15 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
-    private final RedisService redisService;
+//    private final RedisService redisService;
     // the key for storing the single task in the redis
-    private final String REDIS_KEY_FOR_SINGLE_TASK = "single_task";
-    // the key for storing the task in the redis
-    private final String REDIS_KEY_FOR_TASK_BY_USER = "tasks_by_user";
-    // the key for storing the subtasks in the redis
-    private final String REDIS_KEY_FOR_SUBTASK = "subtasks";
+//    private final String REDIS_KEY_FOR_SINGLE_TASK = "single_task";
+//    // the key for storing the task in the redis
+//    private final String REDIS_KEY_FOR_TASK_BY_USER = "tasks_by_user";
+//    // the key for storing the subtasks in the redis
+//    private final String REDIS_KEY_FOR_SUBTASK = "subtasks";
 
-    @Cacheable(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#taskId")
+//    @Cacheable(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#taskId")
     @Override
     public TaskDetailedInfo getTaskById(Long taskId) {
         TaskDetailedInfo task = taskRepository.getTaskById(taskId);
@@ -58,16 +50,19 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDetailedInfo> getAllTasksByMangerId(Long managerId) {
-        List<TaskDetailedInfo> tasksInRedis = getAllTasksByUserIdInRedis(managerId);
+//        List<TaskDetailedInfo> tasksInRedis = getAllTasksByUserIdInRedis(managerId);
 
-        if (tasksInRedis != null && !tasksInRedis.isEmpty()) {
-            return tasksInRedis;
-        } else {
-            List<TaskDetailedInfo> tasksInDB = taskRepository.getTasksByManagerId(managerId);
-            String key = REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString();
-            redisService.cacheTasksToRedis(tasksInDB, key);
-            return tasksInDB;
-        }
+//        if (tasksInRedis != null && !tasksInRedis.isEmpty()) {
+//            return tasksInRedis;
+//        } else {
+//            List<TaskDetailedInfo> tasksInDB = taskRepository.getTasksByManagerId(managerId);
+//            String key = REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString();
+//            redisService.cacheTasksToRedis(tasksInDB, key);
+//            return tasksInDB;
+//        }
+        List<TaskDetailedInfo> tasksInDB = taskRepository.getTasksByManagerId(managerId);
+        return tasksInDB;
+
     }
 
     @Override
@@ -78,55 +73,59 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskDetailedInfo> getTasksByEmployeeId(Long employeeId) {
         // user can be either a manager or an employee
-        List<TaskDetailedInfo> employeeTasksInDB = getAllTasksByUserIdInRedis(employeeId);
+//        List<TaskDetailedInfo> employeeTasksInDB = getAllTasksByUserIdInRedis(employeeId);
 
-        // if the employee has no task, get all tasks from the database
-        if (employeeTasksInDB != null && !employeeTasksInDB.isEmpty()) {
-            return employeeTasksInDB;
-        } else {
-            // filter the tasks that the employee has
-            List<TaskDetailedInfo> employeeTaskInDB = taskRepository.getTasksByEmployeeId(employeeId);
-            // otherwise, get the tasks from the database
-            String key = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
-            redisService.cacheTasksToRedis(employeeTaskInDB, key);
-            return employeeTaskInDB;
-        }
+//        // if the employee has no task, get all tasks from the database
+//        if (employeeTasksInDB != null && !employeeTasksInDB.isEmpty()) {
+//            return employeeTasksInDB;
+//        } else {
+//            // filter the tasks that the employee has
+//            List<TaskDetailedInfo> employeeTaskInDB = taskRepository.getTasksByEmployeeId(employeeId);
+//            // otherwise, get the tasks from the database
+//            String key = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
+//            redisService.cacheTasksToRedis(employeeTaskInDB, key);
+//            return employeeTaskInDB;
+//        }
+
+        List<TaskDetailedInfo> employeeTaskInDB = taskRepository.getTasksByEmployeeId(employeeId);
+        return employeeTaskInDB;
 
 
-    }
-
-    private List<TaskDetailedInfo> getAllTasksByUserIdInRedis(Long userId) {
-
-        // get all tasks from Redis
-        String key = REDIS_KEY_FOR_TASK_BY_USER + "::" + userId.toString();
-        List<Object> allTasksInRedis = redisService.getHash(key);
-        if (allTasksInRedis.isEmpty()) {
-            return null;
-        }
-        return convertToListOfTaskDetailedInfo(allTasksInRedis);
 
     }
+//
+//    private List<TaskDetailedInfo> getAllTasksByUserIdInRedis(Long userId) {
+//
+//        // get all tasks from Redis
+//        String key = REDIS_KEY_FOR_TASK_BY_USER + "::" + userId.toString();
+//        List<Object> allTasksInRedis = redisService.getHash(key);
+//        if (allTasksInRedis.isEmpty()) {
+//            return null;
+//        }
+//        return convertToListOfTaskDetailedInfo(allTasksInRedis);
+//
+//    }
 
 
     @Transactional
-    @CacheEvict(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
+//    @CacheEvict(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
     public void hideTaskById(TaskDetailedInfo task) {
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
-        Long employeeId = task.getEmployeeId();
-        Long managerId = task.getManagerId();
-
-        // get the tasks of the employee and manager from the cache
-        List<TaskDetailedInfo> employeeTasksInRedis = getTasksByEmployeeId(employeeId);
-        List<TaskDetailedInfo> managerTasksInRedis = getAllTasksByMangerId(managerId);
-
-        // remove the task from the list
-        removeTaskFromList(employeeTasksInRedis, task);
-        removeTaskFromList(managerTasksInRedis, task);
-
-        // delete the task from the task list stored in Redis
-        redisService.cacheTasksToRedis(employeeTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString());
-        redisService.cacheTasksToRedis(managerTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString());
+//        Long employeeId = task.getEmployeeId();
+//        Long managerId = task.getManagerId();
+//
+//        // get the tasks of the employee and manager from the cache
+//        List<TaskDetailedInfo> employeeTasksInRedis = getTasksByEmployeeId(employeeId);
+//        List<TaskDetailedInfo> managerTasksInRedis = getAllTasksByMangerId(managerId);
+//
+//        // remove the task from the list
+//        removeTaskFromList(employeeTasksInRedis, task);
+//        removeTaskFromList(managerTasksInRedis, task);
+//
+//        // delete the task from the task list stored in Redis
+//        redisService.cacheTasksToRedis(employeeTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString());
+//        redisService.cacheTasksToRedis(managerTasksInRedis, REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString());
 
         // delete the task from the database
         taskRepository.deleteTaskById(task.getId());
@@ -169,7 +168,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Transactional
-    @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
+//    @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#task.id")
     @Override
     public TaskDetailedInfo saveTask(Task task) {
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
@@ -177,6 +176,7 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.saveTask(task);
         TaskDetailedInfo taskDetailedInfo = getTaskById(task.getId());// after saving the task to the database, the task object has the id
 
+        /**
         // if the task has a parent task, update the subtask cache of parent task
         if (task.getParentId() != null) {
             // save this task as the subtask for its parent task in Redis
@@ -228,7 +228,7 @@ public class TaskServiceImpl implements TaskService {
             String employeeOfParentTaskKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeIdOfParentTask.toString();
             redisService.cacheTasksToRedis(employeeTasksInRedisOfParentTask, employeeOfParentTaskKey);
         }
-
+        */
         return taskDetailedInfo;
     }
 
@@ -238,42 +238,45 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#taskDetailedInfo.id")
+//    @CachePut(value = REDIS_KEY_FOR_SINGLE_TASK, key = "#taskDetailedInfo.id")
     @Transactional
     @Override
     public TaskDetailedInfo updateTask(TaskDetailedInfo taskDetailedInfo) {
         // because a task can be stored in 3 keys, "single_tasks", "tasks::employeeId" and "tasks::managerId"
 
+        /**
         //TODO: check the employee cache
-        // get the task list stored in Redis, update the task to the list and save the list to Redis
-        Long employeeId = taskDetailedInfo.getEmployeeId();
-        List<TaskDetailedInfo> employeeTasksInRedis = getTasksByEmployeeId(employeeId);
-        updateTaskToTaskList(employeeTasksInRedis, taskDetailedInfo);
-        String taskByUserKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
-        redisService.cacheTasksToRedis(employeeTasksInRedis, taskByUserKey);
+//        // get the task list stored in Redis, update the task to the list and save the list to Redis
+//        Long employeeId = taskDetailedInfo.getEmployeeId();
+//        List<TaskDetailedInfo> employeeTasksInRedis = getTasksByEmployeeId(employeeId);
+//        updateTaskToTaskList(employeeTasksInRedis, taskDetailedInfo);
+//        String taskByUserKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + employeeId.toString();
+//        redisService.cacheTasksToRedis(employeeTasksInRedis, taskByUserKey);
+//
+//        // UPDATE THE CACHE FOR MANAGER
+//        // if the task is a subtask, update the subtask cache of parent
+//
+//        if (taskDetailedInfo.getParentId() != null) {
+//            // save this task as the subtask for its parent task in Redis
+//            String subtaskByParentIdKey = REDIS_KEY_FOR_SUBTASK + "::" + taskDetailedInfo.getParentId();
+//
+//            List<Object> subtasksOfParentTask = redisService.getHash(subtaskByParentIdKey);
+//            List<TaskDetailedInfo> subtasksOfParentTaskInRedis = convertToListOfTaskDetailedInfo(subtasksOfParentTask);
+//
+//            updateTaskToTaskList(subtasksOfParentTaskInRedis, taskDetailedInfo);
+//            redisService.cacheTasksToRedis(subtasksOfParentTaskInRedis, subtaskByParentIdKey);
+//        } else {
+//            // if the task is a parent task, update the cache for dashboard of Manager
+//            // get the task list stored in Redis, update the task to the list and save the list to Redis
+//            Long managerId = taskDetailedInfo.getManagerId();
+//            List<TaskDetailedInfo> managerTasksInRedis = getAllTasksByMangerId(managerId);
+//            updateTaskToTaskList(managerTasksInRedis, taskDetailedInfo);
+//            String taskByManagerIdKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString();
+//            redisService.cacheTasksToRedis(managerTasksInRedis, taskByManagerIdKey);
+//        }
 
-        // UPDATE THE CACHE FOR MANAGER
-        // if the task is a subtask, update the subtask cache of parent
 
-        if (taskDetailedInfo.getParentId() != null) {
-            // save this task as the subtask for its parent task in Redis
-            String subtaskByParentIdKey = REDIS_KEY_FOR_SUBTASK + "::" + taskDetailedInfo.getParentId();
-
-            List<Object> subtasksOfParentTask = redisService.getHash(subtaskByParentIdKey);
-            List<TaskDetailedInfo> subtasksOfParentTaskInRedis = convertToListOfTaskDetailedInfo(subtasksOfParentTask);
-
-            updateTaskToTaskList(subtasksOfParentTaskInRedis, taskDetailedInfo);
-            redisService.cacheTasksToRedis(subtasksOfParentTaskInRedis, subtaskByParentIdKey);
-        } else {
-            // if the task is a parent task, update the cache for dashboard of Manager
-            // get the task list stored in Redis, update the task to the list and save the list to Redis
-            Long managerId = taskDetailedInfo.getManagerId();
-            List<TaskDetailedInfo> managerTasksInRedis = getAllTasksByMangerId(managerId);
-            updateTaskToTaskList(managerTasksInRedis, taskDetailedInfo);
-            String taskByManagerIdKey = REDIS_KEY_FOR_TASK_BY_USER + "::" + managerId.toString();
-            redisService.cacheTasksToRedis(managerTasksInRedis, taskByManagerIdKey);
-        }
-
+         **/
         // save the task to the task list stored in Redis
         taskRepository.updateTask(taskDetailedInfo);
         return taskDetailedInfo;
@@ -286,14 +289,14 @@ public class TaskServiceImpl implements TaskService {
         return subtasksOfParentTaskInRedis;
     }
 
-    private void updateTaskToTaskList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo taskDetailedInfo) {
-        for (TaskDetailedInfo task : taskListInRedis) {
-            if (task.getId().equals(taskDetailedInfo.getId())) {
-                task.update(taskDetailedInfo);
-                break;
-            }
-        }
-    }
+//    private void updateTaskToTaskList(List<TaskDetailedInfo> taskListInRedis, TaskDetailedInfo taskDetailedInfo) {
+//        for (TaskDetailedInfo task : taskListInRedis) {
+//            if (task.getId().equals(taskDetailedInfo.getId())) {
+//                task.update(taskDetailedInfo);
+//                break;
+//            }
+//        }
+//    }
 
     @Override
     public User getManagerOfTask(long taskId) {
@@ -304,16 +307,16 @@ public class TaskServiceImpl implements TaskService {
     //    @Cacheable(value = REDIS_KEY_FOR_SUBTASK, key = "#parentId")
     @Override
     public List<TaskDetailedInfo> getSubTasks(long parentId) {
-        String subtaskKey = REDIS_KEY_FOR_SUBTASK + "::" + parentId;
-        List<Object> subtasksOfParentTask = redisService.getHash(subtaskKey);
-        List<TaskDetailedInfo> subtasksOfParentTaskInRedis = convertToListOfTaskDetailedInfo(subtasksOfParentTask);
-
-        if (!subtasksOfParentTaskInRedis.isEmpty()) {
-            return subtasksOfParentTaskInRedis;
-        }
+//        String subtaskKey = REDIS_KEY_FOR_SUBTASK + "::" + parentId;
+//        List<Object> subtasksOfParentTask = redisService.getHash(subtaskKey);
+//        List<TaskDetailedInfo> subtasksOfParentTaskInRedis = convertToListOfTaskDetailedInfo(subtasksOfParentTask);
+//
+//        if (!subtasksOfParentTaskInRedis.isEmpty()) {
+//            return subtasksOfParentTaskInRedis;
+//        }
 
         List<TaskDetailedInfo> subtasksOfParentTaskInDB = taskRepository.getSubTasks(parentId);
-        redisService.cacheTasksToRedis(subtasksOfParentTaskInDB, subtaskKey);
+//        redisService.cacheTasksToRedis(subtasksOfParentTaskInDB, subtaskKey);
 
         return subtasksOfParentTaskInDB;
     }

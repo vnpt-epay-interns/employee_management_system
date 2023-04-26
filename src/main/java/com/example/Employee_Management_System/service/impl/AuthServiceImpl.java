@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmployeeService employeeService;
     private final ManagerService managerService;
     private final AuthenticationManager authenticationManager;
-    private final RedisService redisService;
+//    private final RedisService redisService;
     private final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final static String REDIS_KEY_FOR_EMPLOYEE = "employees::";
 
@@ -207,13 +207,13 @@ public class AuthServiceImpl implements AuthService {
         employeeService.save(employee);
 
         // add employee to employee list in redis
-        EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
-        String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
-        List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
-        if (employeeInformationList != null || !employeeInformationList.isEmpty()) {
-            employeeInformationList.add(employeeInfo);
-            redisService.cacheEmployeeList(employeeInformationList, key);
-        }
+//        EmployeeInformation employeeInfo = new EmployeeInformation(user.id, user.firstName, user.lastName, user.email, user.avatar);
+//        String key = REDIS_KEY_FOR_EMPLOYEE + employee.getManagerId();
+//        List<EmployeeInformation> employeeInformationList = convertToListOfEmployeeInformation(redisService.getHash(key));
+//        if (employeeInformationList != null || !employeeInformationList.isEmpty()) {
+//            employeeInformationList.add(employeeInfo);
+//            redisService.cacheEmployeeList(employeeInformationList, key);
+//        }
 
         return new UserInformation(user);
     }

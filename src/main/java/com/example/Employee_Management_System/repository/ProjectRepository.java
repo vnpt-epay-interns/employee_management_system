@@ -39,8 +39,4 @@ public class ProjectRepository {
     public List<ProjectBriefInformation> getAllProjectInformationByManagerId(Long managerId) {
         return projectMapper.getAllProjectInformationByManagerId(managerId);
     }
-
-    public Project getProjectDetailsById(Long id, Long managerId) {
-        return projectMapper.getProjectDetailsById(id, managerId);
-    }
 }

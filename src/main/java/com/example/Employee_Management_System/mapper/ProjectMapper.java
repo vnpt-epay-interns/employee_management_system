@@ -27,6 +27,4 @@ public interface ProjectMapper {
 
 
     List<ProjectBriefInformation> getAllProjectInformationByManagerId(Long managerId);
-
-    Project getProjectDetailsById(Long id, Long managerId);
 }
