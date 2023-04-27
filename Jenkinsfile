@@ -26,14 +26,14 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'docker rm -f $DOCKER_IMAGE || true'
-                sh 'docker run -d -p 8080:8080 --name $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_TAG'
+                sh 'docker run -d -p 8081:8080 --name $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_TAG'
             }
         }
         stage('Deploy') {
             steps {
                 sh 'docker stop $DOCKER_IMAGE || true'
                 sh 'docker rm -f $DOCKER_IMAGE || true'
-                sh 'docker run -d -p 8080:8080 --name $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_TAG'
+                sh 'docker run -d -p 8081:8080 --name $DOCKER_IMAGE $DOCKER_IMAGE:$DOCKER_TAG'
             }
         }
     }
